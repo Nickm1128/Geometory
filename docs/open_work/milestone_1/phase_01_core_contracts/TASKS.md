@@ -6,11 +6,11 @@
   - Definition of done: resolve the public research-schedule assumption; define global player-turn 80 draw semantics, source sequences, accepted/rejected histories, canonical serialization/hash fields, friendly merge behavior, and visible-strength policy; add failing contract tests before implementation.
   - Evidence: 2026-07-19 authority reconciliation locked 80-turn draw, public seeded research schedule, per-player accepted source sequences, stable merge semantics, canonical SHA-256 scope, and fogged enemy strength bands in assumptions/rules/design/contracts; baseline core suite passed, then focused red suite failed exactly 7 intended assertions (rejected-history/diagnostic, turn/sequence, fog strength/path, hash API) before implementation.
 
-- [ ] `M1-P01-T02` Centralize strict command validation and accepted-command history.
+- [x] `M1-P01-T02` Centralize strict command validation and accepted-command history.
   - Dependencies: M1-P01-T01
   - Can run early: No
   - Definition of done: validate required keys/types, player, turn, phase, monotonic source sequence, allocation ranges/bank, stack ownership/liveness, waypoint IDs, append/replace mode, and duplicates; rejected commands produce diagnostics but never enter replay or mutate state.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 centralized pre-mutation validator now requires common/type-specific keys and types, current player/turn/phase, positive accepted-only per-player sequence, allocation/bank, live ownership, valid waypoint IDs, and valid mode; accepted commands are copied only after resolution and rejected diagnostics are stable. Focused assertions pass; full core suite retains exactly 3 intentional T04/T05 red assertions (hash and fog) with no engine errors.
 
 - [ ] `M1-P01-T03` Correct movement-edge validation, friendly merges, combat ordering, and post-resolution control.
   - Dependencies: M1-P01-T01, M1-P01-T02

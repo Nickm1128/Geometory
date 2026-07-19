@@ -134,6 +134,12 @@ func _test_p01_contract_red_cases(configs: Dictionary) -> void:
   sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-3_0"], "mode": "replace", "client_sequence": 8})
   result = sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-2_0"], "mode": "replace", "client_sequence": 8})
   _assert(not result["ok"], "contract: duplicate accepted source sequence is rejected")
+  result = sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-2_0"], "mode": "invalid", "client_sequence": 9})
+  _assert(not result["ok"] and result["code"] == "invalid_path_mode", "contract: invalid path mode is diagnosed before mutation")
+  result = sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["missing_tile"], "mode": "replace", "client_sequence": 9})
+  _assert(not result["ok"] and result["code"] == "invalid_waypoint", "contract: unknown waypoint is diagnosed before mutation")
+  result = sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-2_0"], "mode": "replace", "client_sequence": 9})
+  _assert(result["ok"], "contract: rejected sequence is reusable because it was never accepted")
 
   var fog = GameCoreScript.new()
   fog.setup(configs["rules"], configs["map"], 104)

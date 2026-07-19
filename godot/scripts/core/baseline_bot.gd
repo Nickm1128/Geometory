@@ -7,9 +7,11 @@ const PHASE_MOVEMENT = "movement"
 const NEUTRAL = "neutral"
 
 var profile: Dictionary = {}
+var next_client_sequence := 1
 
 func setup(new_profile: Dictionary) -> void:
   profile = new_profile.duplicate(true)
+  next_client_sequence = 1
 
 func build_turn_commands(core, player_id: String) -> Array[Dictionary]:
   var commands: Array[Dictionary] = []
@@ -22,7 +24,7 @@ func build_turn_commands(core, player_id: String) -> Array[Dictionary]:
     "player_id": player_id,
     "turn": obs["turn"],
     "phase": PHASE_MOVEMENT,
-    "client_sequence": 9000 + int(obs["turn"])
+    "client_sequence": _next_sequence()
   })
   return commands
 
@@ -52,7 +54,7 @@ func _allocation_command(core, obs: Dictionary) -> Dictionary:
     "economy_cents": economy,
     "military_cents": military,
     "research_cents": research,
-    "client_sequence": 8000 + turn
+    "client_sequence": _next_sequence()
   }
 
 func _movement_commands(core, obs: Dictionary) -> Array[Dictionary]:
@@ -77,7 +79,7 @@ func _movement_commands(core, obs: Dictionary) -> Array[Dictionary]:
       "stack_id": stack_id,
       "waypoints": [target],
       "mode": "append",
-      "client_sequence": 8100 + result.size()
+      "client_sequence": _next_sequence()
     })
   return result
 
@@ -109,3 +111,8 @@ func _nearest_tile(core, player_id: String, from_tile: String, tiles: Dictionary
 
 func _snap_to_100(value: int) -> int:
   return int(floor(float(value) / 100.0)) * 100
+
+func _next_sequence() -> int:
+  var value = next_client_sequence
+  next_client_sequence += 1
+  return value

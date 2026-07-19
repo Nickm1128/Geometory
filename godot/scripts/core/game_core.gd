@@ -29,7 +29,9 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
     "stacks": {},
     "research_schedule": [],
     "replay_events": [],
-    "command_history": [],
+    "accepted_command_history": [],
+    "rejected_command_diagnostics": [],
+    "last_accepted_client_sequence": {PLAYER_HUMAN: 0, PLAYER_BOT: 0},
     "next_stack_index": 1,
     "next_cohort_index": 1
   }
@@ -79,24 +81,106 @@ func calculate_income(player_id: String) -> Dictionary:
   return {"own": own, "foreign": foreign, "base": base, "bonus_bps": bonus, "final": final_income}
 
 func apply_command(command: Dictionary) -> Dictionary:
-  if state.get("game_over", false):
-    return _command_result(false, "match is over")
-  var player_id = String(command.get("player_id", ""))
-  if player_id != state["active_player"]:
-    return _command_result(false, "not active player")
-  if String(command.get("phase", "")) != state["phase"]:
-    return _command_result(false, "wrong phase")
-  var command_type = String(command.get("type", ""))
-  state["command_history"].append(command.duplicate(true))
+  var validation := _validate_command(command)
+  if not bool(validation["ok"]):
+    return _reject_command(command, String(validation["code"]), String(validation["message"]))
+  var command_type: String = command["type"]
+  var result: Dictionary = {}
   match command_type:
     "allocate_resources":
-      return _apply_allocate(command)
+      result = _apply_allocate(command)
     "queue_stack_path":
-      return _apply_queue_path(command)
+      result = _apply_queue_path(command)
     "end_phase":
-      return _apply_end_phase(command)
+      result = _apply_end_phase(command)
     _:
-      return _command_result(false, "unknown command")
+      return _reject_command(command, "unknown_command", "unknown command")
+  if not bool(result["ok"]):
+    return _reject_command(command, "resolution_rejected", String(result["message"]))
+  _accept_command(command)
+  return result
+
+func _validate_command(command: Dictionary) -> Dictionary:
+  if state.get("game_over", false):
+    return _validation_failure("match_over", "match is over")
+  for key in ["type", "player_id", "turn", "phase", "client_sequence"]:
+    if not command.has(key):
+      return _validation_failure("missing_%s" % key, "missing required field: %s" % key)
+  if typeof(command["type"]) != TYPE_STRING or String(command["type"]).is_empty():
+    return _validation_failure("invalid_type", "type must be a non-empty string")
+  if typeof(command["player_id"]) != TYPE_STRING or not state["players"].has(command["player_id"]):
+    return _validation_failure("invalid_player", "player_id must name a known player")
+  if typeof(command["turn"]) != TYPE_INT or int(command["turn"]) != int(state["turn"]):
+    return _validation_failure("wrong_turn", "command turn does not match current turn")
+  if typeof(command["phase"]) != TYPE_STRING or String(command["phase"]) != String(state["phase"]):
+    return _validation_failure("wrong_phase", "command phase does not match current phase")
+  var player_id: String = command["player_id"]
+  if player_id != state["active_player"]:
+    return _validation_failure("inactive_player", "not active player")
+  if typeof(command["client_sequence"]) != TYPE_INT or int(command["client_sequence"]) <= 0:
+    return _validation_failure("invalid_client_sequence", "client_sequence must be a positive integer")
+  var last_sequence = int(state["last_accepted_client_sequence"].get(player_id, 0))
+  if int(command["client_sequence"]) <= last_sequence:
+    return _validation_failure("stale_client_sequence", "client_sequence must increase after the last accepted command")
+  match String(command["type"]):
+    "allocate_resources":
+      return _validate_allocate_command(command, player_id)
+    "queue_stack_path":
+      return _validate_queue_path_command(command, player_id)
+    "end_phase":
+      return _validation_success()
+    _:
+      return _validation_failure("unknown_command", "unknown command")
+
+func _validate_allocate_command(command: Dictionary, player_id: String) -> Dictionary:
+  var total = 0
+  for key in ["economy_cents", "military_cents", "research_cents"]:
+    if not command.has(key) or typeof(command[key]) != TYPE_INT or int(command[key]) < 0:
+      return _validation_failure("invalid_%s" % key, "%s must be a non-negative integer" % key)
+    total += int(command[key])
+  if total > int(state["players"][player_id]["bank_cents"]):
+    return _validation_failure("spend_exceeds_bank", "spend exceeds bank")
+  return _validation_success()
+
+func _validate_queue_path_command(command: Dictionary, player_id: String) -> Dictionary:
+  if not command.has("stack_id") or typeof(command["stack_id"]) != TYPE_STRING or not state["stacks"].has(command["stack_id"]):
+    return _validation_failure("invalid_stack", "stack_id must name a living owned stack")
+  var stack: Dictionary = state["stacks"][command["stack_id"]]
+  if String(stack["owner"]) != player_id or _stack_health(stack) <= 0:
+    return _validation_failure("invalid_stack", "stack_id must name a living owned stack")
+  if not command.has("mode") or typeof(command["mode"]) != TYPE_STRING or String(command["mode"]) not in ["append", "replace"]:
+    return _validation_failure("invalid_path_mode", "mode must be append or replace")
+  if not command.has("waypoints") or typeof(command["waypoints"]) != TYPE_ARRAY:
+    return _validation_failure("invalid_waypoints", "waypoints must be an array")
+  var seen = {}
+  for waypoint in command["waypoints"]:
+    if typeof(waypoint) != TYPE_STRING or not state["tiles"].has(waypoint):
+      return _validation_failure("invalid_waypoint", "each waypoint must name a known tile")
+    if seen.has(waypoint):
+      return _validation_failure("duplicate_waypoint", "waypoints must not repeat a tile")
+    seen[waypoint] = true
+  return _validation_success()
+
+func _validation_success() -> Dictionary:
+  return {"ok": true, "code": "", "message": ""}
+
+func _validation_failure(code: String, message: String) -> Dictionary:
+  return {"ok": false, "code": code, "message": message}
+
+func _accept_command(command: Dictionary) -> void:
+  var accepted: Dictionary = command.duplicate(true)
+  state["accepted_command_history"].append(accepted)
+  state["last_accepted_client_sequence"][accepted["player_id"]] = accepted["client_sequence"]
+
+func _reject_command(command: Dictionary, code: String, message: String) -> Dictionary:
+  state["rejected_command_diagnostics"].append({
+    "command": command.duplicate(true),
+    "code": code,
+    "message": message,
+    "turn": state.get("turn", 0),
+    "phase": state.get("phase", "")
+  })
+  return _command_result(false, message, code)
 
 func visible_tile_ids(player_id: String) -> Dictionary:
   var visible = {}
@@ -672,8 +756,8 @@ func _event_to_text(event: Dictionary) -> String:
     _:
       return "T%d %s" % [event.get("turn", 0), event.get("type", "event")]
 
-func _command_result(ok: bool, message: String) -> Dictionary:
-  return {"ok": ok, "message": message}
+func _command_result(ok: bool, message: String, code: String = "") -> Dictionary:
+  return {"ok": ok, "message": message, "code": code}
 
 func _deterministic_range(stream: String, index: int, min_value: int, max_value: int) -> int:
   var span = max_value - min_value + 1

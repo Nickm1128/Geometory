@@ -167,6 +167,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: update strict command validation and accepted/rejected histories for `M1-P01-T02`.
 
+### M1-RUN-20260719-001 / M1-P01-T02 strict-command boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T02 boundary.
+- Files or artifacts: central validator/accepted and rejected histories in `game_core.gd`; monotonic bot sequence in `baseline_bot.gd`; contract tests.
+- Decisions: validate complete common/type-specific schema before execution; diagnostics are non-gameplay state; rejected sequences are reusable; accepted sequence advances only on acceptance.
+- Validation and exact result: pinned core suite shows all T02 assertions PASS and exactly 3 remaining intentional T04/T05 failures, with no engine errors.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: implement `M1-P01-T03` movement/combat/control contract.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

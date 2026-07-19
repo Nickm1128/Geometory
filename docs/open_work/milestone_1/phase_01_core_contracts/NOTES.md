@@ -23,3 +23,11 @@ Append-only. No implementation entries yet.
 - Validation: the pre-change pinned core suite passed. The post-change focused red suite failed with exactly seven intended contract assertions: rejected legacy history, rejected diagnostic, mismatched turn, duplicate sequence, missing strength band, leaked exact enemy/path values, and missing canonical hash API. No engine parse/crash errors occurred.
 - Blockers or risks: none; the red suite is the intentional implementation boundary, not a phase gate result.
 - Exact next action: implement `M1-P01-T02` centralized strict validation and accepted/rejected command recording until the command-related red assertions pass.
+
+## 2026-07-19 — M1-P01-T02 strict-command boundary
+
+- Status: Complete. `GameCore` now validates an entire command before mutation, stores only accepted deep copies in `accepted_command_history`, retains separate stable rejected diagnostics, and advances per-player source sequence only after acceptance.
+- Files changed: `godot/scripts/core/game_core.gd`, `godot/scripts/core/baseline_bot.gd`, and `godot/tests/run_core_tests.gd`.
+- Validation: focused command assertions pass for rejected legacy/accepted history separation, diagnostics, no gameplay mutation, turn, duplicate/reusable sequence, invalid path mode, and unknown waypoint. The pinned full suite has exactly three remaining intentional red assertions owned by T04/T05 (canonical hash and fogged enemy strength/path), with no parser/crash error.
+- Blockers or risks: none. The bot now owns a monotonically increasing local command sequence; its direct `GameCore` parameter remains T05 work.
+- Exact next action: implement `M1-P01-T03` movement-edge validation, deterministic friendly merges, combat/control ordering, and focused tests.
