@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "map_id": "alpha_handcrafted",
+  "display_name": "Alpha Handcrafted",
+  "coordinate_system": "axial_qr",
+  "status": "mvp_alpha_medium",
+  "board_radius": 6,
+  "home_radius": 2,
+  "intended_players_v1": 2,
+  "intended_players_future": 6,
+  "generation_note": "Alpha Medium is generated as a full axial hex radius-6 board. Home regions are radius-2 around each capital; all other tiles are neutral.",
+  "regions": [
+    {
+      "region_id": "R_HOME_P1",
+      "type": "home",
+      "home_owner": "P1",
+      "center": { "q": -4, "r": 0 },
+      "micro_radius": 2,
+      "capital_tile_id": "CAP_P1",
+      "perimeter_walls": true
+    },
+    {
+      "region_id": "R_NEUTRAL_CENTER",
+      "type": "neutral",
+      "home_owner": "neutral",
+      "center": { "q": 0, "r": 0 },
+      "micro_radius": 6,
+      "capital_tile_id": null,
+      "perimeter_walls": false
+    },
+    {
+      "region_id": "R_HOME_P2",
+      "type": "home",
+      "home_owner": "P2",
+      "center": { "q": 4, "r": 0 },
+      "micro_radius": 2,
+      "capital_tile_id": "CAP_P2",
+      "perimeter_walls": true
+    }
+  ],
+  "player_starts": [
+    { "player_id": "P1", "home_region_id": "R_HOME_P1", "capital_tile_id": "CAP_P1" },
+    { "player_id": "P2", "home_region_id": "R_HOME_P2", "capital_tile_id": "CAP_P2" }
+  ]
+}

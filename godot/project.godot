@@ -1,0 +1,22 @@
+﻿; Engine configuration file.
+; This scaffold targets Godot 4.x. Confirm the installed editor version before implementation.
+
+config_version=5
+
+[application]
+config/name="Geometory"
+run/main_scene="res://scenes/main/Main.tscn"
+config/features=PackedStringArray("4.5", "Mobile")
+config/icon="res://icon.svg"
+
+[display]
+window/size/viewport_width=393
+window/size/viewport_height=852
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

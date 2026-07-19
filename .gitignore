@@ -1,0 +1,27 @@
+# Godot generated folders
+.godot/
+.import/
+export.cfg
+export_credentials.cfg
+*.translation
+
+# Build/export output
+build/
+exports/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Local/editor files
+.vscode/
+.idea/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Simulation/training artifacts
+artifacts/
+reports/generated/
+replays/generated/

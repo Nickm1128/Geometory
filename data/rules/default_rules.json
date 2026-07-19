@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "ruleset_id": "default_v1",
+  "money_unit": "cents",
+  "basis_points_scale": 10000,
+  "match": {
+    "max_players": 6,
+    "mvp_players": 2,
+    "target_minutes_min": 10,
+    "target_minutes_max": 20,
+    "turn_model": "sequential_player_turns",
+    "phases": ["allocation", "movement"],
+    "capital_capture_eliminates_player": true,
+    "starting_bank_cents": 900,
+    "starting_soldiers_per_capital": 5,
+    "max_turns": 80
+  },
+  "income": {
+    "own_home_tile_cents": 100,
+    "foreign_or_neutral_tile_cents": 50
+  },
+  "economy": {
+    "compounds": false,
+    "economy_bonus_unit_cost_cents": 100,
+    "economy_bonus_bps_per_unit": 50,
+    "economy_bonus_cap_bps": 2000
+  },
+  "research": {
+    "research_point_cost_cents": 100,
+    "schedule_turns_to_generate": 80,
+    "health_bps_per_point_min": 100,
+    "health_bps_per_point_max": 400,
+    "damage_bps_per_point_min": 100,
+    "damage_bps_per_point_max": 400,
+    "max_total_health_bonus_bps": 20000,
+    "max_total_damage_bonus_bps": 20000,
+    "schedule_public": true
+  },
+  "military": {
+    "soldier_cost_cents": 300,
+    "spawn_delay_own_turns": 1,
+    "spawn_tile": "capital"
+  },
+  "soldier": {
+    "base_health": 100,
+    "base_damage_mean": 100,
+    "base_damage_stddev": 10,
+    "movement_tiles_per_own_turn": 1,
+    "stack_model": "cohorts"
+  },
+  "walls": {
+    "home_perimeter_walls_enabled": true,
+    "wall_max_health": 1000,
+    "destroyed_walls_respawn": false,
+    "blocks_enemy_movement": true
+  },
+  "fog_of_war": {
+    "visible_controlled_tiles": true,
+    "visible_adjacent_to_controlled_tiles": true,
+    "visible_own_occupied_tiles": true,
+    "bots_use_same_observable_state": true
+  },
+  "combat": {
+    "model": "deterministic_pairwise_exchange",
+    "max_exchanges_per_tile_per_turn": 100,
+    "damage_rng_stream": "combat",
+    "multi_faction_tiebreaker": "tile_controller_then_player_id",
+    "damage_application_order": "oldest_cohort_first"
+  },
+  "movement": {
+    "capture_model": "pass_through",
+    "path_queue_max_waypoints": 8,
+    "blocked_path_behavior": "stop_and_keep_queue",
+    "survivors_continue_queue": true
+  },
+  "ui": {
+    "theme": "dark_tactical",
+    "default_ui_scale": 1.0,
+    "show_context_tips": true,
+    "reduce_motion_default": false,
+    "player_colors": {
+      "P1": "#35C7FF",
+      "P2": "#FF5A66",
+      "neutral": "#6D7484"
+    }
+  },
+  "android_export": {
+    "package_unique_name": "com.milin.geometory",
+    "display_name": "Geometory",
+    "orientation": "portrait",
+    "min_sdk": 23,
+    "target_sdk": 36
+  }
+}
