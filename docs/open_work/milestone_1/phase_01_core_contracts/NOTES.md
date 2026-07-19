@@ -131,3 +131,11 @@ Append-only. No implementation entries yet.
 - Validation: the red pinned-core run failed exactly one intended assertion because raw visible combat events exposed exact damage plus nested enemy-strength/path fields. The repaired pinned suite passed the recursive privacy assertion and all existing bot-observable/command contracts without parser or engine errors.
 - Blockers or risks: no simulator evaluation was claimed or invented; P01 owns the production fog interface and P02 owns a runner.
 - Exact next action: start reopened `M1-P01-T06` by auditing substantive ownership still retained in `GameCore`, then extract real command, movement, combat, fog, hashing/RNG, and turn-resolution behavior.
+
+## 2026-07-19 - M1-P01-T06 substantive extraction repair
+
+- Status: Complete. `GameCore` is now a 525-line deterministic facade; command validation, movement/merge, combat/control/damage, fog projection, canonical hashing, named RNG derivation, and turn-start/end/cap/elimination/draw decisions have real scene-free owners. Removed duplicate legacy combat, hash, RNG, and turn-advance paths.
+- Files changed: `godot/scripts/core/{game_core,command_rules,movement_rules,combat_rules,fog_rules,state_hasher,turn_resolver,rng_rules}.gd` and `godot/scripts/core/README.md`.
+- Validation: `tools/run_core_tests.ps1` under pinned Godot 4.6.3 passed with `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; the three-size headless UI smoke matrix passed; `tools/sync_godot_data.ps1 -Mode Check` reported root/runtime parity; and `git diff --check` passed.
+- Blockers or risks: none.
+- Exact next action: complete `M1-P01-T07` missing focused regression coverage, two full identical hash runs, fresh phase review, hygiene, tag publication, and P02 activation.

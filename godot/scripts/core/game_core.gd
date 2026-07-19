@@ -8,6 +8,7 @@ const MovementRules = preload("res://scripts/core/movement_rules.gd")
 const CombatRules = preload("res://scripts/core/combat_rules.gd")
 const CommandRules = preload("res://scripts/core/command_rules.gd")
 const FogRules = preload("res://scripts/core/fog_rules.gd")
+const RngRules = preload("res://scripts/core/rng_rules.gd")
 
 const PLAYER_HUMAN = "P1"
 const PLAYER_BOT = "P2"
@@ -122,71 +123,7 @@ func apply_command(command: Dictionary) -> Dictionary:
   return result
 
 func _validate_command(command: Dictionary) -> Dictionary:
-  if state.get("game_over", false):
-    return _validation_failure("match_over", "match is over")
-  var missing_field = CommandRules.missing_common_field(command)
-  if not missing_field.is_empty():
-    return _validation_failure("missing_%s" % missing_field, "missing required field: %s" % missing_field)
-  if typeof(command["type"]) != TYPE_STRING or String(command["type"]).is_empty():
-    return _validation_failure("invalid_type", "type must be a non-empty string")
-  if typeof(command["player_id"]) != TYPE_STRING or not state["players"].has(command["player_id"]):
-    return _validation_failure("invalid_player", "player_id must name a known player")
-  if typeof(command["turn"]) != TYPE_INT or int(command["turn"]) != int(state["turn"]):
-    return _validation_failure("wrong_turn", "command turn does not match current turn")
-  if typeof(command["phase"]) != TYPE_STRING or String(command["phase"]) != String(state["phase"]):
-    return _validation_failure("wrong_phase", "command phase does not match current phase")
-  var player_id: String = command["player_id"]
-  if player_id != state["active_player"]:
-    return _validation_failure("inactive_player", "not active player")
-  if typeof(command["client_sequence"]) != TYPE_INT or int(command["client_sequence"]) <= 0:
-    return _validation_failure("invalid_client_sequence", "client_sequence must be a positive integer")
-  var last_sequence = int(state["last_accepted_client_sequence"].get(player_id, 0))
-  if int(command["client_sequence"]) <= last_sequence:
-    return _validation_failure("stale_client_sequence", "client_sequence must increase after the last accepted command")
-  match String(command["type"]):
-    "allocate_resources":
-      return _validate_allocate_command(command, player_id)
-    "queue_stack_path":
-      return _validate_queue_path_command(command, player_id)
-    "end_phase":
-      return _validation_success()
-    _:
-      return _validation_failure("unknown_command", "unknown command")
-
-func _validate_allocate_command(command: Dictionary, player_id: String) -> Dictionary:
-  var total = 0
-  for key in ["economy_cents", "military_cents", "research_cents"]:
-    if not command.has(key) or typeof(command[key]) != TYPE_INT or int(command[key]) < 0:
-      return _validation_failure("invalid_%s" % key, "%s must be a non-negative integer" % key)
-    total += int(command[key])
-  if total > int(state["players"][player_id]["bank_cents"]):
-    return _validation_failure("spend_exceeds_bank", "spend exceeds bank")
-  return _validation_success()
-
-func _validate_queue_path_command(command: Dictionary, player_id: String) -> Dictionary:
-  if not command.has("stack_id") or typeof(command["stack_id"]) != TYPE_STRING or not state["stacks"].has(command["stack_id"]):
-    return _validation_failure("invalid_stack", "stack_id must name a living owned stack")
-  var stack: Dictionary = state["stacks"][command["stack_id"]]
-  if String(stack["owner"]) != player_id or _stack_health(stack) <= 0:
-    return _validation_failure("invalid_stack", "stack_id must name a living owned stack")
-  if not command.has("mode") or not CommandRules.is_valid_path_mode(command["mode"]):
-    return _validation_failure("invalid_path_mode", "mode must be append or replace")
-  if not command.has("waypoints") or typeof(command["waypoints"]) != TYPE_ARRAY:
-    return _validation_failure("invalid_waypoints", "waypoints must be an array")
-  var seen = {}
-  for waypoint in command["waypoints"]:
-    if typeof(waypoint) != TYPE_STRING or not state["tiles"].has(waypoint):
-      return _validation_failure("invalid_waypoint", "each waypoint must name a known tile")
-    if seen.has(waypoint):
-      return _validation_failure("duplicate_waypoint", "waypoints must not repeat a tile")
-    seen[waypoint] = true
-  return _validation_success()
-
-func _validation_success() -> Dictionary:
-  return {"ok": true, "code": "", "message": ""}
-
-func _validation_failure(code: String, message: String) -> Dictionary:
-  return {"ok": false, "code": code, "message": message}
+  return CommandRules.validate_command(state, command, _stack_health)
 
 func _accept_command(command: Dictionary) -> void:
   var accepted: Dictionary = command.duplicate(true)
@@ -204,78 +141,10 @@ func _reject_command(command: Dictionary, code: String, message: String) -> Dict
   return _command_result(false, message, code)
 
 func visible_tile_ids(player_id: String) -> Dictionary:
-  var visible = {}
-  for tile_id in state["tiles"].keys():
-    var tile: Dictionary = state["tiles"][tile_id]
-    if tile["controlled_by"] == player_id:
-      visible[tile_id] = true
-      for neighbor_id in get_neighbor_tile_ids(tile_id):
-        visible[neighbor_id] = true
-  for stack in state["stacks"].values():
-    if stack["owner"] == player_id:
-      visible[stack["tile_id"]] = true
-  return visible
+  return FogRules.visible_tile_ids(state, player_id, get_neighbor_tile_ids)
 
 func observable_state(player_id: String) -> Dictionary:
-  if not state["players"].has(player_id):
-    return {}
-  var visible = visible_tile_ids(player_id)
-  var tiles = {}
-  for tile_id in visible.keys():
-    if state["tiles"].has(tile_id):
-      tiles[tile_id] = state["tiles"][tile_id].duplicate(true)
-  var stacks = {}
-  for stack_id in state["stacks"].keys():
-    var stack: Dictionary = state["stacks"][stack_id]
-    if stack["owner"] == player_id:
-      stacks[stack_id] = stack.duplicate(true)
-    elif visible.has(stack["tile_id"]):
-      stacks[stack_id] = _observable_enemy_stack(stack)
-  var walls = {}
-  for wall_id in state["walls"].keys():
-    var wall: Dictionary = state["walls"][wall_id]
-    if visible.has(wall["from"]) or visible.has(wall["to"]):
-      walls[wall_id] = wall.duplicate(true)
-  return {
-    "seed": state["seed"],
-    "turn": state["turn"],
-    "active_player": state["active_player"],
-    "phase": state["phase"],
-    "player_id": player_id,
-    "player": state["players"][player_id].duplicate(true),
-    "tiles": tiles,
-    "walls": walls,
-    "stacks": stacks,
-    "research_schedule": state["research_schedule"].duplicate(true),
-    "public_rules": rules.duplicate(true),
-    "visible_events": _visible_events(player_id, visible)
-  }
-
-func _observable_enemy_stack(stack: Dictionary) -> Dictionary:
-  return {
-    "id": stack["id"],
-    "owner": stack["owner"],
-    "tile_id": stack["tile_id"],
-    "strength_band": FogRules.strength_band(_stack_soldier_count(stack))
-  }
-
-func _visible_events(player_id: String, visible: Dictionary) -> Array:
-  var result: Array = []
-  for event in state["replay_events"]:
-    var is_visible = false
-    if String(event.get("player_id", "")) == player_id:
-      is_visible = true
-    elif event.has("tile_id") and visible.has(String(event["tile_id"])):
-      is_visible = true
-    elif event.has("wall_id") and state["walls"].has(String(event["wall_id"])):
-      var wall: Dictionary = state["walls"][String(event["wall_id"])]
-      if visible.has(String(wall["from"])) or visible.has(String(wall["to"])):
-        is_visible = true
-    if is_visible:
-      var projected = FogRules.project_visible_event(event)
-      if not projected.is_empty():
-        result.append(projected)
-  return result
+  return FogRules.observable_state(state, rules, player_id, get_neighbor_tile_ids)
 
 func get_neighbor_tile_ids(tile_id: String) -> Array[String]:
   var coord = HexUtils.parse_tile_id(tile_id)
@@ -405,13 +274,7 @@ func _apply_end_phase(command: Dictionary) -> Dictionary:
   if state["phase"] == PHASE_ALLOCATION:
     state["phase"] = PHASE_MOVEMENT
     return _command_result(true, "movement phase")
-  _resolve_player_movement(player_id)
-  _merge_same_owner_stacks()
-  _resolve_all_combats()
-  _apply_post_resolution_control()
-  _check_eliminations()
-  if not state.get("game_over", false):
-    _advance_to_next_player()
+  TurnResolver.resolve_end_phase(state, rules, player_id, PLAYER_HUMAN, PLAYER_BOT, _resolve_player_movement, _merge_same_owner_stacks, _resolve_all_combats, _apply_post_resolution_control, _check_eliminations, _begin_player_turn, _end_match_as_draw)
   return _command_result(true, "turn ended")
 
 func _generate_research_schedule() -> void:
@@ -419,8 +282,8 @@ func _generate_research_schedule() -> void:
   var turns = int(rules["research"].get("schedule_turns_to_generate", 80))
   for i in range(turns):
     var turn_index = i + 1
-    var h = _deterministic_range("research", "turn:%d:health" % turn_index, int(rules["research"]["health_bps_per_point_min"]), int(rules["research"]["health_bps_per_point_max"]))
-    var d = _deterministic_range("research", "turn:%d:damage" % turn_index, int(rules["research"]["damage_bps_per_point_min"]), int(rules["research"]["damage_bps_per_point_max"]))
+    var h = RngRules.deterministic_range(int(state["seed"]), state["rng_streams"], "research", "turn:%d:health" % turn_index, int(rules["research"]["health_bps_per_point_min"]), int(rules["research"]["health_bps_per_point_max"]))
+    var d = RngRules.deterministic_range(int(state["seed"]), state["rng_streams"], "research", "turn:%d:damage" % turn_index, int(rules["research"]["damage_bps_per_point_min"]), int(rules["research"]["damage_bps_per_point_max"]))
     state["research_schedule"].append({"health_bps_per_point": h, "damage_bps_per_point": d})
 
 func _generate_alpha_medium_map() -> void:
@@ -512,53 +375,10 @@ func _create_starting_stacks() -> void:
     _add_soldiers_to_tile(player_id, state["players"][player_id]["capital_tile_id"], count)
 
 func _begin_player_turn(player_id: String) -> void:
-  state["active_player"] = player_id
-  state["phase"] = PHASE_ALLOCATION
-  var player: Dictionary = state["players"][player_id]
-  if String(state["tiles"][player["capital_tile_id"]]["controlled_by"]) != player_id:
-    _eliminate_player(player_id, String(state["tiles"][player["capital_tile_id"]]["controlled_by"]))
-    return
-  var pending = int(player["pending_soldiers"])
-  if pending > 0:
-    _add_soldiers_to_tile(player_id, player["capital_tile_id"], pending)
-    player["pending_soldiers"] = 0
-    _event("soldiers_spawned", {"player_id": player_id, "tile_id": player["capital_tile_id"], "soldiers": pending})
-  player["active_economy_bonus_bps"] = int(player["next_economy_bonus_bps"])
-  player["next_economy_bonus_bps"] = 0
-  var income = calculate_income(player_id)
-  player["bank_cents"] = int(player["bank_cents"]) + int(income["final"])
-  _event("income_added", {"player_id": player_id, "income": income, "bank_cents": player["bank_cents"]})
-
-func _advance_to_next_player() -> void:
-  if TurnResolver.reaches_turn_cap(state, rules):
-    _end_match_as_draw()
-    return
-  var current = String(state["active_player"])
-  var next = TurnResolver.next_active_player(current, PLAYER_HUMAN, PLAYER_BOT, state["players"])
-  state["turn"] = int(state["turn"]) + 1
-  _begin_player_turn(next)
+  TurnResolver.begin_player_turn(state, player_id, PHASE_ALLOCATION, calculate_income, _add_soldiers_to_tile, _eliminate_player, _event)
 
 func _resolve_player_movement(player_id: String) -> void:
-  var stack_ids = state["stacks"].keys()
-  stack_ids.sort()
-  for stack_id in stack_ids:
-    if not state["stacks"].has(stack_id):
-      continue
-    var stack: Dictionary = state["stacks"][stack_id]
-    if stack["owner"] != player_id or stack.get("waypoints", []).is_empty():
-      continue
-    var from_tile = String(stack["tile_id"])
-    var to_tile = String(stack["waypoints"][0])
-    if not MovementRules.executed_edge_is_valid(state, from_tile, to_tile, get_neighbor_tile_ids(from_tile)):
-      _event("movement_blocked", {"stack_id": stack_id, "player_id": player_id, "from": from_tile, "to": to_tile, "reason": "invalid_edge"})
-      continue
-    var wall_id = HexUtils.edge_id(from_tile, to_tile)
-    if _is_wall_blocking(wall_id, player_id):
-      _attack_wall(stack_id, wall_id)
-      continue
-    stack["tile_id"] = to_tile
-    stack["waypoints"].pop_front()
-    _event("stack_moved", {"stack_id": stack_id, "player_id": player_id, "from": from_tile, "to": to_tile})
+  MovementRules.resolve_player_movement(state, player_id, get_neighbor_tile_ids, _is_wall_blocking, _attack_wall, _event)
 
 func _is_wall_blocking(wall_id: String, player_id: String) -> bool:
   if not state["walls"].has(wall_id):
@@ -578,134 +398,19 @@ func _attack_wall(stack_id: String, wall_id: String) -> void:
     _event("wall_damaged", {"wall_id": wall_id, "player_id": stack["owner"], "damage": damage, "hp": wall["hp"]})
 
 func _merge_same_owner_stacks() -> void:
-  var seen = {}
-  var stack_ids = state["stacks"].keys()
-  stack_ids.sort()
-  for stack_id in stack_ids:
-    if not state["stacks"].has(stack_id):
-      continue
-    var stack: Dictionary = state["stacks"][stack_id]
-    var key = "%s@%s" % [stack["owner"], stack["tile_id"]]
-    if not seen.has(key):
-      seen[key] = stack_id
-      continue
-    var target_id = String(seen[key])
-    var target: Dictionary = state["stacks"][target_id]
-    for cohort in stack["cohorts"]:
-      target["cohorts"].append(cohort)
-    target["cohorts"].sort_custom(func(a: Dictionary, b: Dictionary): return MovementRules.cohort_id_order(String(a["cohort_id"])) < MovementRules.cohort_id_order(String(b["cohort_id"])))
-    target["waypoints"] = []
-    stack["waypoints"] = []
-    state["stacks"].erase(stack_id)
-    _event("friendly_stacks_merged", {"owner": target["owner"], "tile_id": target["tile_id"], "destination_stack_id": target_id, "absorbed_stack_id": stack_id})
-
-func _cohort_id_order(cohort_id: String) -> int:
-  if cohort_id.length() > 1 and cohort_id.substr(0, 1) == "C" and cohort_id.substr(1).is_valid_int():
-    return int(cohort_id.substr(1))
-  return 2147483647
+  MovementRules.merge_same_owner_stacks(state, _event)
 
 func _resolve_all_combats() -> void:
-  var tiles_to_owners = {}
-  for stack in state["stacks"].values():
-    var tile_id = String(stack["tile_id"])
-    if not tiles_to_owners.has(tile_id):
-      tiles_to_owners[tile_id] = {}
-    tiles_to_owners[tile_id][stack["owner"]] = true
-  var tile_ids: Array = tiles_to_owners.keys()
-  tile_ids.sort()
-  for tile_id in tile_ids:
-    var owners = tiles_to_owners[tile_id].keys()
-    if owners.size() < 2:
-      continue
-    owners.sort()
-    var exchange = 0
-    while _living_owners_on_tile(tile_id).size() > 1 and exchange < int(rules["combat"]["max_exchanges_per_tile_per_turn"]):
-      var live_owners = _living_owners_on_tile(tile_id)
-      live_owners.sort()
-      var defender = CombatRules.defender_for(String(state["tiles"][tile_id]["controlled_by"]), live_owners)
-      var attacker = CombatRules.attacker_for(defender, live_owners)
-      var defender_stack_id = _stack_id_on_tile(tile_id, defender)
-      var attacker_stack_id = _stack_id_on_tile(tile_id, attacker)
-      if defender_stack_id == "" or attacker_stack_id == "":
-        break
-      _combat_exchange(tile_id, attacker_stack_id, defender_stack_id, exchange)
-      exchange += 1
-    var survivors = _living_owners_on_tile(tile_id)
-    if survivors.size() == 1:
-      _event("combat_resolved", {"tile_id": tile_id, "winner": String(survivors[0]), "previous_controller": state["tiles"][tile_id]["controlled_by"]})
+  CombatRules.resolve_all_combats(state, rules, _roll_stack_damage, _event)
 
 func _apply_post_resolution_control() -> void:
-  var tile_ids: Array = state["tiles"].keys()
-  tile_ids.sort()
-  for tile_id in tile_ids:
-    var owners: Array = _living_owners_on_tile(tile_id)
-    owners.sort()
-    if owners.size() != 1:
-      continue
-    var controller: String = owners[0]
-    var previous: String = state["tiles"][tile_id]["controlled_by"]
-    if controller != previous:
-      state["tiles"][tile_id]["controlled_by"] = controller
-      _event("tile_control_changed", {"tile_id": tile_id, "from": previous, "to": controller})
-
-func _combat_exchange(tile_id: String, attacker_stack_id: String, defender_stack_id: String, exchange: int) -> void:
-  var attacker: Dictionary = state["stacks"][attacker_stack_id]
-  var defender: Dictionary = state["stacks"][defender_stack_id]
-  var attacker_damage = _roll_stack_damage(attacker, "combat_%s_%s_%d" % [tile_id, attacker_stack_id, exchange])
-  var defender_damage = _roll_stack_damage(defender, "combat_%s_%s_%d" % [tile_id, defender_stack_id, exchange])
-  _apply_damage(defender_stack_id, attacker_damage)
-  _apply_damage(attacker_stack_id, defender_damage)
-  _event("combat_exchange", {
-    "tile_id": tile_id,
-    "attacker": attacker["owner"],
-    "defender": defender["owner"],
-    "attacker_damage": attacker_damage,
-    "defender_damage": defender_damage
-  })
-
-func _apply_damage(stack_id: String, damage: int) -> void:
-  if not state["stacks"].has(stack_id):
-    return
-  var stack: Dictionary = state["stacks"][stack_id]
-  var remaining = damage
-  for cohort in stack["cohorts"]:
-    if remaining <= 0:
-      break
-    var health = int(cohort["current_total_health"])
-    var applied = min(health, remaining)
-    cohort["current_total_health"] = health - applied
-    remaining -= applied
-    var max_per = max(1, int(cohort["max_health_per_soldier"]))
-    cohort["count"] = int(ceil(float(cohort["current_total_health"]) / float(max_per)))
-  var alive: Array = []
-  for cohort in stack["cohorts"]:
-    if int(cohort["current_total_health"]) > 0 and int(cohort["count"]) > 0:
-      alive.append(cohort)
-  stack["cohorts"] = alive
-  if alive.is_empty():
-    state["stacks"].erase(stack_id)
+  CombatRules.apply_post_resolution_control(state, _event)
 
 func _check_eliminations() -> void:
-  for player_id in get_player_ids():
-    if bool(state["players"][player_id]["eliminated"]):
-      continue
-    var capital = String(state["players"][player_id]["capital_tile_id"])
-    var controller = String(state["tiles"][capital]["controlled_by"])
-    if controller != player_id and controller != NEUTRAL:
-      _eliminate_player(player_id, controller)
-  var alive: Array[String] = []
-  for player_id in get_player_ids():
-    if not bool(state["players"][player_id]["eliminated"]):
-      alive.append(player_id)
-  if alive.size() <= 1:
-    state["game_over"] = true
-    state["winner"] = alive[0] if alive.size() == 1 else ""
-    _event("match_ended", {"winner": state["winner"], "turns": state["turn"]})
+  TurnResolver.resolve_eliminations(state, get_player_ids(), NEUTRAL, _eliminate_player, _event)
 
 func _end_match_as_draw() -> void:
-  state["game_over"] = true
-  state["winner"] = ""
-  _event("match_ended", {"winner": "", "turns": state["turn"], "reason": "turn_cap_draw"})
+  TurnResolver.end_as_draw(state, _event)
 
 func _eliminate_player(player_id: String, capturer_id: String) -> void:
   if bool(state["players"][player_id]["eliminated"]):
@@ -757,20 +462,6 @@ func _public_stack(stack: Dictionary) -> Dictionary:
     "waypoints": stack.get("waypoints", []).duplicate()
   }
 
-func _stack_id_on_tile(tile_id: String, owner: String) -> String:
-  for stack_id in state["stacks"].keys():
-    var stack: Dictionary = state["stacks"][stack_id]
-    if stack["tile_id"] == tile_id and stack["owner"] == owner:
-      return stack_id
-  return ""
-
-func _living_owners_on_tile(tile_id: String) -> Array:
-  var owners = {}
-  for stack in state["stacks"].values():
-    if stack["tile_id"] == tile_id and _stack_health(stack) > 0:
-      owners[stack["owner"]] = true
-  return owners.keys()
-
 func _stack_soldier_count(stack: Dictionary) -> int:
   var total = 0
   for cohort in stack["cohorts"]:
@@ -795,7 +486,7 @@ func _roll_stack_damage(stack: Dictionary, salt: String) -> int:
   var stddev = int(rules["soldier"]["base_damage_stddev"]) * soldiers
   var noise = 0.0
   for i in range(6):
-    noise += _unit_random("combat", "%s_%d" % [salt, i])
+    noise += RngRules.unit_random(int(state["seed"]), state["rng_streams"], int(state["turn"]), "combat", "%s_%d" % [salt, i])
   noise = noise - 3.0
   return max(1, int(round(float(mean) + noise * float(stddev) / 2.0)))
 
@@ -830,55 +521,5 @@ func _event_to_text(event: Dictionary) -> String:
 func _command_result(ok: bool, message: String, code: String = "") -> Dictionary:
   return {"ok": ok, "message": message, "code": code}
 
-func _deterministic_range(stream: String, operation_salt: String, min_value: int, max_value: int) -> int:
-  var span = max_value - min_value + 1
-  return min_value + int(abs(_stream_hash(stream, operation_salt)) % span)
-
-func _unit_random(stream: String, salt: String) -> float:
-  var value = abs(_stream_hash(stream, "%s_%d" % [salt, state.get("turn", 0)])) % 1000000
-  return float(value) / 1000000.0
-
 func bot_random_unit(salt: String) -> float:
-  return _unit_random("bot", salt)
-
-func _stream_hash(stream: String, salt: String) -> int:
-  var descriptor: Dictionary = state.get("rng_streams", {}).get(stream, {})
-  var derivation_version := String(state.get("rng_streams", {}).get("derivation_version", ""))
-  var stream_namespace := String(descriptor.get("salt_namespace", stream))
-  return _hash("%s|%s|%s" % [derivation_version, stream_namespace, salt])
-
-func _hash(text: String) -> int:
-  var h = 2166136261
-  for i in range(text.length()):
-    h = int((h ^ text.unicode_at(i)) * 16777619) & 0x7fffffff
-  h = int((h ^ int(state.get("seed", 1))) * 1103515245 + 12345) & 0x7fffffff
-  return h
-
-func _sha256(text: String) -> String:
-  var context := HashingContext.new()
-  context.start(HashingContext.HASH_SHA256)
-  context.update(text.to_utf8_buffer())
-  return context.finish().hex_encode()
-
-func _canonical_json(value: Variant) -> String:
-  match typeof(value):
-    TYPE_NIL:
-      return "null"
-    TYPE_BOOL:
-      return "true" if value else "false"
-    TYPE_INT, TYPE_FLOAT, TYPE_STRING:
-      return JSON.stringify(value)
-    TYPE_ARRAY:
-      var items: Array[String] = []
-      for item in value:
-        items.append(_canonical_json(item))
-      return "[" + ",".join(items) + "]"
-    TYPE_DICTIONARY:
-      var keys: Array = value.keys()
-      keys.sort_custom(func(a, b): return String(a) < String(b))
-      var entries: Array[String] = []
-      for key in keys:
-        entries.append(JSON.stringify(String(key)) + ":" + _canonical_json(value[key]))
-      return "{" + ",".join(entries) + "}"
-    _:
-      return JSON.stringify(str(value))
+  return RngRules.unit_random(int(state["seed"]), state["rng_streams"], int(state["turn"]), "bot", salt)

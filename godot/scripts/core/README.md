@@ -6,6 +6,6 @@ Do not extend `Node` unless a thin adapter is required. Core rules must be calla
 
 `GameCore` is the stable facade. Its deterministic dependencies are split by
 responsibility: `command_rules`, `movement_rules`, `combat_rules`, `fog_rules`,
-`state_hasher`, and `turn_resolver`. These services are scene-free and operate
+`state_hasher`, `rng_rules`, and `turn_resolver`. These services are scene-free and operate
 only on serializable inputs; presentation and bot code may call the facade but
 never mutate its state directly.

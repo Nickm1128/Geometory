@@ -30,11 +30,11 @@
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
   - Evidence: Reopened 2026-07-19 after fresh source review. An adversarial visible combat event initially leaked exact damage and nested enemy-strength/path fields. `FogRules.project_visible_event` now applies an allowlisted schema for every visible event (including own events), omitting unknown/nested fields, combat damage, and wall attack damage. The pinned core suite passes the recursive event-privacy assertion alongside existing fog contracts.
 
-- [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
+- [x] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05
   - Can run early: No
   - Definition of done: separate command validation, movement, combat, fog/observation, hashing/RNG, and turn resolution without scene-tree dependencies or public behavior regression.
-  - Evidence: Reopened 2026-07-19 after fresh source review. Six scene-free helpers exist and regressions are green, but `GameCore` remains an approximately 899-line owner of most validation, movement, combat, observation, hashing, and turn-resolution behavior; duplicate/dead helper paths remain. Delegating helper calls without transferring substantive ownership does not satisfy this task.
+  - Evidence: Reopened and completed 2026-07-19. `GameCore` is reduced to a 525-line facade: `CommandRules` owns validation; `MovementRules` owns movement/merge; `CombatRules` owns combat, damage, and control; `FogRules` owns observation; `StateHasher` owns canonical projection/serialization; new `RngRules` owns named-stream derivation; and `TurnResolver` owns turn start/end, cap, elimination, and draw decisions. Legacy duplicate command/combat/hash/RNG paths were removed. Pinned Godot 4.6.3 core tests and the 393x852/360x800/480x960 UI smoke matrix pass; root/runtime data parity passes.
 
 - [ ] `M1-P01-T07` Complete deterministic regression evidence and P01 hygiene.
   - Dependencies: M1-P01-T06
