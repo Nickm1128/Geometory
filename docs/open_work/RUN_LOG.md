@@ -266,6 +266,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit/push the focused T07 cross-platform fix, require a green replacement run, then complete the clean Terra/High handoff verification and deliver the prompt.
 
+### M1-RUN-20260719-001 / public-CI hygiene-anchor remediation / M1-P01-T07
+
+- Status: Progress; the second public run advanced past Audit and exposed the remaining CRLF-sensitive PhaseClose result anchor.
+- Branch/ref: published checkpoint `bf116b3`; failed GitHub Actions run `29702770565`, job `88234544633`.
+- Files or artifacts: decoded public job log; checker and cross-platform regression suite.
+- Decisions: treat INDEX and hygiene-log checkout forms as one cross-platform contract and test both explicitly under CRLF.
+- Validation and exact result: Audit passed publicly. The regression step failed because P00's `- Result: Pass.` anchor still assumed LF. The anchor now accepts optional carriage return, and a CRLF copy of the canonical hygiene log must successfully PhaseClose P00 locally and in CI; the complete suite is green locally.
+- Blockers or risks: replacement public CI pending; no runtime/product blocker.
+- Paid call and ledger entry: None
+- Exact next action: publish this focused correction and require the entire public workflow—not only the tracker steps—to pass.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

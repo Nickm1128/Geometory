@@ -119,6 +119,14 @@ try {
   Write-Host "PASS: structured INDEX contract accepts the repository's CRLF checkout convention."
 
   $canonicalHygiene = [System.IO.File]::ReadAllText((Join-Path $repoRoot 'docs/open_work/hygiene/LOG.md'))
+  $crlfCanonicalHygiene = [regex]::Replace($canonicalHygiene, '(?<!\r)\n', "`r`n")
+  [System.IO.File]::WriteAllText($hygieneFixturePath, $crlfCanonicalHygiene, [System.Text.UTF8Encoding]::new($false))
+  $crlfPhaseClose = Invoke-Checker @("-Mode", "PhaseClose", "-PhaseId", "M1-P00", "-SkipSkillMirror", "-HygieneOverridePath", $hygieneFixturePath)
+  if ($crlfPhaseClose.ExitCode -ne 0 -or $crlfPhaseClose.Text -notmatch 'STRUCTURAL PASS') {
+    throw "CRLF hygiene PhaseClose regression failed.`n$($crlfPhaseClose.Text)"
+  }
+  Write-Host "PASS: PhaseClose accepts the hygiene log under the repository's CRLF checkout convention."
+
   $syntheticP01Hygiene = @"
 
 ## M1-P01 / checker-regression

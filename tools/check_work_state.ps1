@@ -534,7 +534,7 @@ if ($Mode -eq 'PhaseClose') {
     $hygieneText = Read-Text $hygienePath
     $phaseHygieneMatches = [regex]::Matches($hygieneText, "(?ms)^## [^\r\n]*$([regex]::Escape($PhaseId))[^\r\n]*\r?\n(?<body>.*?)(?=^## |\z)")
     $phaseHygieneMatch = if ($phaseHygieneMatches.Count -gt 0) { $phaseHygieneMatches[$phaseHygieneMatches.Count - 1] } else { $null }
-    if ($null -eq $phaseHygieneMatch -or $phaseHygieneMatch.Groups['body'].Value -notmatch '(?m)^- Result: Pass\.?$') {
+    if ($null -eq $phaseHygieneMatch -or $phaseHygieneMatch.Groups['body'].Value -notmatch '(?m)^- Result: Pass\.?\r?$') {
       Add-Error "$PhaseId has no passing hygiene log entry."
     } else {
       $phaseHygieneBody = $phaseHygieneMatch.Groups['body'].Value

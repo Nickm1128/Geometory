@@ -103,3 +103,9 @@ Append-only. No implementation entries yet.
 - Remediation: task and continuation structured-line anchors now accept optional carriage returns without accepting suffixes. The regression suite dynamically writes a CRLF copy of canonical INDEX and requires both Resume and Audit to return `STRUCTURAL PASS`.
 - Local result: canonical Audit and the complete work-state regression suite pass; no runtime or product file changed.
 - Exact next action: publish the focused correction and require the replacement GitHub Actions run to pass before the new-thread handoff.
+
+## 2026-07-19 — Cross-platform PhaseClose correction
+
+- Public evidence: replacement run `29702770565`, job `88234544633`, passed the production Audit and then failed the expanded regression step because the P00 hygiene `Result: Pass` anchor remained LF-only.
+- Remediation and proof: the result anchor accepts optional carriage return, and the regression suite now converts the canonical hygiene log to CRLF and requires `PhaseClose M1-P00` to pass. All INDEX, hygiene, negative-review, and non-resolving-ref fixtures pass locally.
+- Exact next action: publish and require a fully green replacement workflow before handoff.
