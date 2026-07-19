@@ -139,3 +139,16 @@ Append-only. No implementation entries yet.
 - Validation: `tools/run_core_tests.ps1` under pinned Godot 4.6.3 passed with `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; the three-size headless UI smoke matrix passed; `tools/sync_godot_data.ps1 -Mode Check` reported root/runtime parity; and `git diff --check` passed.
 - Blockers or risks: none.
 - Exact next action: complete `M1-P01-T07` missing focused regression coverage, two full identical hash runs, fresh phase review, hygiene, tag publication, and P02 activation.
+
+## 2026-07-19 - Fresh P01 source-review correction
+
+- Reviewer: `/root/p01_source_review`; reviewed ref `435287e` plus uncommitted T07 regression changes; scope was all checked P01 tasks, requirements, gates, authorities, implementation, and focused tests.
+- Result: Reopened `M1-P01-T02`, `M1-P01-T04`, and `M1-P01-T05`. Findings: raw rejected diagnostics could retain non-serializable objects; RNG derivation ignored recorded stream ID/purpose and combat keys omitted defender cohort identity; `income_added` exposed its nested dictionary without recursive field projection. `T01`, `T03`, and `T06` were substantiated.
+- Resolution: pending owning-task remediation in dependency order. Gates G01, G02, G04-G06 are reopened; prior two-hash and suite evidence remains supporting only.
+- Exact next action: repair T02 serialization-safe rejected diagnostics.
+
+## 2026-07-19 - M1-P01-T02 serialization-safe diagnostic repair
+
+- Status: Complete. Rejected-command diagnostics now store only stable scalar common fields and sorted field names, never a raw command value.
+- Validation: pinned Godot 4.6.3 core test passed a `RefCounted` unknown-field case proving it remains rejected, does not enter accepted history or hash scope, and leaves recursively serializable MatchState.
+- Exact next action: repair T04 RNG descriptor tuple and combat-key scope.

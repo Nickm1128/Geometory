@@ -132,7 +132,7 @@ func _accept_command(command: Dictionary) -> void:
 
 func _reject_command(command: Dictionary, code: String, message: String) -> Dictionary:
   state["rejected_command_diagnostics"].append({
-    "command": command.duplicate(true),
+    "command": CommandRules.rejected_command_diagnostic(command),
     "code": code,
     "message": message,
     "turn": state.get("turn", 0),

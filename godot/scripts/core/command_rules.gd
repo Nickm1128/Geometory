@@ -31,8 +31,10 @@ static func validate_command(state: Dictionary, command: Dictionary, stack_healt
     return _failure("invalid_client_sequence", "client_sequence must be a positive integer")
   if int(command["client_sequence"]) <= int(state.get("last_accepted_client_sequence", {}).get(player_id, 0)):
     return _failure("stale_client_sequence", "client_sequence must increase after the last accepted command")
+  var allowed_fields := ["type", "player_id", "turn", "phase", "client_sequence"]
   match String(command["type"]):
     "allocate_resources":
+      allowed_fields.append_array(["economy_cents", "military_cents", "research_cents"])
       var total := 0
       for key in ["economy_cents", "military_cents", "research_cents"]:
         if not command.has(key) or typeof(command[key]) != TYPE_INT or int(command[key]) < 0:
@@ -41,6 +43,7 @@ static func validate_command(state: Dictionary, command: Dictionary, stack_healt
       if total > int(state["players"][player_id]["bank_cents"]):
         return _failure("spend_exceeds_bank", "spend exceeds bank")
     "queue_stack_path":
+      allowed_fields.append_array(["stack_id", "mode", "waypoints"])
       if not command.has("stack_id") or typeof(command["stack_id"]) != TYPE_STRING or not state.get("stacks", {}).has(command["stack_id"]):
         return _failure("invalid_stack", "stack_id must name a living owned stack")
       var stack: Dictionary = state["stacks"][command["stack_id"]]
@@ -61,7 +64,29 @@ static func validate_command(state: Dictionary, command: Dictionary, stack_healt
       pass
     _:
       return _failure("unknown_command", "unknown command")
+  for field in command.keys():
+    if typeof(field) != TYPE_STRING or not allowed_fields.has(field):
+      return _failure("unsupported_field", "command includes an unsupported field")
   return {"ok": true, "code": "", "message": ""}
 
 static func _failure(code: String, message: String) -> Dictionary:
   return {"ok": false, "code": code, "message": message}
+
+static func rejected_command_diagnostic(command: Dictionary) -> Dictionary:
+  var field_names: Array[String] = []
+  for field in command.keys():
+    field_names.append(String(field))
+  field_names.sort()
+  return {
+    "type": _diagnostic_scalar(command.get("type")),
+    "player_id": _diagnostic_scalar(command.get("player_id")),
+    "turn": _diagnostic_scalar(command.get("turn")),
+    "phase": _diagnostic_scalar(command.get("phase")),
+    "client_sequence": _diagnostic_scalar(command.get("client_sequence")),
+    "field_names": field_names
+  }
+
+static func _diagnostic_scalar(value: Variant) -> Variant:
+  if value == null or typeof(value) == TYPE_BOOL or typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT or typeof(value) == TYPE_STRING:
+    return value
+  return null

@@ -3,6 +3,7 @@ extends SceneTree
 const GameCoreScript := preload("res://scripts/core/game_core.gd")
 const ConfigLoaderScript := preload("res://scripts/core/config_loader.gd")
 const BaselineBotScript := preload("res://scripts/core/baseline_bot.gd")
+const CombatRulesScript := preload("res://scripts/core/combat_rules.gd")
 
 var failures := 0
 
@@ -19,6 +20,7 @@ func _init() -> void:
   _test_research_reproducibility(configs)
   _test_commands_and_path(core)
   _test_p01_contract_red_cases(configs)
+  _test_invalid_serialization_and_combat_regressions(configs)
   _test_movement_resolution_contracts(configs)
   _test_turn_cap_rng_and_hash_contracts(configs)
   _test_fog_observation_contract(configs)
@@ -239,6 +241,49 @@ func _test_turn_cap_rng_and_hash_contracts(configs: Dictionary) -> void:
   _assert(capped.state["turn"] == 80 and capped.state["winner"] == "", "contract: unresolved player-turn 80 ends as draw without turn 81")
   _assert(_has_draw_end(capped.snapshot()["replay_events"]), "contract: turn-cap draw emits a stable match-ended event")
 
+func _test_invalid_serialization_and_combat_regressions(configs: Dictionary) -> void:
+  var malformed = GameCoreScript.new()
+  malformed.setup(configs["rules"], configs["map"], 351)
+  var before_hash := malformed.canonical_state_hash()
+  var rejected := malformed.apply_command({"type": "end_phase", "player_id": "P1", "turn": 1, "phase": "allocation", "client_sequence": 1, "runtime_object": RefCounted.new()})
+  _assert(not rejected["ok"] and rejected["code"] == "unsupported_field", "contract: non-serializable unknown command field is rejected")
+  _assert(malformed.snapshot()["accepted_command_history"].is_empty() and malformed.canonical_state_hash() == before_hash, "contract: rejected non-serializable command cannot enter history or mutate gameplay")
+  _assert(not _has_nonserializable_value(malformed.snapshot()) and malformed.snapshot()["rejected_command_diagnostics"][0]["command"]["field_names"].has("runtime_object") and not malformed.snapshot()["rejected_command_diagnostics"][0]["command"].has("runtime_object"), "contract: rejected diagnostics retain only a serializable stable projection")
+
+  var wall_core = GameCoreScript.new()
+  wall_core.setup(configs["rules"], configs["map"], 352)
+  var wall_stack: String = wall_core.get_stack_at_tile_for_player("T_-4_0", "P1")
+  var wall_id := ""
+  for candidate in wall_core.state["walls"].keys():
+    var wall: Dictionary = wall_core.state["walls"][candidate]
+    if wall["owner"] == "P1":
+      wall_id = String(candidate)
+      break
+  wall_core.state["walls"][wall_id]["hp"] = 999999
+  wall_core.call("_attack_wall", wall_stack, wall_id)
+  _assert(_has_event(wall_core.snapshot()["replay_events"], "wall_damaged") and not wall_core.state["walls"][wall_id]["destroyed"], "contract: wall damage retains an intact wall and records hp")
+  wall_core.state["walls"][wall_id]["hp"] = 1
+  wall_core.call("_attack_wall", wall_stack, wall_id)
+  _assert(_has_event(wall_core.snapshot()["replay_events"], "wall_destroyed") and wall_core.state["walls"][wall_id]["destroyed"], "contract: lethal wall damage destroys the wall with a stable event")
+
+  var cohort_stack := {"cohorts": [{"current_total_health": 250, "max_health_per_soldier": 100, "count": 3}]}
+  var casualty_state := {"stacks": {"S1": cohort_stack}}
+  CombatRulesScript.apply_damage(casualty_state, "S1", 151)
+  _assert(casualty_state["stacks"]["S1"]["cohorts"][0]["current_total_health"] == 99 and casualty_state["stacks"]["S1"]["cohorts"][0]["count"] == 1, "contract: casualty arithmetic rounds surviving soldiers from remaining cohort health")
+  CombatRulesScript.apply_damage(casualty_state, "S1", 99)
+  _assert(not casualty_state["stacks"].has("S1"), "contract: casualty arithmetic removes a depleted stack")
+
+  var combat_a = GameCoreScript.new()
+  var combat_b = GameCoreScript.new()
+  combat_a.setup(configs["rules"], configs["map"], 353)
+  combat_b.setup(configs["rules"], configs["map"], 353)
+  for core in [combat_a, combat_b]:
+    var attacker_id: String = core.get_stack_at_tile_for_player("T_-4_0", "P1")
+    core.state["stacks"][attacker_id]["tile_id"] = "T_4_0"
+    core.call("_resolve_all_combats")
+    core.call("_apply_post_resolution_control")
+  _assert(combat_a.canonical_state_hash() == combat_b.canonical_state_hash() and combat_a.snapshot()["replay_events"] == combat_b.snapshot()["replay_events"], "contract: seeded combat state and event order are deterministic across repeated runs")
+
 func _test_bot(configs: Dictionary) -> void:
   var core = GameCoreScript.new()
   core.setup(configs["rules"], configs["map"], 777)
@@ -373,6 +418,21 @@ func _has_recursive_key(value: Variant, prohibited_key: String) -> bool:
       if _has_recursive_key(item, prohibited_key):
         return true
   return false
+
+func _has_nonserializable_value(value: Variant) -> bool:
+  if value == null or typeof(value) in [TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_STRING]:
+    return false
+  if typeof(value) == TYPE_ARRAY:
+    for item in value:
+      if _has_nonserializable_value(item):
+        return true
+    return false
+  if typeof(value) == TYPE_DICTIONARY:
+    for key in value.keys():
+      if typeof(key) != TYPE_STRING or _has_nonserializable_value(value[key]):
+        return true
+    return false
+  return true
 
 func _assert(condition: bool, message: String) -> void:
   if condition:
