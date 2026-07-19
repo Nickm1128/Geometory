@@ -5,9 +5,9 @@ workflow_state: "active"
 active_phase: "M1-P01"
 current_task: "M1-P01-T01"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "After the requested user report and acknowledgement, begin M1-P01-T01 by locking core contracts and adding failing contract tests before implementation."
+exact_next_action: "Start a GPT-5.6 Terra / Think High thread with the prepared continuation prompt; that prompt authorizes beginning M1-P01-T01 contract reconciliation and failing tests."
 last_completed_phase_tag: "m1-p00"
-last_checkpoint_ref: "m1-p00"
+last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "P00 closeout commit 153efbc passed GitHub Actions run 29698512789; immutable tag m1-p00 and the physical S24 contract are published/recorded."
 ---
 
@@ -39,6 +39,6 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 P00 is complete at immutable tag `m1-p00`; its closeout commit passed GitHub
 Actions run `29698512789`, and the physical S24 contract artifact is
-`20260719_131542`. P01 is tracker-active at `M1-P01-T01`, but no P01
-implementation has begun. Resume only after the requested user report and
-acknowledgement, then add authority-backed failing contract tests first.
+`20260719_131542`. P01 is tracker-active at `M1-P01-T01`; only autonomous-handoff
+skill preparation has occurred. The prepared GPT-5.6 Terra / Think High prompt
+is explicit authorization to begin contract reconciliation and failing tests.

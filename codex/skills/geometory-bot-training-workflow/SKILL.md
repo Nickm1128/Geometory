@@ -31,3 +31,5 @@ description: "Operate and validate Geometory deterministic bot simulations, tact
 ## Promote
 
 Promote only after every tactical, determinism, development, holdout, side-bias, duration, and budget gate passes. Update only the canonical active bot profile, sync runtime data, rerun full validation, record evidence, and create the permitted task commit. Rejected candidates must not alter champion state.
+
+If credentials alone block the live P04 gate, record that blocker and continue only the P05 tasks explicitly marked eligible to run early. Keep P04 incomplete, preserve champion state, and never substitute a mocked cycle for the required live accept-or-reject evidence.

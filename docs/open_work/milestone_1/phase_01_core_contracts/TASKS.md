@@ -4,7 +4,7 @@
   - Dependencies: M1-P00-G07
   - Can run early: No
   - Definition of done: resolve the public research-schedule assumption; define global player-turn 80 draw semantics, source sequences, accepted/rejected histories, canonical serialization/hash fields, friendly merge behavior, and visible-strength policy; add failing contract tests before implementation.
-  - Evidence: Pending.
+  - Evidence: Partial preparation only: the canonical project/open-work/validation/visual/bot skills now strengthen contract-first slicing, fresh-context rehydration, CI-failure handling, evidence interpretation, and P04 credential routing. All five validate and synchronize; a fresh GPT-5.6 Terra / Think High read-only test resumed `M1-P01-T01`, selected the correct authority/red-test slice, identified the current command-history/bot-access/hash gaps, and found no real blocker. Core authority reconciliation and failing contract tests have not begun.
 
 - [ ] `M1-P01-T02` Centralize strict command validation and accepted-command history.
   - Dependencies: M1-P01-T01

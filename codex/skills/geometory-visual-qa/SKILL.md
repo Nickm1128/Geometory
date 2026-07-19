@@ -32,3 +32,4 @@ description: "Run deterministic visual, layout, safe-area, touch, screenshot, em
 - Keep device/emulator captures and raw logs under ignored `artifacts/visual_qa`; track only approved canonical desktop baselines.
 - Record manifest and artifact paths plus findings in the active phase notes/gate.
 - Fail on script errors, crashes, ANRs, clipped critical text, unsafe controls, illegal overlap, or touch targets below the documented minimum.
+- Keep contract success distinct from visual certification. If a foundation-phase capture launches and handshakes correctly but reveals a later-phase layout defect, record and route the defect to its owning task without calling the image visually approved or weakening a gate that already requires visual quality.

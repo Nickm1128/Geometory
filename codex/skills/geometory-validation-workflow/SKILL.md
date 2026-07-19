@@ -31,4 +31,12 @@ description: "Validate, test, export, or certify Geometory work in C:\\Users\\mi
 - UI passes supported portrait sizes, safe areas, scale settings, touch targets, and drag/pinch protection.
 - Android evidence records build path/hash, manifest SDK/permissions/architectures, install target, launch result, and relevant log errors.
 
+## Failure And Evidence Discipline
+
+- Read test output for Godot script errors, crashes, and assertion failures even when the process exit code is zero.
+- When a task calls for contract-first work, preserve red/green evidence: prove the new focused test fails for the intended reason before implementation, then passes afterward.
+- For deterministic/hash gates, run the required suite twice and compare the recorded outputs or hashes rather than relying on two successful exit codes.
+- For a remote CI failure, inspect the actual job step/log before editing. Reproduce the environment-sensitive boundary locally where practical and never weaken assertions to accommodate a runner.
+- A documentation-only checkpoint may rely on the most recent green runtime suite only when no runtime/config/package input changed and the active gate permits it. Phase closure still requires the complete documented evidence set.
+
 Do not check a task or gate merely because a command exited successfully. Record what was exercised, the result, and artifact/evidence location in the active phase files.

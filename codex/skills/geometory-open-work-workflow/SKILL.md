@@ -24,6 +24,16 @@ Treat the repository trackers as execution state. Keep one coordinating agent re
 - Append concise evidence and cross-phase consequences to `NOTES.md`; update the exact next action in `INDEX.md`.
 - Delegate bounded, disjoint work when useful. Subagents return changes/evidence; the coordinator owns integration and tracker state.
 
+## Run Autonomously For Long Sessions
+
+- Treat an explicit new user prompt to begin or continue milestone work as clearing a report/acknowledgement-only handoff in `INDEX.md`. It does not clear a recorded blocker, paid-call boundary, destructive ambiguity, or Git divergence.
+- Work one tracker task through implementation, evidence, documentation, validation, and its atomic commit before switching tasks. Do not accumulate unchecked bookkeeping for later reconciliation.
+- Make reversible, authority-backed implementation choices without asking routine questions. Record durable choices; ask only when missing authority would materially change product behavior or external state.
+- Use fresh bounded subagents for independent audits or disjoint implementation slices when context grows. Give them repository paths and task scope, not a conversation summary; the coordinator alone integrates, edits trackers, commits, tags, pushes, promotes profiles, or makes paid calls.
+- At a context boundary, finish the smallest safe slice, update the exact next action, and create the permitted checkpoint before rehydrating from sources. Never use context pressure as a reason to weaken validation or mark partial work complete.
+- If CI fails, inspect the actual failing step/log, reproduce the narrow failure locally when possible, fix it under the current task ID, and require a green rerun. Never silence or relax a gate merely to make CI green.
+- Honor explicit user report boundaries after updating durable state. Do not start the next implementation task until the requested report or acknowledgement occurs.
+
 ## Handle Blockers
 
 - Record the blocker in `BLOCKERS.md` with owner, scope, affected IDs, exact question/failure, safe fallback, fallback authority, and safe parallel work.

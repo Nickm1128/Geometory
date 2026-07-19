@@ -134,6 +134,28 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Exact next action: push/fetch-verify this transition, run `PhaseClose M1-P00`, then report and wait for user acknowledgement before `M1-P01-T01`.
 - Remediation before commit: completed-phase tag validation sliced the phase ID at an invalid offset and crashed. It now parses the two-digit phase number with an anchored regex; Audit, TaskClose, the regression, and final PhaseClose must pass before publication.
 
+### M1-RUN-20260719-001 / Terra-high handoff preparation / M1-P01-T01
+
+- Status: Progress; no core behavior or tests changed.
+- Branch/ref: `milestone/m1-vertical-slice` after P00 transition commit `15f1519`.
+- Files or artifacts: five canonical `codex/skills/*/SKILL.md` packages, generated user-level mirrors after validation, and the user-facing continuation prompt.
+- Decisions: strengthen existing skills instead of adding a redundant sixth package; make the new prompt explicit authorization to clear only the prior report boundary and begin P01.
+- Validation and exact result: Pending skill validation, mirror synchronization, read-only Terra High forward-test, tracker audit, commit/push, and CI.
+- Blockers or risks: none. The live OpenRouter lane remains governed by P04 credentials/budget rules and is not authorized early.
+- Paid call and ledger entry: None
+- Exact next action: validate/synchronize the skill changes, forward-test the resume in a fresh Terra High agent, then publish the P01-T01 handoff checkpoint and return the prompt.
+
+### M1-RUN-20260719-001 / Terra-high forward-test boundary / M1-P01-T01
+
+- Status: Complete for handoff preparation; P01 core implementation remains unstarted.
+- Branch/ref: `milestone/m1-vertical-slice` after `15f1519`; handoff checkpoint pending.
+- Files or artifacts: five modified canonical skills and `docs/open_work/AUTONOMOUS_RUN.md`.
+- Decisions: the stored prompt explicitly clears the report-only pause, preserves every blocker/paid/Git/device boundary, and directs execution rather than another planning-only response.
+- Validation and exact result: all five `quick_validate.py` checks passed; sync Apply/Check produced exact managed-mirror parity; tracker Audit passed with zero warnings; fresh GPT-5.6 Terra at high reasoning recovered the correct task/slice/gaps and made no edits or external actions.
+- Blockers or risks: none. Core contracts and tests remain intentionally unstarted for the new thread.
+- Paid call and ledger entry: None
+- Exact next action: commit/push this `M1-P01-T01` handoff checkpoint, require green CI, then provide the stored prompt to the user.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
