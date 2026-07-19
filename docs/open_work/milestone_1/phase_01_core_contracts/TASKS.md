@@ -30,11 +30,11 @@
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
   - Evidence: Reopened and repaired 2026-07-19. `income_added.income` now recursively projects only integer `own`, `foreign`, `base`, `bonus_bps`, and `final` values. Pinned Godot 4.6.3 contracts prove an adversarial nested private field cannot reach a visible income event.
 
-- [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
+- [x] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05
   - Can run early: No
   - Definition of done: separate command validation, movement, combat, fog/observation, hashing/RNG, and turn resolution without scene-tree dependencies or public behavior regression.
-  - Evidence: Reopened administratively 2026-07-19 because its T04/T05 dependencies were reopened by fresh review. The substantive ownership transfer remains implemented; revalidate it after dependency repairs before checking this downstream task again.
+  - Evidence: Revalidated 2026-07-19 after repaired T04/T05 dependencies. `GameCore` remains a 525-line facade; all seven extracted services have real responsibility entry points and no scene-tree/input/rendering dependency. Pinned Godot 4.6.3 core suite passes with deterministic hash `e390ad42e8508f6c8a0d8af894266e9150eacd7b0fa75e805e57a0ea39a79839`.
 
 - [ ] `M1-P01-T07` Complete deterministic regression evidence and P01 hygiene.
   - Dependencies: M1-P01-T06

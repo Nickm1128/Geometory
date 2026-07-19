@@ -164,3 +164,9 @@ Append-only. No implementation entries yet.
 - Status: Complete. `FogRules` now schema-projects `income_added.income` recursively to its documented integer fields instead of forwarding the raw nested dictionary.
 - Validation: pinned Godot 4.6.3 core contract passed an adversarial nested income payload and proved private nested values remain absent.
 - Exact next action: revalidate T06 ownership transfer after repaired dependencies.
+
+## 2026-07-19 - M1-P01-T06 dependency revalidation
+
+- Status: Complete. The extracted service boundary remains substantive after T04/T05 repair: `GameCore` is 525 lines, each extracted owner exposes a real deterministic entry point, and none depends on scene-tree/input/rendering APIs.
+- Validation: pinned Godot 4.6.3 core suite passed with `DETERMINISM_HASH` `e390ad42e8508f6c8a0d8af894266e9150eacd7b0fa75e805e57a0ea39a79839`.
+- Exact next action: execute T07's full repaired validation, review, hygiene, publication, and P02 activation.
