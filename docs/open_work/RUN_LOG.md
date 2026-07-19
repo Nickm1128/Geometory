@@ -222,6 +222,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: execute `M1-P01-T07` phase validation/hygiene/publication.
 
+### M1-RUN-20260719-001 / M1-P01-T07 closeout handoff
+
+- Status: Progress
+- Branch/ref: `milestone/m1-vertical-slice` synchronized at `4e6a320` after fetch.
+- Files or artifacts: P01 T01–T06 task commits are published; P01 remains active at T07.
+- Decisions: preserve the open closeout task until focused capital-capture, repeated hash, gate, hygiene, tag, and remote-verification evidence is complete.
+- Validation and exact result: Resume/Audit pass with zero warnings; most recent pinned core suite and three-size UI smoke passed. Full phase-close evidence remains pending.
+- Blockers or risks: none open.
+- Paid call and ledger entry: None
+- Exact next action: add/run capital-capture regression, then record two matching full core hash runs and complete P01 closeout.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

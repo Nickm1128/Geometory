@@ -63,3 +63,10 @@ Append-only. No implementation entries yet.
 - Validation: pinned core suite passes with no parser/engine errors; no extracted script extends `Node` or references scene/input/rendering APIs.
 - Blockers or risks: none.
 - Exact next action: complete `M1-P01-T07` full deterministic regression evidence, repeated hashes, P01 gates/hygiene, publication, and P02 activation.
+
+## 2026-07-19 — M1-P01-T07 closeout handoff
+
+- Status: In progress. T01–T06 are committed and pushed through `4e6a320`; the branch is clean and synchronized after fetch, and Resume/Audit pass with zero warnings.
+- Validated to date: pinned core suite passed after T05/T06; three-size UI smoke passed after command, movement, and bot-interface changes. The phase-close evidence still needs two recorded identical full-core hash runs, the capital-capture focused case, gate/hygiene evidence, immutable tag publication, and remote phase-close verification.
+- Blockers or risks: no blocker. Do not mark T07 or P01 gates complete before the remaining explicit evidence exists.
+- Exact next action: add/run the focused capital-capture regression, then execute and compare two full pinned core runs before completing the P01 hygiene/publication sequence.
