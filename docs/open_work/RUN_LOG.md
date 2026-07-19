@@ -89,6 +89,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit/push the T07 reconciliation checkpoint, require green public CI, and retry the physical S24 handshake when Windows detects it.
 
+### M1-RUN-20260719-001 / public-CI remediation / M1-P00-T07
+
+- Status: Progress
+- Branch/ref: `milestone/m1-vertical-slice` at published checkpoint `3f5148d`
+- Files or artifacts: GitHub Actions Validate run `29697954513`, `.github/workflows/validate.yml`, and `tools/test_check_work_state.ps1`.
+- Decisions: keep the regression repository-scoped with `-SkipSkillMirror`; fetch full Git history so task-commit audit evidence is available on CI.
+- Validation and exact result: the first run failed only at PhaseClose regression because Ubuntu had no Windows `USERPROFILE`. The patched test passes locally with `USERPROFILE` deliberately removed; tracker Audit, YAML parse, and diff check also pass.
+- Blockers or risks: corrected public-CI rerun pending; physical-device blocker `B-001` remains unchanged.
+- Paid call and ledger entry: None
+- Exact next action: commit/push the focused T07 CI fix, require a green Validate run, then retry the physical handshake.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

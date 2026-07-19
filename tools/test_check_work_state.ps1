@@ -5,7 +5,7 @@ $requestedPhase = "M1-P00"
 
 $previousPreference = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
-$output = @(& $hostExecutable -NoProfile -ExecutionPolicy Bypass -File $checker -Mode PhaseClose -PhaseId $requestedPhase 2>&1)
+$output = @(& $hostExecutable -NoProfile -ExecutionPolicy Bypass -File $checker -Mode PhaseClose -PhaseId $requestedPhase -SkipSkillMirror 2>&1)
 $childExitCode = $LASTEXITCODE
 $ErrorActionPreference = $previousPreference
 $text = $output -join "`n"

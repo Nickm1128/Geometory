@@ -5,10 +5,10 @@ workflow_state: "active"
 active_phase: "M1-P00"
 current_task: "M1-P00-T07"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Commit and push the reconciled P00 closeout for public CI, then obtain a current-build QA ready handshake after the physical S24 reconnects."
+exact_next_action: "Commit and push the CI-portability fix, require a green Validate run, then obtain a current-build QA ready handshake after the physical S24 reconnects."
 last_completed_phase_tag: ""
 last_checkpoint_ref: "milestone/m1-vertical-slice"
-last_green_validation: "Pinned core, three-size UI, visual-contract, tracker, skills, data parity, both API-36 APK inspections, and current emulator QA handshake passed locally on 2026-07-19; public CI and current physical handshake remain pending."
+last_green_validation: "Pinned local suites and APK/device-emulator checks passed on 2026-07-19; first public CI run exposed and locally verified a Linux-only skill-mirror regression, with the corrected rerun pending."
 ---
 
 # Milestone 1 Work Index
@@ -38,7 +38,8 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 ## Resume Handoff
 
 P00 implementation lanes T01–T06 and T07 authority/local-validation work are
-green. Resume T07 by pushing the intentional closeout checkpoint for public CI,
-then resolve `B-001` with an alias-only current-build phone ready handshake.
+green. Resume T07 by publishing the locally verified CI-portability fix and
+requiring a green Validate rerun, then resolve `B-001` with an alias-only
+current-build phone ready handshake.
 After both lanes pass, complete hygiene, publish immutable `m1-p00`, and activate
 P01 without merging `main`.
