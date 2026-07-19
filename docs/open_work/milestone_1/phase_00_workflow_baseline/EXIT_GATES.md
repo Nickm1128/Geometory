@@ -1,16 +1,16 @@
 # M1-P00 Exit Gates — Workflow, Baseline, And Tooling
 
-- [ ] `M1-P00-G01` The untouched prototype is tracked, remotely recoverable at `m1-baseline`, and separated from milestone changes.
-  - Evidence: Pending final phase audit.
-- [ ] `M1-P00-G02` Core tests, UI smoke tests, root/Godot data parity, and an inspected API-36 debug APK pass under Godot 4.6.3.
-  - Evidence: Pending.
-- [ ] `M1-P00-G03` Every M1 phase has exactly `REQUIREMENTS.md`, `TASKS.md`, `EXIT_GATES.md`, and `NOTES.md`, and the work-state audit passes.
-  - Evidence: Pending.
-- [ ] `M1-P00-G04` All five canonical skills validate, match their user-level mirrors, and pass fresh-context forward tests.
-  - Evidence: Pending.
+- [x] `M1-P00-G01` The untouched prototype is tracked, remotely recoverable at `m1-baseline`, and separated from milestone changes.
+  - Evidence: `main`, `origin/main`, and immutable annotated tag `m1-baseline` resolve to audited prototype commit `4b7dc89`; all workflow and milestone changes are isolated on `milestone/m1-vertical-slice`.
+- [x] `M1-P00-G02` Core tests, UI smoke tests, root/Godot data parity, and an inspected API-36 debug APK pass under Godot 4.6.3.
+  - Evidence: On 2026-07-19, pinned Godot `4.6.3.stable.official.7d41c59c4` passed the core suite, UI smoke at 360x800/393x852/480x960, and visual-contract suite; all three data copies matched. Normal APK `36ee04e669f48eebf68041382e3827160232599bfe8dc3df542c5539c1b738ff` is min SDK 24, target/compile SDK 36, arm64-v8a plus x86_64, and only `VIBRATE`.
+- [x] `M1-P00-G03` Every M1 phase has exactly `REQUIREMENTS.md`, `TASKS.md`, `EXIT_GATES.md`, and `NOTES.md`, and the work-state audit passes.
+  - Evidence: The 2026-07-19 read-only audit parsed 50 tasks and 50 gates with zero warnings; all seven phase directories contain exactly the four required files, and the PhaseClose routing regression passes.
+- [x] `M1-P00-G04` All five canonical skills validate, match their user-level mirrors, and pass fresh-context forward tests.
+  - Evidence: Five skill-creator validations, SHA-256 mirror synchronization, and fresh-context project, validation, open-work, visual, and bot workflow tests passed on 2026-07-19.
 - [ ] `M1-P00-G05` The dedicated AVD boots with verified properties; phone and emulator each launch the QA package.
-  - Evidence: Pending.
-- [ ] `M1-P00-G06` The normal Android build contains neither QA hooks nor unnecessary Internet/network-state permissions.
-  - Evidence: Pending.
+  - Evidence: The API-36 AVD profile/boot passed, and current QA APK `2898bae83a6b6e0d4157d6001452a98137bae46cded779745d1a73972f0c974f` passed the emulator request/ready/capture contract at `artifacts/visual_qa/20260719_125340/allocation_staged`. Current-build physical launch is blocked by `B-001`; earlier physical evidence is not substituted.
+- [x] `M1-P00-G06` The normal Android build contains neither QA hooks nor unnecessary Internet/network-state permissions.
+  - Evidence: APK Analyzer found zero visual-QA/test assets in normal APK `36ee04e669f48eebf68041382e3827160232599bfe8dc3df542c5539c1b738ff`; its only requested permission is `android.permission.VIBRATE`, while the separate QA package contains fixture resources and no tests.
 - [ ] `M1-P00-G07` P00 hygiene passes, immutable tag `m1-p00` exists, and the milestone branch/tag are current on the remote.
   - Evidence: Pending.

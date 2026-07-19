@@ -34,6 +34,10 @@ jobs:
         shell: pwsh
         run: ./tools/check_work_state.ps1 -Mode Audit -SkipSkillMirror
 
+      - name: Verify PhaseClose targets its requested phase
+        shell: pwsh
+        run: ./tools/test_check_work_state.ps1
+
       - name: Verify canonical and runtime data parity
         shell: pwsh
         run: |

@@ -21,8 +21,10 @@ The command batch can include:
 
 - allocation command
 - movement queue commands
-- future split/merge commands
 - end phase command
+
+Friendly merging is automatic core resolution. Manual unstacking, split
+commands, and multi-select are outside Milestone 1.
 
 The rules engine validates bot commands the same way it validates human commands.
 
@@ -39,7 +41,7 @@ Observable state includes:
 
 Observable state excludes hidden enemy positions, hidden queues, hidden income, hidden exact research, and hidden wall damage.
 
-## V1 Rule-Based Bot
+## Milestone 1 Rule-Based Bot
 
 The first bot should use a configurable heuristic profile from `data/bots/baseline_rule_bot.json`.
 
@@ -85,7 +87,23 @@ Profile fields can adjust behavior without changing code:
 - Bots must not modify state directly.
 - Bots must not read compact replay logs beyond what a player could know during a match.
 - Bot randomness must use seeded streams so simulations are reproducible.
+- Attempted hidden-state access and invalid commands are hard evaluation
+  failures, not merely metrics.
+- The frozen prototype bot/profile remains immutable as the comparison opponent.
 
-## Future AI-Assisted Improvement
+## Guarded External AI-Assisted Improvement
 
-AI systems may propose profile changes or new heuristic rules, but validation must happen through headless simulation. No AI-proposed rule should be accepted without measurable automated evaluation.
+Milestone 1 includes an external Python champion/challenger workbench. It sends
+only sanitized profile/schema values and generated development metrics and may
+modify only allowlisted scalar or registered-toggle leaves in a candidate
+profile based on the exact champion hash.
+
+Model output cannot author or edit source, rules, maps, prompts, scripts,
+trackers, or shell commands. It never receives secrets, source, device/personal
+data, or holdout seeds/results. The Android app contains no model code or key.
+
+Every candidate must pass schema, deterministic, tactical, fog, legality,
+termination, side-bias, duration, development, and hidden-holdout gates before
+the coordinating agent may promote it transactionally. Rejection and failure
+leave champion bytes unchanged. Exact statistical thresholds and paid-call
+controls are authoritative in the P03/P04 requirements and M1 plan.

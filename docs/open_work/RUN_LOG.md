@@ -78,6 +78,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: close and commit T06, then perform full P00 authority reconciliation, hygiene, publication, and P01 handoff in `M1-P00-T07`.
 
+### M1-RUN-20260719-001 / closeout-validation boundary / M1-P00-T07
+
+- Status: Progress
+- Branch/ref: `milestone/m1-vertical-slice` after `607859f`
+- Files or artifacts: reconciled authority documents, exact archived-note rename, line-ending policy, PhaseClose regression, current normal/QA APKs, and emulator artifact `artifacts/visual_qa/20260719_125340/allocation_staged`.
+- Decisions: retain P00 as active and keep G05/HYG-06 unchecked until the final QA build receives an alias-only physical ready handshake; emulator evidence is not a substitute.
+- Validation and exact result: pinned core, three-size UI smoke, visual-contract, tracker/skill/data/link/safety checks and both APK inspections pass locally. Normal hash is `36ee04e6...`; current emulator-ready QA hash is `2898bae8...`.
+- Blockers or risks: `B-001` — Windows and ADB currently detect no physical Android target. Public CI is also pending the intentional closeout push.
+- Paid call and ledger entry: None
+- Exact next action: commit/push the T07 reconciliation checkpoint, require green public CI, and retry the physical S24 handshake when Windows detects it.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

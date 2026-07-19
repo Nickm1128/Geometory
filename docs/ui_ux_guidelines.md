@@ -2,9 +2,11 @@
 
 ## Target Device And Layout
 
-Primary test device: Galaxy S24. V1 is portrait-first and must adapt to other Android aspect ratios.
+Primary test device: the alias-only Galaxy S24 profile in `docs/device_validation_profile.md`. Milestone 1 is portrait-first and must adapt to other Android aspect ratios.
 
-Do not hardcode layout for one resolution. Use anchors, containers, safe margins, and scalable HUD panels.
+Do not hardcode layout for one resolution. Production uses live Android safe-area
+data, anchors, containers, scalable HUD panels, and persisted UI scale. QA may
+inject a declared device profile; it must never replace live production insets.
 
 ## Screen Principles
 
@@ -17,7 +19,7 @@ Do not hardcode layout for one resolution. Use anchors, containers, safe margins
 ## Touch Targets
 
 - Minimum target: 48 dp equivalent.
-- Preferred important action target: 56-64 dp equivalent.
+- Primary actions: at least 56 logical pixels; 64 is preferred where space allows.
 - Maintain at least 8 dp spacing between adjacent critical actions.
 - Hex selection should tolerate small finger offset and choose nearest valid tile.
 - Long press should be optional, never required for core play.
@@ -31,6 +33,16 @@ Recommended portrait layout:
 - Bottom action panel: context actions for selected tile/stack.
 - Allocation sheet: bottom sheet opened at start of allocation phase.
 - Turn summary sheet: compact result log after movement/combat.
+
+Main Menu, Continue Match, Review Last Match, Quick Play, How to Play, Settings,
+allocation, movement, warnings, pause, turn summary, game over, and replay are
+all player-facing Milestone 1 flows. A complete match must be understandable
+without Dev Tools.
+
+During play, the selected stack shows health/quality and the same visible enemy
+strength context available on the board. Turn and combat summaries use real
+events, while allocation/income changes, territory capture, wall damage or
+breach, and victory/defeat each receive immediate, unambiguous feedback.
 
 ## Modal Rules
 
@@ -57,7 +69,7 @@ Recommended portrait layout:
 
 ## Visual Direction
 
-Default V1 direction: clean strategic dark board with thin light grid lines and distinct player colors. A light theme can be added later if readability demands it.
+Default Milestone 1 direction: clean strategic dark board with thin light grid lines and distinct player colors. A light theme can be added later if readability demands it.
 
 Guidelines:
 
@@ -66,13 +78,18 @@ Guidelines:
 - Subtle gradient or vignette background, not busy texture.
 - Fog should hide information clearly without making the board look broken.
 - Walls should be readable at both macro and micro zoom levels.
+- Macro-region boundaries/grouping must be visible enough to deliver the
+  macro-fantasy pillar without obscuring micro-hex tactics.
+- Ownership, selection, capital, threat, fog frontier, damage, and queued paths
+  require non-color cues and readable zoom-level states.
 
 ## Accessibility Baseline
 
 - Do not encode ownership by color only; include outline, pattern, or icon accents for selected/critical states.
 - Avoid rapid flashing.
 - Keep combat/result summaries available in text.
-- Allow UI scale tuning later through settings.
+- Persist UI scales 1.00, 1.15, and 1.30, tips, and reduced-motion settings.
+- Bundle the chosen font so deterministic fixtures do not depend on host fonts.
 
 ## Validation Checklist
 
@@ -83,3 +100,12 @@ Before marking UI work complete:
 - Verify tap targets are reachable with one hand.
 - Verify text does not clip at large UI scale.
 - Verify fog/player colors remain readable over the chosen background.
+- Render the required state directly through the versioned 26-scenario fixture
+  catalog instead of navigating a whole match.
+- Test critical screens at 360x800, 393x852, and 480x960 and at UI scales 1.00,
+  1.15, and 1.30.
+- Pass every required scenario on the dedicated API-36 emulator and physical
+  Galaxy S24 with no safe-area violation, clipping, illegal overlap, undeclared
+  ellipsis, crash, ANR, or script error.
+- Pixel-compare only canonical 393x852 Windows/OpenGL/Godot-4.6.3 captures;
+  review emulator/device captures structurally across platforms.

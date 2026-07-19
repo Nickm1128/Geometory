@@ -63,6 +63,19 @@ In P00, `safe_area_profile` is provenance carried through the handshake while `s
 
 P00 implements the 16 states reachable through current presentation APIs and reserves all 26 Milestone 1 identifiers. Hard midgame, combat, result, and replay fixtures remain intentionally unimplemented until their underlying phase features exist.
 
+## Golden Review Policy
+
+Only canonical 393x852 captures produced on Windows/OpenGL/Godot 4.6.3 are
+pixel-compared. A same-environment comparison fails when changed pixels exceed
+0.20% or mean RGB delta exceeds 0.50/255. Emulator and physical-device captures
+are reviewed structurally across platforms and never judged against those pixel
+thresholds.
+
+Updating a tracked golden requires an explicit approval flag, task ID, reason,
+successful structural assertions, and a contact sheet that the coordinator has
+inspected. Capture tooling must refuse an implicit or unattributed baseline
+rewrite.
+
 The production APK contains the inert exported-project setting that selects the
 QA main scene only when the build-time `visual_qa` feature exists. Normal export
 has no such feature and packages zero QA scenes, scripts, schemas, or tests, so

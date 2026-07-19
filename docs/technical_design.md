@@ -2,12 +2,14 @@
 
 ## Engine Target
 
-The project is scaffolded for Godot 4.x using typed GDScript. If the installed Godot version differs, update this document and `godot/project.godot` before implementation.
+Milestone 1 is pinned to official standard Godot 4.6.3 with typed GDScript and matching export templates. `tools/toolchain.json` is the machine-readable version/hash authority; a different engine cannot silently substitute for validation or export.
 
 ## Directory Strategy
 
 ```text
 Geometory/
+  AGENTS.md  autonomous operating fallback
+  codex/     repository-canonical project skills
   docs/      design authority and workflows
   data/      rules, maps, bot configs, schemas over time
   core/      engine-agnostic contracts and subsystem boundaries
@@ -35,6 +37,7 @@ Owns:
 - wall rules
 - bot observable-state API
 - replay events
+- canonical state hashing and explicitly owned deterministic RNG streams
 
 Must not own:
 
@@ -56,7 +59,7 @@ Owns:
 - movement previews
 - HUD, allocation panels, modal sheets
 - animation and visual feedback
-- audio/haptics later
+- audio and haptics presentation
 
 Presentation submits serializable commands to the core and renders resulting state/events.
 
@@ -72,11 +75,15 @@ Bots use the same command path as humans:
 Match State -> Fog Filter -> Observable State -> Bot Policy -> Commands -> Validator
 ```
 
+The bot receives a capability-limited snapshot, never the `GameCore` object.
+Own stacks retain full data; visible enemies expose only player-visible strength
+context and never private queues, economy, or research.
+
 ## State Model
 
 The core state should be serializable as dictionaries/JSON-compatible data:
 
-- `MatchState`: seed, turn index, active player, phase, ruleset ID, map ID, players, tiles, walls, stacks, command/event history IDs.
+- `MatchState`: seed, global player-turn ordinal, active player, phase, ruleset ID/hash, map ID/hash, players, tiles, walls, stacks, accepted-command history, rejected-command diagnostics, events, and RNG-stream state/derivation metadata.
 - `PlayerState`: bank cents, research bps, pending soldiers, economy bonuses, capital tile, eliminated flag.
 - `TileState`: axial coordinate, region ID, home owner, controller, terrain tags.
 - `WallState`: edge endpoints, owner, current HP, max HP, destroyed flag.
@@ -85,18 +92,24 @@ The core state should be serializable as dictionaries/JSON-compatible data:
 
 ## Command Model
 
-Commands are the multiplayer and replay boundary. Initial command types are defined in `core/contracts/commands.md`.
+Commands are the human, bot, replay, and future-network boundary. Initial command types are defined in `core/contracts/commands.md`.
 
 Rules:
 
 - Commands are intent, not results.
 - Commands must include player ID, turn, phase, and stable target IDs.
-- The rules engine validates legality against current state.
+- Source sequence is monotonically increasing and validated with player, turn,
+  phase, ownership, spend range, waypoint existence, path mode, and duplicate
+  rules. Multi-waypoint destinations need not be adjacent at submission time;
+  every edge actually executed by movement is revalidated for adjacency and
+  legality during resolution.
+- The rules engine validates the complete command before mutating state or
+  recording history; rejected commands go only to diagnostics.
 - Results are emitted as events and can be compacted for replay notation.
 
 ## Config Strategy
 
-Use JSON for V1 rules, maps, and bot profiles because it is easy to diff, load in Godot, and inspect from external tools.
+Use JSON for Milestone 1 rules, maps, bot profiles, schemas, and generated normalized evidence because it is easy to diff, load in Godot, and inspect from external tools.
 
 - Rules: `data/rules/default_rules.json`
 - Map: `data/maps/alpha_handcrafted.map.json`
@@ -114,7 +127,7 @@ Hardcoded constants are allowed only for schema defaults in tests; gameplay shou
 
 ## Godot Scene Strategy
 
-V1 scene tree target:
+Milestone 1 scene/component target:
 
 ```text
 Main.tscn
@@ -130,31 +143,52 @@ Main.tscn
 
 Scenes must not implement rules directly. They can cache visual state but must reconcile from core events.
 
+The current prototype keeps most presentation behavior in one large script. P05
+extracts reusable screen shell, HUD, sheet, modal, result, replay, and visual
+state components while preserving the `GameCore` facade.
+
 ## Headless Testing
 
-Headless tests should run through Godot once the executable path is known:
+Headless tests run through the pinned engine:
 
 ```text
-godot --headless --path godot --script res://tests/run_core_tests.gd
+$godot = powershell -NoProfile -ExecutionPolicy Bypass -File tools/find_godot.ps1 -RequirePinned | Select-Object -First 1
+& $godot --headless --path godot --script res://tests/run_core_tests.gd
 ```
-
-Until Godot is discoverable, tests can be documented and scaffolded but not executed locally.
 
 ## Save/Replay Format
 
-V1 should save:
+Milestone 1 persists an active match atomically after every accepted command.
+Resume reconstructs from seed, setup/config hashes, and accepted commands rather
+than trusting a saved snapshot. On completion, the active record is cleared and
+the latest completed replay is retained for player review. Debug snapshots may
+exist as evidence but are never the source of determinism; there are no manual
+save slots or replay library.
 
-- full JSON state snapshots for debugging
-- compact replay notation for analysis and AI review
-
-A replay can be replayed from initial seed, map, ruleset, and commands. Snapshot saves are convenience artifacts, not the source of determinism.
+GMTY1 carries schema/version, setup, configuration hashes, all accepted command
+types/sequences, and step/final hashes. Unsupported, corrupt, truncated, or stale
+records fail safely and are quarantined with recoverable diagnostics.
 
 ## Networking Preparation
 
-Do not implement networking in V1. Preserve the network path by ensuring:
+Do not implement networking in Milestone 1. P2P, lobbies, accounts, servers, and
+network synchronization begin in Milestone 2 or later. Preserve that path by
+ensuring:
 
 - all player actions are serializable commands
 - rules advance deterministically
 - random streams are seeded
 - command validation is centralized
 - replay command logs are complete enough to reconstruct matches
+
+## Android And Visual-QA Boundary
+
+The production package is `com.milin.geometory`; the QA-only package is
+`com.milin.geometory.qa`. Build-time `visual_qa` selects a wrapper main scene and
+fixture resources that the normal preset excludes. Production scripts contain
+no fixture route, and neither package contains tests or network permissions.
+
+The fixture request/ready contract carries schema, nonce, scenario, seed, UI
+scale, safe-area provenance, APK hash, viewport, live safe area, assertions,
+errors, and deterministic state hash. P00 reserves 26 scenario IDs; P05 completes
+and visually certifies them.

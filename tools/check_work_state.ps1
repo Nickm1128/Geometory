@@ -102,7 +102,7 @@ $requiredPhaseFiles = @("REQUIREMENTS.md", "TASKS.md", "EXIT_GATES.md", "NOTES.m
 $milestoneRoot = Join-Path $workRoot "milestone_1"
 
 foreach ($entry in $expectedPhases.GetEnumerator()) {
-  $phaseId = $entry.Key
+  $parsedPhaseId = $entry.Key
   $phaseDir = Join-Path $milestoneRoot $entry.Value
   if (-not (Test-Path -LiteralPath $phaseDir -PathType Container)) {
     Add-Error "Missing phase directory: $($entry.Value)"
@@ -111,12 +111,12 @@ foreach ($entry in $expectedPhases.GetEnumerator()) {
   $actualNames = @(Get-ChildItem -LiteralPath $phaseDir -File | Select-Object -ExpandProperty Name)
   foreach ($requiredName in $requiredPhaseFiles) {
     if ($requiredName -notin $actualNames) {
-      Add-Error "$phaseId is missing $requiredName."
+      Add-Error "$parsedPhaseId is missing $requiredName."
     }
   }
   foreach ($actualName in $actualNames) {
     if ($actualName -notin $requiredPhaseFiles) {
-      Add-Error "$phaseId contains unexpected phase file $actualName; phase directories must contain exactly four files."
+      Add-Error "$parsedPhaseId contains unexpected phase file $actualName; phase directories must contain exactly four files."
     }
   }
 
@@ -128,15 +128,15 @@ foreach ($entry in $expectedPhases.GetEnumerator()) {
   $requirementMatches = [regex]::Matches($requirementsText, '(?m)^- `(?<id>M1-P\d{2}-R\d{2})`\s+')
   $requirementIdLines = [regex]::Matches($requirementsText, '(?m)^- `M1-P\d{2}-R\d{2}`')
   if ($requirementMatches.Count -eq 0) {
-    Add-Error "$phaseId has no requirement IDs."
+    Add-Error "$parsedPhaseId has no requirement IDs."
   }
   if ($requirementMatches.Count -ne $requirementIdLines.Count) {
-    Add-Error "$phaseId contains an unparseable requirement entry."
+    Add-Error "$parsedPhaseId contains an unparseable requirement entry."
   }
   $requirementIds = @{}
   foreach ($match in $requirementMatches) {
     $id = $match.Groups['id'].Value
-    if (-not $id.StartsWith($phaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
+    if (-not $id.StartsWith($parsedPhaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
     if ($requirementIds.ContainsKey($id)) { Add-Error "Duplicate requirement ID: $id" }
     $requirementIds[$id] = $true
     if ($allRequirements.ContainsKey($id)) { Add-Error "Duplicate requirement ID across phases: $id" }
@@ -146,18 +146,18 @@ foreach ($entry in $expectedPhases.GetEnumerator()) {
   $taskPattern = '(?ms)^- \[(?<check>[ xX])\] `(?<id>M1-P\d{2}-T\d{2})` (?<title>[^\r\n]+)\r?\n  - Dependencies: (?<deps>[^\r\n]+)\r?\n  - Can run early: (?<early>Yes|No)\r?\n  - Definition of done: (?<done>[^\r\n]+)\r?\n  - Evidence: (?<evidence>[^\r\n]+)'
   $taskMatches = [regex]::Matches($tasksText, $taskPattern)
   $taskCheckboxLines = [regex]::Matches($tasksText, '(?m)^- \[[ xX]\] `M1-P\d{2}-T\d{2}`')
-  if ($taskMatches.Count -eq 0) { Add-Error "$phaseId has no parseable tasks." }
-  if ($taskMatches.Count -ne $taskCheckboxLines.Count) { Add-Error "$phaseId contains an unparseable task entry." }
+  if ($taskMatches.Count -eq 0) { Add-Error "$parsedPhaseId has no parseable tasks." }
+  if ($taskMatches.Count -ne $taskCheckboxLines.Count) { Add-Error "$parsedPhaseId contains an unparseable task entry." }
   foreach ($match in $taskMatches) {
     $id = $match.Groups['id'].Value
-    if (-not $id.StartsWith($phaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
+    if (-not $id.StartsWith($parsedPhaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
     if ($allTasks.ContainsKey($id)) {
       Add-Error "Duplicate task ID: $id"
       continue
     }
     $allTasks[$id] = [pscustomobject]@{
       Id = $id
-      Phase = $phaseId
+      Phase = $parsedPhaseId
       Checked = $match.Groups['check'].Value -match '[xX]'
       Dependencies = $match.Groups['deps'].Value.Trim()
       CanRunEarly = $match.Groups['early'].Value -eq "Yes"
@@ -168,24 +168,24 @@ foreach ($entry in $expectedPhases.GetEnumerator()) {
   $gatePattern = '(?ms)^- \[(?<check>[ xX])\] `(?<id>M1-P\d{2}-G\d{2})` (?<title>[^\r\n]+)\r?\n  - Evidence: (?<evidence>[^\r\n]+)'
   $gateMatches = [regex]::Matches($gatesText, $gatePattern)
   $gateCheckboxLines = [regex]::Matches($gatesText, '(?m)^- \[[ xX]\] `M1-P\d{2}-G\d{2}`')
-  if ($gateMatches.Count -eq 0) { Add-Error "$phaseId has no parseable exit gates." }
-  if ($gateMatches.Count -ne $gateCheckboxLines.Count) { Add-Error "$phaseId contains an unparseable exit-gate entry." }
+  if ($gateMatches.Count -eq 0) { Add-Error "$parsedPhaseId has no parseable exit gates." }
+  if ($gateMatches.Count -ne $gateCheckboxLines.Count) { Add-Error "$parsedPhaseId contains an unparseable exit-gate entry." }
   foreach ($match in $gateMatches) {
     $id = $match.Groups['id'].Value
-    if (-not $id.StartsWith($phaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
+    if (-not $id.StartsWith($parsedPhaseId + "-")) { Add-Error "$id is in the wrong phase directory." }
     if ($allGates.ContainsKey($id)) {
       Add-Error "Duplicate gate ID: $id"
       continue
     }
     $allGates[$id] = [pscustomobject]@{
       Id = $id
-      Phase = $phaseId
+      Phase = $parsedPhaseId
       Checked = $match.Groups['check'].Value -match '[xX]'
       Evidence = $match.Groups['evidence'].Value.Trim()
     }
   }
-  $phaseRecords[$phaseId] = [pscustomobject]@{
-    Id = $phaseId
+  $phaseRecords[$parsedPhaseId] = [pscustomobject]@{
+    Id = $parsedPhaseId
     Directory = $phaseDir
   }
 }

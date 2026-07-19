@@ -18,7 +18,7 @@ Every command includes:
 
 `client_sequence` is stable per command source and helps debug replay/network ordering.
 
-## V1 Commands
+## Milestone 1 Commands
 
 ### AllocateResources
 
@@ -82,15 +82,17 @@ Validation:
 - player is active
 - phase matches current phase
 
-## Future Commands
+## Explicitly Deferred Commands
 
-Planned after V1 core is stable:
+These intents are outside Milestone 1 and are not committed gameplay contracts:
 
 - split stack
-- merge stacks
 - cancel queued path
 - set rally behavior
-- request diplomacy or P2P lobby actions
+
+Friendly auto-merge is a deterministic movement-resolution rule, not a player
+command. Diplomacy, lobbies, and P2P synchronization are post-M1 systems and do
+not belong to this gameplay-command contract.
 
 ## Events
 

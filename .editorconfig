@@ -13,3 +13,6 @@ indent_size = 2
 
 [*.{md,json,cfg,tscn,tres}]
 indent_size = 2
+
+[*.{py,sh,bash}]
+end_of_line = lf

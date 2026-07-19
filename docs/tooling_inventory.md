@@ -71,6 +71,9 @@ official archive hash, and refuses to overwrite a different package at
 - `Android Visual QA`: package `com.milin.geometory.qa`; enables only the
   `visual_qa` feature and excludes tests.
 
+P00 certifies the current `0.1.0` normal and `0.1.0-qa` QA packages. P06 owns
+the final `0.2.0-m1` package pair.
+
 Both presets export arm64-v8a and x86_64, use min SDK 24 and target/compile SDK 36
 from the verified Godot 4.6.3 templates, disable Internet and network-state
 permissions, and retain only the vibration permission required by runtime
@@ -79,9 +82,10 @@ haptics. The normal and QA APKs are generated under ignored `exports/`.
 ## Validation Commands
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/find_godot.ps1 -RequirePinned
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/run_core_tests.ps1
+$godot = powershell -NoProfile -ExecutionPolicy Bypass -File tools/find_godot.ps1 -RequirePinned | Select-Object -First 1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/run_core_tests.ps1 -GodotPath $godot
 & $godot --headless --path godot --script res://tests/run_ui_smoke_tests.gd
+& $godot --headless --path godot --script res://tests/run_visual_qa_contract_tests.gd
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1 -Preset "Android Visual QA"
 ```
@@ -98,7 +102,7 @@ and manual dispatch. It performs:
 1. read-only work-state validation without assuming a workstation skill mirror;
 2. canonical/runtime data-copy parity checks;
 3. verified Godot 4.6.3 download and version reporting;
-4. deterministic core tests; and
+4. deterministic core tests;
 5. the three-size portrait UI smoke matrix; and
 6. deterministic visual-QA catalog/schema/hash contracts.
 

@@ -88,7 +88,7 @@
     "package_unique_name": "com.milin.geometory",
     "display_name": "Geometory",
     "orientation": "portrait",
-    "min_sdk": 23,
+    "min_sdk": 24,
     "target_sdk": 36
   }
 }

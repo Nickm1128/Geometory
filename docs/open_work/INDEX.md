@@ -5,10 +5,10 @@ workflow_state: "active"
 active_phase: "M1-P00"
 current_task: "M1-P00-T07"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Reconcile P00 authority documents and archived notes, run all exit/hygiene checks, publish immutable m1-p00, and activate M1-P01."
+exact_next_action: "Commit and push the reconciled P00 closeout for public CI, then obtain a current-build QA ready handshake after the physical S24 reconnects."
 last_completed_phase_tag: ""
-last_checkpoint_ref: "607859f"
-last_green_validation: "All 16 P00 visual fixtures, repeated hashes, strict envelopes, package isolation, and current emulator full-cycle capture passed on 2026-07-19."
+last_checkpoint_ref: "milestone/m1-vertical-slice"
+last_green_validation: "Pinned core, three-size UI, visual-contract, tracker, skills, data parity, both API-36 APK inspections, and current emulator QA handshake passed locally on 2026-07-19; public CI and current physical handshake remain pending."
 ---
 
 # Milestone 1 Work Index
@@ -19,7 +19,7 @@ last_green_validation: "All 16 P00 visual fixtures, repeated hashes, strict enve
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P00`
 - Active coordinator task: `M1-P00-T07`
-- Open blockers: none recorded
+- Open blockers: `B-001` (physical S24 absent from Windows/ADB; non-device T07 work continues)
 
 ## Phase Status
 
@@ -37,4 +37,8 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-P00 implementation lanes T01–T06 are green. Resume T07 by reconciling README/assumptions/roadmap/tooling/workflow authorities and the archived starter note, then run the full phase gate and hygiene/publication sequence without merging `main`.
+P00 implementation lanes T01–T06 and T07 authority/local-validation work are
+green. Resume T07 by pushing the intentional closeout checkpoint for public CI,
+then resolve `B-001` with an alias-only current-build phone ready handshake.
+After both lanes pass, complete hygiene, publish immutable `m1-p00`, and activate
+P01 without merging `main`.

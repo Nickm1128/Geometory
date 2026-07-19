@@ -1,9 +1,23 @@
 # Tests
 
-Testing is organized around the core-first architecture.
+The pinned Godot suites currently live under `godot/tests/` so they can load
+runtime scripts through `res://`. Root `tests/` is reserved for engine-agnostic
+Python/shell fixtures introduced by replay, simulation, bot, and AI-workbench
+phases.
 
-- `core_logic_tests`: economy, research, movement, fog, walls, combat.
-- `simulation_tests`: deterministic match replays, seed reproducibility, full match completion.
-- `bot_tests`: observable-state limits, command validity, heuristic behavior.
+Required test families grow in dependency order:
 
-Once Godot is discoverable, headless tests should run without loading gameplay scenes.
+- P01: command, movement, merge/control/combat, draw, fog, hash, and RNG core
+  contracts;
+- P02: GMTY1 parser/reconstruction, corrupt records, persistence/resume, and
+  rendered-free match batches;
+- P03: tactical scenarios, legality/privacy, paired league, side bias, and
+  bootstrap confidence;
+- P04: mocked model/schema/privacy/cost/timeout/promotion safety;
+- P05: 26 direct UI fixtures, size/scale matrices, structural device checks, and
+  canonical same-environment image diffs; and
+- P06: integrated Android lifecycle, interaction, performance, and release
+  certification.
+
+Tests and generated evidence are separate: stable fixtures/schemas belong in
+source; bulk reports, logs, screenshots, replays, and APKs stay ignored.

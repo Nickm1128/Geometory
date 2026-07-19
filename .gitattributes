@@ -1,0 +1,26 @@
+# Normalize text in the index while matching this Windows-first project's
+# EditorConfig checkout convention. Shell scripts remain LF for Unix runners.
+* text=auto eol=crlf
+
+*.sh text eol=lf
+*.bash text eol=lf
+*.py text eol=lf
+
+# Binary assets and build products must never receive line-ending conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.ctex binary
+*.bin binary
+*.pck binary
+*.zip binary
+*.tpz binary
+*.apk binary
+*.aab binary
+*.idsig binary
+*.keystore binary
+*.jks binary
+*.p12 binary
+*.pfx binary

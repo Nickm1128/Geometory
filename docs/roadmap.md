@@ -1,109 +1,67 @@
 # Milestone Roadmap
 
-## Phase 1: Foundation And Scaffold
+`docs/open_work/INDEX.md` is the authority for live status. This roadmap records
+durable sequencing and scope; the detailed requirements, tasks, gates, notes,
+and evidence live under `docs/open_work/milestone_1/`.
 
-Deliverables:
+## Milestone 1 — Autonomous Android Vertical Slice
 
-- project vision doc
-- authoritative rules doc
-- technical design doc
-- Android UI/UX guidelines
-- bot design doc
-- simulation/training-loop design doc
-- milestone roadmap
-- rules/map/bot config stubs
-- Godot project shell
-- project-specific Codex skills/workflows
+### P00 — Workflow, Trustworthy Baseline, And Tooling
 
-Exit criteria:
+Protect the original prototype in Git; install the autonomous work system and
+five synchronized skills; pin Godot 4.6.3/API 36; reproduce the Galaxy S24 test
+profile; establish CI and an isolated deterministic visual-fixture package.
 
-- future implementation has clear file locations and rules authority
-- constants are configurable
-- known tooling gaps are documented
+### P01 — Deterministic Core Correctness And Modular Contracts
 
-## Phase 2: Headless Core Prototype
+Lock strict command/sequence rules, accepted-command history, turn-80 draw,
+adjacent movement, merge/control/combat ordering, fog-safe bot observation,
+canonical hashes, owned RNG streams, and modular core responsibilities.
 
-Deliverables:
+### P02 — Replay, Simulation, Resume, And Evidence
 
-- load rules and map config
-- create match state from seed
-- command model and validator
-- turn loop
-- income/allocation/research/military math
-- seeded research schedule
-- axial hex pathing
-- movement queues
-- tile control
-- fog query
-- wall blocking/damage
-- deterministic combat
-- replay event emission
-- basic headless tests
+Complete GMTY1 parsing/serialization/reconstruction; add the production-core
+headless match runner, seed suites, manifests and metrics; persist active matches
+atomically; add Continue Match and last-match replay inspection.
 
-Exit criteria:
+### P03 — Competent Fair Baseline Bot
 
-- a full bot-vs-bot match can finish headlessly from seed
-- replay log can reproduce the same outcome
-- MVP implementation includes a playable human-vs-bot path using the same core.
+Freeze the prototype opponent, implement observable tactical features and
+profile-driven strategies, add tactical fixtures and paired evaluation, and
+meet termination, side-bias, legality, privacy, and win-rate gates.
 
-## Phase 3: Minimal Godot Playable
+### P04 — Guarded AI-Assisted Champion/Challenger Workbench
 
-Deliverables:
+Build the external Python proposal/evaluation/promotion cycle with strict schema,
+privacy, allowlist, cost, credential, deterministic evaluation, transactional
+promotion, and auditable accept-or-reject behavior. No model code or key enters
+the Android client.
 
-- render handcrafted map
-- camera pan/zoom
-- tap select tile/stack
-- path preview and queue command
-- allocation bottom sheet
-- turn transition flow
-- fog rendering
-- wall rendering
-- combat/result summaries
+### P05 — Mobile Aesthetics And UX Vertical Slice
 
-Exit criteria:
+Modularize the presentation, centralize visual/motion/haptic tokens, use live
+safe areas, expose macro regions and strategic state clearly, polish all menu,
+match, result, and replay flows, implement all 26 direct fixtures, and pass the
+multi-size/scale emulator and physical-device visual matrix.
 
-- one human can complete a local match against a bot on Android-sized viewport
-- Quick Play, How To Play, Settings, Dev Tools, Pause, and Game Over flows exist for phone playtesting.
+### P06 — Integrated Balance, Android Certification, And Closeout
 
-## Phase 4: Bot Competence Pass
+Run final simulations, replay/resume and tactical regressions, complete-match
+flows, lifecycle/upgrade/device interactions, performance sampling, manifest and
+APK certification, authority reconciliation, final hygiene, evidence report,
+and human playtest checklist. Publish `v0.2.0-m1` without merging to `main`.
 
-Deliverables:
+## Milestone 2 Or Later — Explicitly Deferred
 
-- baseline rule bot
-- bot profile config tuning
-- simulation batch runner
-- metrics report
-- invalid command diagnostics
+- P2P transport, lobbies, accounts, servers, and network synchronization
+- more than two active players
+- additional or procedural maps
+- multiple unit types
+- manual save slots and replay library
+- unstacking and multi-select
+- runtime LLM opponents or keys in the APK
+- Play Store submission
+- advanced music, audio, and animation production
 
-Exit criteria:
-
-- bot expands, defends, attacks visible opportunities, and finishes matches without cheating
-
-## Phase 5: Polish Vertical Slice
-
-Deliverables:
-
-- improved mobile layout
-- stronger visual hierarchy
-- map readability at zoom levels
-- smoother input feedback
-- balance pass
-- save/replay inspection flow
-- Android export validation
-
-Exit criteria:
-
-- prototype is stable and readable on Galaxy S24 and at least two additional aspect ratios
-
-## Phase 6: Networking And AI Loop Preparation
-
-Deliverables:
-
-- command sync design for P2P
-- replay compatibility tests
-- OpenRouter proposal ingestion prototype outside the game client
-- automated candidate validation harness
-
-Exit criteria:
-
-- networking and AI-assisted bot improvement can proceed without rewriting core rules
+Deterministic commands, replay contracts, and capability-limited observations
+preserve these future paths without putting them in Milestone 1.

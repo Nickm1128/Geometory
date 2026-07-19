@@ -2,7 +2,9 @@
 
 ## Purpose
 
-The simulation layer enables fast bot matches, replay analysis, balance testing, and later AI-assisted bot rule improvement without launching the full rendered game.
+The simulation layer enables fast bot matches, replay analysis, balance testing,
+and Milestone 1's guarded bot-profile improvement without launching the full
+rendered game. AI-authored gameplay rules or source are forbidden.
 
 ## Headless Simulation Requirements
 
@@ -11,6 +13,11 @@ The simulation layer enables fast bot matches, replay analysis, balance testing,
 - Advance state only through commands and deterministic rules.
 - Emit compact replay notation and aggregate metrics.
 - Support seeded batches for reproducible comparisons.
+- Use the exact production core and capability-limited bot interface.
+- Write deterministic JSON metrics, compact replays, manifests, state/version
+  hashes, timing, and explicit errors.
+- Support fixed development and hidden-holdout seed sets with paired,
+  side-swapped matches.
 
 ## Simulation Batch Flow
 
@@ -63,18 +70,44 @@ END winner=P1 turns=18 elim=P2@T18
 
 Notation rules are tracked in `core/contracts/replay_notation.md`.
 
-## AI-Assisted Bot Loop
+## Guarded Milestone 1 AI-Assisted Bot Loop
 
-Later workflow with OpenRouter or another external AI system:
+The external Python 3.11 CLI owns `propose`, `evaluate`, `promote`, and `cycle`.
+The Android client never contains credentials or model code. The default is the
+fixed `openai/gpt-5-mini` model through non-streaming OpenRouter Chat
+Completions with strict structured
+output with `provider.require_parameters=true` and
+`provider.data_collection="deny"`, temperature 0.2, seed 12345, and 2,500
+maximum output tokens; a user may
+explicitly override the model through `OPENROUTER_MODEL`, never `auto`/`latest`.
 
-1. Run a baseline simulation batch.
-2. Export compact replays plus metric summaries.
-3. Send summaries to the AI model, not full hidden state dumps unless analyzing postgame omniscient logs intentionally.
-4. Ask for rule/profile changes with clear constraints.
-5. Convert proposals to structured candidate patches.
-6. Validate schema, determinism, and safety.
-7. Run comparison batches against the baseline.
-8. Keep changes only if they improve target metrics or useful behavioral diversity.
+One cycle makes exactly one paid proposal request. A retry is a new cycle and an
+ambiguous timeout is never automatically retried. Integer-microdollar accounting
+reserves conservative maximum cost before a call and reconciles returned usage
+and generation statistics. Hard limits are $1.00/cycle and $10.00 total M1, with
+a coordinator lock, a current-pricing lookup before conservative reservation,
+and `OPENROUTER_API_KEY` referencing a dedicated server-capped key no greater
+than $10.
+
+The request may contain only sanitized profile values, schemas, and generated
+development metrics. Never send source or source-bearing prompts, secrets,
+device/personal data, or holdout seeds/results. A proposal may change only
+allowlisted scalar or registered-toggle profile leaves against an exact champion
+hash; it cannot alter source, rules, maps, prompts, scripts, trackers, or shell
+commands.
+
+Cycle flow:
+
+1. Reserve the paid budget and obtain one strict-schema proposal.
+2. Validate provider controls, privacy, exact base hash, allowlist, types, ranges,
+   and normalized candidate bytes.
+3. Run tactical/deterministic gates and 200 paired development seeds.
+4. For a surviving candidate, run 500 separate paired hidden-holdout seeds.
+5. Produce a deterministic evaluation report; reject without touching the
+   champion, or have the coordinator-owned workflow automatically promote a
+   fully passing candidate transactionally.
+6. Synchronize runtime data, rerun full validation, and create the auditable task
+   commit only after a passing promotion.
 
 ## Acceptance Gate For Bot Changes
 
@@ -87,6 +120,17 @@ A bot profile or heuristic change should report:
 - behavioral diversity notes
 - regressions or degenerate strategies observed
 
+Promotion also requires zero invalid/fog violations, at most 1% max-turn
+matches, no more than five percentage points of side bias, median duration within
+±20% of the champion, at least 55% candidate score in both suites, and a paired
+bootstrap 95% lower bound above 50% in both. Exact P03 baseline-opponent gates
+remain separately required.
+
 ## Artifact Policy
 
-Generated replays, batch reports, and AI proposals should go under ignored folders such as `artifacts/`, `reports/generated/`, or `replays/generated/`. Curated findings can be promoted into docs.
+Raw/redacted transport data, replays, and bulk generated output stay ignored
+under `artifacts/`, `reports/generated/`, or `replays/generated/`. Version only
+normalized proposals, candidates, evaluation reports, generation IDs/hashes,
+the integer cost ledger, and curated findings required for auditability. Missing
+or uncapped credentials block only the live-call lane; mock evaluation and
+preapproved P05 work can continue.

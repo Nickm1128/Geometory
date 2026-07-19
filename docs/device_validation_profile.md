@@ -12,6 +12,10 @@ The machine-readable, non-identifying profile is
 Android ID, account, phone number, Wi-Fi address, or another unique identifier
 to that file, documentation, logs, screenshots, or task evidence.
 
+`primary_galaxy_s24` is the alias for the physical target. The intentionally
+different `galaxy_s24_primary` value is the injectable visual-contract
+safe-area profile ID; neither value is a hardware identifier.
+
 ## Authoritative Physical Profile
 
 | Field | Certified value |

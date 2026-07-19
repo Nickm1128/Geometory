@@ -1,10 +1,10 @@
 # Authoritative Game Rules
 
-This document is the source of truth for V1 gameplay behavior. Constants live in `data/rules/default_rules.json` and should be read from configuration rather than hardcoded.
+This document is the source of truth for Milestone 1 gameplay behavior. Constants live in `data/rules/default_rules.json` and must be read from configuration rather than hardcoded. Open-work trackers distinguish intended rules from implementation still pending validation.
 
 ## Match Objective
 
-Up to 6 players can exist in the architecture. V1 may ship with fewer. The winner is the last non-eliminated player.
+Up to 6 players may remain representable in architecture, but Milestone 1 has exactly two active players: human P1 and bot P2. The winner is the last non-eliminated player; an unfinished match is a draw after global player-turn 80 resolves.
 
 A player is eliminated when an enemy controls that player's capital tile after combat and control resolution. All tiles controlled by the eliminated player transfer to the capital capturer.
 
@@ -15,7 +15,7 @@ A player is eliminated when an enemy controls that player's capital tile after c
 - Each player starts with one home macro region.
 - Each home region has one capital tile at its center.
 - Neutral tiles exist between or around home regions to create early expansion pressure.
-- MVP map `Alpha Medium` is a radius-6 axial board with 127 total tiles. P1 and P2 home regions are radius-2 around their capitals and contain 19 tiles each.
+- Milestone 1 map `Alpha Medium` is a radius-6 axial board with 127 total tiles. P1 and P2 home regions are radius-2 around their capitals and contain 19 tiles each.
 
 ## Tile Ownership And Control
 
@@ -26,7 +26,7 @@ Each tile has:
 - `region_id`: macro grouping.
 - optional wall edges around home-region perimeter.
 
-V1 uses pass-through capture. A living stack changes `controlled_by` for every tile it successfully enters. If a player later moves over that tile again, they reclaim it.
+Milestone 1 uses pass-through capture. After uncontested movement, a living mover controls the destination tile. On a contested destination, control does not change until combat resolves; the surviving combatant controls it. If a player later moves over a tile again, they reclaim it after the same resolution rule.
 
 ## Fog Of War
 
@@ -40,7 +40,7 @@ Bots receive the same observable state as a human player. Hidden tiles must not 
 
 ## Turn Structure
 
-V1 uses sequential player turns. On player P's turn:
+Milestone 1 uses sequential player turns. `turn` is the global player-turn ordinal, not a round number or per-player counter. On player P's turn:
 
 1. Spawn soldiers purchased on P's previous turn at P's capital.
 2. If P's capital is enemy-controlled, eliminate P before further action.
@@ -48,8 +48,11 @@ V1 uses sequential player turns. On player P's turn:
 4. Allocation phase: P may spend banked money on Economy, Military, and Research.
 5. Movement phase: P may add or replace queued waypoints for selected stacks.
 6. Movement tick: P's living stacks advance at most 1 tile along their queued paths.
-7. Resolve wall attacks, tile control, combat, and eliminations.
+7. Resolve wall attacks, uncontested movement control, combat, survivor control,
+   and eliminations in that order.
 8. Advance to the next non-eliminated player.
+
+After resolution of player-turn 80, an unfinished match ends immediately in a deterministic draw.
 
 ## Money
 
@@ -66,14 +69,14 @@ final_income = floor(base_income * (10000 + active_economy_bonus_bps) / 10000)
 
 ## Economy Allocation
 
-Default V1 economy investment is temporary and non-compounding.
+Default Milestone 1 economy investment is temporary and non-compounding.
 
 ```text
 economy_units = floor(economy_spend_cents / economy_bonus_unit_cost_cents)
 next_turn_income_bonus_bps = min(economy_units * economy_bonus_bps_per_unit, economy_bonus_cap_bps)
 ```
 
-When `economy.compounds` is true in config, the bonus is added to an accumulated player economy level instead of replacing the next-turn bonus. V1 should keep this off.
+When `economy.compounds` is true in config, the bonus is added to an accumulated player economy level instead of replacing the next-turn bonus. Milestone 1 keeps this off.
 
 ## Research Allocation
 
@@ -89,6 +92,8 @@ research_schedule[turn] = {
 ```
 
 The schedule is sampled from the match seed and stored in match state/replay header.
+
+The complete schedule and its current configuration are public information shown consistently to the player and exposed to bots through their observable contract.
 
 On allocation:
 
@@ -136,8 +141,12 @@ Stack aggregate health is the sum of cohort health. Stack expected damage is the
 - Each living stack may have a queue of waypoint tile IDs.
 - During a movement tick, each active-player stack advances at most 1 tile toward the first waypoint.
 - When a waypoint is reached, it is removed and the next waypoint becomes active.
-- If a path is blocked by a living enemy, unresolved combat, or wall, the stack stops and waits for resolution.
+- A live wall blocks its edge. Contact with a living enemy creates a contested
+  destination for combat resolution; it does not grant control before survival
+  is known.
 - If a stack survives combat, its remaining waypoints stay queued.
+- Every executed edge must still be adjacent and legal at resolution time; a stale queue can never jump an invalid edge.
+- Friendly stacks that meet automatically merge compatible cohorts, clear both source queues, and emit an explanatory event. Milestone 1 does not support manual unstacking.
 
 ## Walls
 
@@ -151,7 +160,7 @@ Walls are edge blockers, not units on tiles.
 
 ## Combat
 
-V1 combat is deterministic and modular.
+Milestone 1 combat is deterministic and modular.
 
 Resolution order:
 
@@ -175,4 +184,4 @@ A match must be reproducible from:
 - player/bot setup
 - command history
 
-All random values must come from deterministic seeded streams recorded or derivable from the match seed.
+Only fully validated, accepted commands enter command history; rejected attempts stay in separate diagnostics. All random values must come from explicitly owned deterministic streams recorded or derivable from the match seed. Canonical SHA-256 state hashing verifies reconstruction at declared steps and match end.

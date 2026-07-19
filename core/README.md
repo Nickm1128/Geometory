@@ -1,6 +1,8 @@
 # Core Contracts
 
-This directory defines the engine-agnostic organization for Geometory's headless game logic. Runtime code will initially live in `godot/scripts/core` so Godot can load it, but it must follow these subsystem boundaries.
+This directory defines the engine-agnostic contracts for Geometory's headless
+game logic. Runtime GDScript lives in `godot/scripts/core` so Godot can load it;
+P01–P04 progressively enforce these subsystem boundaries and add runners/tools.
 
 ## Subsystems
 
