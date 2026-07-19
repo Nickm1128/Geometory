@@ -39,8 +39,11 @@ Normal debug package:
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1 -GodotPath $godot
 ```
 
-The QA-only package and direct fixture export are introduced by
-`M1-P00-T06`; do not infer that route before that task is complete.
+QA-only package:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1 -GodotPath $godot -Preset "Android Visual QA"
+```
 
 Use `-Install` and optional `-Serial` only after confirming the intended ADB
 target. Never record the physical phone serial in tracked files, logs, or task
@@ -61,7 +64,7 @@ tools against the generated APK. Record evidence for:
 
 The normal package must be `com.milin.geometory`, contain no `visual_qa` or test
 resources, and request neither `android.permission.INTERNET` nor
-`android.permission.ACCESS_NETWORK_STATE`. After T06, the QA package must be
+`android.permission.ACCESS_NETWORK_STATE`. The QA package must be
 `com.milin.geometory.qa`; it may contain the fixture harness but no test suite.
 
 Warnings are evidence, not automatic failures. Record and classify each one;
@@ -75,9 +78,9 @@ from the physical phone. Use an explicit serial whenever more than one target is
 connected. For the physical phone, capture and publish only the non-identifying
 profile fields authorized in `tools/device_profiles/`.
 
-Normal builds launch the production main scene. After T06, QA builds launch the
-fixture scene only because the `visual_qa` export feature is present. A QA route
-in the normal APK is a release-blocking defect.
+Normal builds launch the production main scene. QA builds launch the fixture
+scene only because the `visual_qa` export feature is present. A QA route in the
+normal APK is a release-blocking defect.
 
 For each target, verify:
 
@@ -95,11 +98,10 @@ cleared the screen.
 
 ## 6. Visual-QA Evidence
 
-After T06, follow `docs/workflows/visual_qa.md` for deterministic fixture
-requests, ready-marker validation, screenshots, manifests, assertions, and
-logs. A package launch is not visual certification. During P00, only
-foundation/launch evidence is required; the full device matrix and canonical
-golden review are P05 work.
+Follow `docs/workflows/visual_qa.md` for deterministic fixture requests,
+ready-marker validation, screenshots, manifests, assertions, and logs. A package
+launch is not visual certification. During P00, only foundation/launch evidence
+is required; the full device matrix and canonical golden review are P05 work.
 
 Keep APKs, screenshots, logcat output, window dumps, contact sheets, and image
 diffs under ignored artifact directories. Version only stable schemas, fixture

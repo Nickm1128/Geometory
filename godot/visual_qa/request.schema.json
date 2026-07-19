@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geometory.local/schemas/visual-qa-request-v1.json",
+  "title": "Geometory Visual QA Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "nonce",
+    "scenario_id",
+    "seed",
+    "ui_scale",
+    "safe_area_profile",
+    "build_id"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "nonce": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "scenario_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+    "ui_scale": { "enum": [1.0, 1.15, 1.3] },
+    "safe_area_profile": { "enum": ["live", "galaxy_s24_primary"] },
+    "build_id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

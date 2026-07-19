@@ -47,3 +47,15 @@ Append dated findings and decisions. Link durable product changes to the relevan
 - Fidelity boundary: emulator cutout, corners, haptics, and 60-Hz behavior are not substitutes for physical S24 certification.
 - Cross-phase impact: P05 visual structure and P06 performance/lifecycle work must use the physical profile as authority while treating emulator-specific pixels as noncanonical.
 - Exact next action: certify the deterministic 26-scenario contract foundation, separate QA package, and direct emulator/phone launch path under `M1-P00-T06`.
+
+## 2026-07-19 — M1-P00-T06
+
+- Status: Complete as a fixture/package contract foundation; visual certification remains explicitly pending P05.
+- Architecture: the 26-ID catalog, strict request/ready schemas, QA wrapper scene, direct capture runner, and separate `com.milin.geometory.qa` package are versioned. Sixteen states reachable through current presentation APIs are implemented; combat/result/replay states remain reserved until their owning phases exist.
+- Determinism remediation: production UI commands currently use millisecond client sequences. The QA hash now retains semantic accepted-command content while normalizing only that volatile transport field; five isolated runs of each representative match fixture produced one hash, and regression tests prove semantic path changes still alter the hash. P01 remains responsible for the production canonical state hash.
+- Robustness remediation: fixture requests must actually apply their requested seed/scale; malformed or missing requests emit schema-valid failure markers; capture stops before screenshots on readiness failure; ADB target reconnect is retried by selected target; explicit output directories must be new/empty; and remote screenshot cleanup runs on failure.
+- Package boundary: normal export has no `visual_qa` feature and contains zero QA scenes/scripts/schemas/tests. Its exported project metadata retains the inert feature-override selector, but the referenced scene is absent and cannot be loaded. The QA export alone enables the feature and packages the fixture.
+- Device evidence: the current emulator export/install/ready/capture path passes overlay, unrelated-window, app-fatal-log, schema, echo, and assertion checks. Earlier alias-only physical evidence proves QA launch/readiness; its capture was rejected because an unrelated visible window was present, with no screenshot/log retained and no unrelated application altered.
+- Visual finding for P05: the 1080x2340 allocation fixture at UI scale 1.15 shows severe horizontal compression in allocation controls, including vertically wrapped button text and unusable narrow controls. This is accepted evidence that the harness works, not a visual pass.
+- Cross-phase impact: P05 must implement the remaining 10 fixtures, safe-area injection, semantic screen assertions, layout repair, canonical goldens, matrices, and visual certification. P06 must re-inspect both final package boundaries and manifests.
+- Exact next action: reconcile all P00 authorities, archive the starter note, run phase hygiene/gates, publish immutable `m1-p00`, and activate P01 under `M1-P00-T07`.

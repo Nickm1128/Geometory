@@ -67,6 +67,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: close and commit T05, then validate the isolated visual-QA fixture/package foundation for `M1-P00-T06`.
 
+### M1-RUN-20260719-001 / visual-contract boundary / M1-P00-T06
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` after `607859f`
+- Files or artifacts: 26-ID fixture catalog; strict request/ready schemas; QA-only scene/scripts/preset/package; schema validator and capture runner; ignored emulator/physical evidence under `artifacts/visual_qa/`.
+- Decisions: P00 certifies deterministic reachability, package isolation, and capture integrity only. It intentionally does not approve layout/aesthetics or implement states whose replay/combat/result owners are later phases.
+- Validation and exact result: contract/unit suites passed; all 16 implemented fixtures passed direct execution; representative hashes were stable across five runs; malformed requests produced strict failure envelopes; current emulator full-cycle capture passed. Normal/QA APK hashes are `3839079c...`/`9831b1f0...`; normal contains zero loadable QA/tests, QA contains fixture resources and zero tests, and both request only `VIBRATE`. Physical launch/readiness passed earlier; unrelated-overlay capture was rejected without retained screenshot/log.
+- Blockers or risks: no P00 blocker. Severe allocation-control compression/vertical text is a recorded P05 remediation, and the remaining 10 catalog states depend on P02/P05 features.
+- Paid call and ledger entry: None
+- Exact next action: close and commit T06, then perform full P00 authority reconciliation, hygiene, publication, and P01 handoff in `M1-P00-T07`.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

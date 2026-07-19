@@ -64,15 +64,17 @@ official archive hash, and refuses to overwrite a different package at
 
 ## Android Export Presets
 
-`godot/export_presets.cfg` defines the normal debug preset:
+`godot/export_presets.cfg` defines two debug presets:
 
-- `Android Debug`: package `com.milin.geometory`; excludes tests.
+- `Android Debug`: package `com.milin.geometory`; excludes tests and all visual-QA
+  resources.
+- `Android Visual QA`: package `com.milin.geometory.qa`; enables only the
+  `visual_qa` feature and excludes tests.
 
-It exports arm64-v8a and x86_64, uses min SDK 24 and target/compile SDK 36
-from the verified Godot 4.6.3 templates, disables Internet and network-state
-permissions, and retains only the vibration permission required by runtime
-haptics. `M1-P00-T06` adds the isolated QA preset and feature route. APKs are
-generated under ignored `exports/`.
+Both presets export arm64-v8a and x86_64, use min SDK 24 and target/compile SDK 36
+from the verified Godot 4.6.3 templates, disable Internet and network-state
+permissions, and retain only the vibration permission required by runtime
+haptics. The normal and QA APKs are generated under ignored `exports/`.
 
 ## Validation Commands
 
@@ -81,6 +83,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/find_godot.ps1 -Requir
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/run_core_tests.ps1
 & $godot --headless --path godot --script res://tests/run_ui_smoke_tests.gd
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/export_android_debug.ps1 -Preset "Android Visual QA"
 ```
 
 An APK is not certified merely because export succeeds. Follow
@@ -96,7 +99,8 @@ and manual dispatch. It performs:
 2. canonical/runtime data-copy parity checks;
 3. verified Godot 4.6.3 download and version reporting;
 4. deterministic core tests; and
-5. the three-size portrait UI smoke matrix.
+5. the three-size portrait UI smoke matrix; and
+6. deterministic visual-QA catalog/schema/hash contracts.
 
 CI is a clean-environment guard, not a substitute for emulator and physical
 device validation.

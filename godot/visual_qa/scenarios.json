@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "default_seed": 12345,
+  "default_ui_scale": 1.15,
+  "scenarios": [
+    { "id": "main_menu", "implemented": true, "required_nodes": [] },
+    { "id": "quick_play", "implemented": true, "required_nodes": [] },
+    { "id": "how_to_play", "implemented": true, "required_nodes": [] },
+    { "id": "settings_default", "implemented": true, "required_nodes": [] },
+    { "id": "settings_large_scale", "implemented": true, "required_nodes": [] },
+    { "id": "dev_tools", "implemented": true, "required_nodes": [] },
+    { "id": "allocation_default", "implemented": true, "required_nodes": ["MapView", "ConfirmAllocationButton"] },
+    { "id": "allocation_staged", "implemented": true, "required_nodes": ["AllocationSpendBar", "AllocationUnspentLabel"] },
+    { "id": "movement_initial", "implemented": true, "required_nodes": ["MapView", "EndTurnButton"] },
+    { "id": "movement_selected", "implemented": true, "required_nodes": ["MapView", "CancelSelectionButton"] },
+    { "id": "movement_pending_path", "implemented": true, "required_nodes": ["MapView", "ConfirmMoveButton"] },
+    { "id": "movement_confirmed", "implemented": true, "required_nodes": ["MapView", "EndTurnButton"] },
+    { "id": "movement_paths_off", "implemented": true, "required_nodes": ["MapView", "PathToggleButton"] },
+    { "id": "end_turn_warning", "implemented": true, "required_nodes": ["EndTurnConfirmOverlay", "GoBackButton"] },
+    { "id": "pause", "implemented": true, "required_nodes": [] },
+    { "id": "pause_settings", "implemented": true, "required_nodes": [] },
+    { "id": "midgame_frontline", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "visible_enemy_stack", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "fog_frontier", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "damaged_wall", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "wall_breach_result", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "combat_result", "implemented": false, "required_nodes": ["MapView"] },
+    { "id": "turn_summary", "implemented": false, "required_nodes": [] },
+    { "id": "victory", "implemented": false, "required_nodes": [] },
+    { "id": "defeat", "implemented": false, "required_nodes": [] },
+    { "id": "replay_review", "implemented": false, "required_nodes": [] }
+  ]
+}

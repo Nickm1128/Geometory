@@ -3,12 +3,12 @@ schema_version: 1
 milestone: "M1"
 workflow_state: "active"
 active_phase: "M1-P00"
-current_task: "M1-P00-T06"
+current_task: "M1-P00-T07"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Validate the 26-scenario request/ready contract, isolated QA package contents, and privacy-safe direct launch evidence; then close M1-P00-T06."
+exact_next_action: "Reconcile P00 authority documents and archived notes, run all exit/hygiene checks, publish immutable m1-p00, and activate M1-P01."
 last_completed_phase_tag: ""
-last_checkpoint_ref: "0ee584b"
-last_green_validation: "The alias-only S24 profile and live dedicated API-36 AVD configuration/runtime checks passed on 2026-07-19."
+last_checkpoint_ref: "607859f"
+last_green_validation: "All 16 P00 visual fixtures, repeated hashes, strict envelopes, package isolation, and current emulator full-cycle capture passed on 2026-07-19."
 ---
 
 # Milestone 1 Work Index
@@ -18,7 +18,7 @@ last_green_validation: "The alias-only S24 profile and live dedicated API-36 AVD
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P00`
-- Active coordinator task: `M1-P00-T06`
+- Active coordinator task: `M1-P00-T07`
 - Open blockers: none recorded
 
 ## Phase Status
@@ -37,4 +37,4 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-The baseline, autonomous workflow, pinned toolchain, normal Android boundary, alias-only S24 profile, and matched API-36 AVD are green. Resume T06 at the fixture/package contract; retain ignored raw artifacts, reject unrelated phone overlays, and do not edit or merge `main`.
+P00 implementation lanes T01–T06 are green. Resume T07 by reconciling README/assumptions/roadmap/tooling/workflow authorities and the archived starter note, then run the full phase gate and hygiene/publication sequence without merging `main`.

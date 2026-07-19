@@ -1,5 +1,7 @@
 param(
   [string]$GodotPath = "",
+  [ValidateSet("Android Debug", "Android Visual QA")]
+  [string]$Preset = "Android Debug",
   [string]$Serial = "",
   [switch]$Install
 )
@@ -8,7 +10,8 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $godotProject = Join-Path $repoRoot "godot"
 $exports = Join-Path $repoRoot "exports"
-$apk = Join-Path $exports "geometory-debug.apk"
+$apkName = if ($Preset -eq "Android Visual QA") { "geometory-qa-debug.apk" } else { "geometory-debug.apk" }
+$apk = Join-Path $exports $apkName
 
 if (-not $GodotPath) {
   $found = & (Join-Path $PSScriptRoot "find_godot.ps1") -RequirePinned 2>$null | Select-Object -First 1
@@ -41,7 +44,7 @@ $env:ANDROID_SDK_ROOT = $sdkRoot
 $env:JAVA_HOME = $javaRoot
 
 New-Item -ItemType Directory -Force -Path $exports | Out-Null
-& $GodotPath --headless --path $godotProject --export-debug "Android Debug" $apk
+& $GodotPath --headless --path $godotProject --export-debug $Preset $apk
 if ($LASTEXITCODE -ne 0) {
   throw "Godot export failed with exit code $LASTEXITCODE."
 }

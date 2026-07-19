@@ -76,3 +76,7 @@ jobs:
       - name: Run portrait UI smoke matrix
         shell: bash
         run: godot --headless --path godot --script res://tests/run_ui_smoke_tests.gd
+
+      - name: Validate deterministic visual-QA contracts
+        shell: bash
+        run: godot --headless --path godot --script res://tests/run_visual_qa_contract_tests.gd

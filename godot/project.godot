@@ -6,6 +6,7 @@ config_version=5
 [application]
 config/name="Geometory"
 run/main_scene="res://scenes/main/Main.tscn"
+run/main_scene.visual_qa="res://visual_qa/VisualQaMain.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
