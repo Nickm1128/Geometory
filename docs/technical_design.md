@@ -76,14 +76,23 @@ Match State -> Fog Filter -> Observable State -> Bot Policy -> Commands -> Valid
 ```
 
 The bot receives a capability-limited snapshot, never the `GameCore` object.
-Own stacks retain full data; visible enemies expose only player-visible strength
-context and never private queues, economy, or research.
+Own stacks retain full data; visible enemies expose only ID, owner, tile, and a
+public deterministic strength band (`tiny`, `small`, `medium`, `large`, or
+`overwhelming`), never exact soldier/health/damage values, cohorts, queues,
+economy, or research.
 
 ## State Model
 
 The core state should be serializable as dictionaries/JSON-compatible data:
 
-- `MatchState`: seed, global player-turn ordinal, active player, phase, ruleset ID/hash, map ID/hash, players, tiles, walls, stacks, accepted-command history, rejected-command diagnostics, events, and RNG-stream state/derivation metadata.
+- `MatchState`: schema/version, seed, global player-turn ordinal, active player,
+  phase, end state, ruleset ID/hash, map ID/hash, players, tiles, walls,
+  stacks, research schedule/generation version, accepted-command history,
+  rejected-command diagnostics, events, next-ID counters, and RNG-stream
+  state/derivation metadata. Canonical serialization sorts all dictionary keys
+  and stable-ID collections, includes every gameplay-relevant field plus
+  accepted history/events, and excludes diagnostics/presentation fields so a
+  rejected input cannot change its SHA-256 hash.
 - `PlayerState`: bank cents, research bps, pending soldiers, economy bonuses, capital tile, eliminated flag.
 - `TileState`: axial coordinate, region ID, home owner, controller, terrain tags.
 - `WallState`: edge endpoints, owner, current HP, max HP, destroyed flag.
@@ -98,7 +107,9 @@ Rules:
 
 - Commands are intent, not results.
 - Commands must include player ID, turn, phase, and stable target IDs.
-- Source sequence is monotonically increasing and validated with player, turn,
+- `client_sequence` is a positive integer, strictly increasing per player in
+  M1's one-source-per-player model, and advances only after acceptance. It is
+  validated with player, turn,
   phase, ownership, spend range, waypoint existence, path mode, and duplicate
   rules. Multi-waypoint destinations need not be adjacent at submission time;
   every edge actually executed by movement is revalidated for adjacency and

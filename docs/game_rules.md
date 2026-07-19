@@ -52,7 +52,9 @@ Milestone 1 uses sequential player turns. `turn` is the global player-turn ordin
    and eliminations in that order.
 8. Advance to the next non-eliminated player.
 
-After resolution of player-turn 80, an unfinished match ends immediately in a deterministic draw.
+After the resolution work for player-turn 80, an unfinished match ends
+immediately in a deterministic draw. It emits one `match_ended` event with an
+empty winner, sets `game_over`, and does not begin player-turn 81.
 
 ## Money
 
@@ -91,9 +93,13 @@ research_schedule[turn] = {
 }
 ```
 
-The schedule is sampled from the match seed and stored in match state/replay header.
+The complete 80-entry, one-based schedule is sampled by the named `research`
+RNG stream from the match seed and configured bounds, then stored with its
+generation version in match setup/replay data. It is immutable for that match.
 
-The complete schedule and its current configuration are public information shown consistently to the player and exposed to bots through their observable contract.
+The complete schedule, ruleset hash, configured bounds, and schedule generation
+version are public information shown consistently to the player and exposed to
+bots through their observable contract.
 
 On allocation:
 
@@ -146,7 +152,11 @@ Stack aggregate health is the sum of cohort health. Stack expected damage is the
   is known.
 - If a stack survives combat, its remaining waypoints stay queued.
 - Every executed edge must still be adjacent and legal at resolution time; a stale queue can never jump an invalid edge.
-- Friendly stacks that meet automatically merge compatible cohorts, clear both source queues, and emit an explanatory event. Milestone 1 does not support manual unstacking.
+- Friendly living stacks that meet automatically merge into the lexicographically
+  lowest stack ID. Their cohorts retain stable cohort-ID order, all participating
+  queues are discarded, the absorbed stack is removed, and one
+  `friendly_stacks_merged` event records the destination and absorbed IDs.
+  Milestone 1 does not support manual unstacking.
 
 ## Walls
 
@@ -184,4 +194,15 @@ A match must be reproducible from:
 - player/bot setup
 - command history
 
-Only fully validated, accepted commands enter command history; rejected attempts stay in separate diagnostics. All random values must come from explicitly owned deterministic streams recorded or derivable from the match seed. Canonical SHA-256 state hashing verifies reconstruction at declared steps and match end.
+Only fully validated, accepted commands enter accepted-command history; rejected
+attempts append a diagnostic and never mutate gameplay state or accepted source
+sequence. `client_sequence` is a positive integer strictly increasing per
+player (M1 has one source per player), and advances only on acceptance. All
+random values must come from explicitly owned deterministic streams recorded or
+derivable from the match seed. Canonical SHA-256 state hashing verifies
+reconstruction at declared steps and match end. Its serialization includes the
+schema/version, ruleset/map IDs and hashes, seed/RNG derivation metadata, turn,
+active player/phase/end state, players, tiles, walls, stacks/cohorts, research
+schedule, accepted commands, replay events, and next-ID counters in sorted
+stable-ID/key order; rejected diagnostics and presentation-only fields are
+excluded.

@@ -18,6 +18,7 @@ func _init() -> void:
   _test_economy(core)
   _test_research_reproducibility(configs)
   _test_commands_and_path(core)
+  _test_p01_contract_red_cases(configs)
   _test_bot(configs)
   _test_replay_reproducibility(configs)
 
@@ -93,6 +94,64 @@ func _test_commands_and_path(core) -> void:
   })
   _assert(result["ok"], "end turn succeeds")
   _assert(core.snapshot()["tiles"]["T_-3_0"]["controlled_by"] == "P1", "pass-through capture applies")
+
+func _test_p01_contract_red_cases(configs: Dictionary) -> void:
+  var rejected = GameCoreScript.new()
+  rejected.setup(configs["rules"], configs["map"], 101)
+  var before: Dictionary = rejected.snapshot()
+  var result: Dictionary = rejected.apply_command({
+    "type": "not_a_command",
+    "player_id": "P1",
+    "turn": 1,
+    "phase": "allocation",
+    "client_sequence": 1
+  })
+  var after: Dictionary = rejected.snapshot()
+  _assert(not result["ok"], "contract: unknown command is rejected")
+  _assert(after.get("accepted_command_history", []).is_empty(), "contract: rejected command never enters accepted history")
+  _assert(after.get("command_history", []).is_empty(), "contract: rejected command never enters legacy command history")
+  _assert(after.get("rejected_command_diagnostics", []).size() == 1, "contract: rejected command records one diagnostic")
+  _assert(before["players"] == after["players"] and before["phase"] == after["phase"], "contract: rejected command leaves gameplay state unchanged")
+
+  var turn_checked = GameCoreScript.new()
+  turn_checked.setup(configs["rules"], configs["map"], 102)
+  result = turn_checked.apply_command({
+    "type": "allocate_resources",
+    "player_id": "P1",
+    "turn": 99,
+    "phase": "allocation",
+    "economy_cents": 0,
+    "military_cents": 0,
+    "research_cents": 0,
+    "client_sequence": 1
+  })
+  _assert(not result["ok"], "contract: mismatched turn is rejected before mutation")
+
+  var sequenced = GameCoreScript.new()
+  sequenced.setup(configs["rules"], configs["map"], 103)
+  sequenced.apply_command({"type": "allocate_resources", "player_id": "P1", "turn": 1, "phase": "allocation", "economy_cents": 0, "military_cents": 0, "research_cents": 0, "client_sequence": 7})
+  var p1_stack: String = sequenced.get_stack_at_tile_for_player("T_-4_0", "P1")
+  sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-3_0"], "mode": "replace", "client_sequence": 8})
+  result = sequenced.apply_command({"type": "queue_stack_path", "player_id": "P1", "turn": 1, "phase": "movement", "stack_id": p1_stack, "waypoints": ["T_-2_0"], "mode": "replace", "client_sequence": 8})
+  _assert(not result["ok"], "contract: duplicate accepted source sequence is rejected")
+
+  var fog = GameCoreScript.new()
+  fog.setup(configs["rules"], configs["map"], 104)
+  var p2_stack: String = fog.get_stack_at_tile_for_player("T_4_0", "P2")
+  fog.state["stacks"][p2_stack]["tile_id"] = "T_-3_0"
+  fog.state["stacks"][p2_stack]["waypoints"] = ["T_3_0"]
+  var observed: Dictionary = fog.observable_state("P1")
+  var enemy: Dictionary = observed["stacks"][p2_stack]
+  _assert(enemy.has("strength_band"), "contract: visible enemy exposes a strength band")
+  _assert(not enemy.has("soldiers") and not enemy.has("health") and not enemy.has("expected_damage") and not enemy.has("waypoints"), "contract: visible enemy excludes exact strength and queued path")
+
+  var hashed_a = GameCoreScript.new()
+  var hashed_b = GameCoreScript.new()
+  hashed_a.setup(configs["rules"], configs["map"], 105)
+  hashed_b.setup(configs["rules"], configs["map"], 105)
+  _assert(hashed_a.has_method("canonical_state_hash"), "contract: core exposes canonical SHA-256 state hash")
+  if hashed_a.has_method("canonical_state_hash") and hashed_b.has_method("canonical_state_hash"):
+    _assert(hashed_a.call("canonical_state_hash") == hashed_b.call("canonical_state_hash"), "contract: equal setups have equal canonical hashes")
 
 func _test_bot(configs: Dictionary) -> void:
   var core = GameCoreScript.new()

@@ -34,7 +34,8 @@ Observable state includes:
 
 - visible tiles and known controllers
 - own bank, research, pending soldiers, capital, and stacks
-- visible enemy stacks with visible aggregate estimates
+- visible enemy stacks with only a public deterministic strength band; no exact
+  soldier count, health, damage, cohort, or queued-path data
 - visible wall segments and HP only if visible
 - public rules and public match metadata
 - visible replay/event history

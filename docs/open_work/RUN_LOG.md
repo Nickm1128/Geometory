@@ -156,6 +156,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit/push this `M1-P01-T01` handoff checkpoint, require green CI, then provide the stored prompt to the user.
 
+### M1-RUN-20260719-001 / M1-P01-T01 contract/red-test boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T01 boundary.
+- Files or artifacts: authority updates in assumptions/rules/design/bot/command contracts and focused red cases in `godot/tests/run_core_tests.gd`.
+- Decisions: draw after resolving global player-turn 80; research schedule is immutable/public; M1 source sequence is positive and accepted-only per player; visible enemy strength is a band, never exact values or paths; canonical hashes exclude rejected diagnostics.
+- Validation and exact result: baseline pinned core suite passed; the focused post-contract core suite exited 1 with exactly 7 intended failures (rejected legacy history/diagnostic, mismatched turn, duplicate sequence, strength band, exact strength/path leak, hash API) and no parser/crash error.
+- Blockers or risks: none; red tests intentionally define work for T02/T04/T05.
+- Paid call and ledger entry: None
+- Exact next action: update strict command validation and accepted/rejected histories for `M1-P01-T02`.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

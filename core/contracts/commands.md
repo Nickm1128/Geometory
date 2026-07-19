@@ -16,7 +16,10 @@ Every command includes:
 }
 ```
 
-`client_sequence` is stable per command source and helps debug replay/network ordering.
+`client_sequence` is a positive integer stable per command source and helps
+debug replay/network ordering. M1 has exactly one command source per player, so
+it must be strictly greater than that player's last accepted sequence. A
+rejected command never advances the sequence.
 
 ## Milestone 1 Commands
 
@@ -81,6 +84,18 @@ Validation:
 
 - player is active
 - phase matches current phase
+
+## Acceptance And History
+
+Validation is all-or-nothing. A command is accepted only after required common
+and type-specific fields, player, turn, phase, source sequence, ownership, and
+target rules all pass. Accepted commands are deep-copied into ordered
+`accepted_command_history`; rejected inputs append a structured diagnostic
+(`command`, stable rejection code, and message) and do not mutate gameplay
+state, accepted history, or accepted source-sequence state.
+
+The replay command stream is `accepted_command_history` only. `client_sequence`
+is replayed in accepted arrival order and never used to reorder commands.
 
 ## Explicitly Deferred Commands
 
