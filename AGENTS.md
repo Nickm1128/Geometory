@@ -47,6 +47,24 @@ Before yielding, compaction, or handing work to a fresh agent, record:
 
 Fresh agents must rebuild context from repository sources using the resume sequence above.
 
+## Autonomous Run Continuity
+
+- Explicit authorization to continue through a milestone persists across task,
+  commit, hygiene, tag, and phase boundaries. Those boundaries are checkpoints,
+  not permission gates.
+- `INDEX.md` records `continuation_mode`. While it is `autonomous`, put ordinary
+  progress, status, review, and phase-count answers in commentary and continue
+  the next dependency-safe action. Such questions do not pause the run unless
+  the user explicitly says to pause, stop, wait, replace scope, or report back
+  before continuing.
+- A final response ends the active run. Before sending one, rerun Resume and
+  verify one of three terminal conditions: Milestone 1 is complete; every
+  dependency-safe lane is recorded as blocked on user input or external state;
+  or `continuation_mode` is `report_required` because the user explicitly
+  requested a pause. If none applies, do not send a final response.
+- Closing or summarizing a phase is never terminal while a later approved phase
+  is dependency-safe. Activate it and continue.
+
 ## Validation And Hygiene
 
 - Run the smallest relevant validation during implementation and the phase's full exit-gate suite before closure.
@@ -55,6 +73,11 @@ Fresh agents must rebuild context from repository sources using the resume seque
 - Bot work must use fog-filtered observable state and normal validated commands.
 - Generated APKs, screenshots, replays, reports, secrets, and model transport artifacts stay in ignored artifact locations.
 - After every phase, execute `docs/open_work/hygiene/CHECKLIST.md`, append the result to its log, close remediation tasks, and only then activate the next phase.
+- Before phase hygiene can pass, commission a fresh source-first independent
+  review of every checked task, applicable requirement, and exit gate against
+  authority, implementation, and tests. A linter pass, green CI, or passing
+  suite is supporting evidence, not substantive certification. Reopen any task
+  whose definition of done is not actually met.
 
 ## Git Safety
 

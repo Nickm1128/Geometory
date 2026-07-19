@@ -76,3 +76,23 @@ Append-only. No implementation entries yet.
 - Added focused capital-capture/elimination assertions after post-combat control.
 - Validation: two pinned Godot 4.6.3 core runs exited 0 with matching `DETERMINISM_HASH` `0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e`.
 - Remaining: record every P01 gate and hygiene item, commit closeout, publish/fetch-verify immutable `m1-p01`, then commit the P02 activation transition and run PhaseClose.
+
+## 2026-07-19 — Premature-stop and substantive-review correction
+
+- Failure observed: the prior autonomous run stopped at ordinary task/phase-report boundaries twice despite explicit authorization to continue through Milestone 1 and despite having no recorded blocker. Green lint, CI, and tests were also treated as sufficient closeout evidence without a fresh source-level audit of each checked definition of done.
+- Workflow decision: milestone authorization now persists across tasks, commits, hygiene passes, tags, phases, and context checkpoints. While `continuation_mode` is `autonomous`, status or review questions are additive and must be answered in commentary while work continues unless the user explicitly requests a pause. A final response is reserved for milestone completion, an explicit report-required pause, or exhaustion of every dependency-safe lane by recorded blockers.
+- Review evidence: independent source review confirmed two identical pinned core hashes (`0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e`), passing three-size UI smoke, and green GitHub Actions run `29700145449`, but found that passing automation did not prove T04–T06 complete.
+- Reopened work: T04 includes presentation-only state in the canonical gameplay hash and has RNG metadata/salt and schedule-version contract gaps; T05 can leak exact enemy values through raw visible-event payloads; T06 added helpers without transferring substantive responsibility from the approximately 899-line facade and retains duplicate/dead paths.
+- Closeout gaps: T07 still needs wall-damage/destruction, casualty arithmetic, malformed/non-serializable command, recursive event-privacy, and stronger deterministic-combat coverage plus a resolved fresh phase review.
+- Cross-phase effect: bot command-sequence initialization must remain derived from accepted observable state rather than hidden core state when P03/P04 policies evolve.
+- Blockers: none. The prior stopping behavior was a workflow defect, not an external blocker.
+- Exact next action: begin reopened `M1-P01-T04` with focused failing tests for gameplay-only canonical hashing, RNG derivation/ownership, and schedule-version coverage, then repair the implementation before proceeding in dependency order.
+
+## 2026-07-19 — Workflow-correction validation
+
+- Structural enforcement: INDEX schema 2 now requires matching current-task and continuation-mode fields in frontmatter, Live State, Resume Handoff, and exact-next-action content. Resume/Audit reject mismatches, stale suffixes, broad pause/approval language in autonomous handoffs, incomplete hygiene, missing independent review, and non-resolving review refs.
+- Validation: canonical Resume/Audit pass with zero warnings; the cross-platform checker regression suite passes its PhaseClose routing, stale-task, stale-action, continuation, pause-language, hygiene-completion, review-record, and review-ref fixtures; `git diff --check` passes apart from expected local line-ending notices.
+- Skill evidence: all five canonical skills passed `quick_validate.py`; Apply/Check synchronized only the five managed user-level mirrors. The open-work `agents/openai.yaml` was regenerated through the skill-creator generator.
+- Fresh Terra/High test: a no-context read-only agent recovered `M1-P01-T04`, the correct red-test slice, automatic task/phase continuation, and all three valid terminal conditions. It correctly declined to implement while the coordinator-owned workflow checkpoint was still dirty; a clean-state verification remains after publication.
+- Independent review: the first read-only review found checker gaps in exact action, pause prose, hygiene completeness, review freshness, and hard-coded fixtures. Those findings were remediated; the follow-up review returned Pass. Remaining direct tag-freshness fixture coverage is deferred because tests must not create or move phase tags.
+- Exact next action: publish this single-ID workflow checkpoint, require green CI, rerun a clean fresh-context Terra/High resume, and then hand the stored autonomous prompt to the user.

@@ -3,7 +3,8 @@
 Current P00 tools provide:
 
 - pinned Godot discovery, core execution, Android export, and data sync;
-- read-only autonomous work-state checks and a PhaseClose routing regression;
+- read-only autonomous work-state checks with structured INDEX continuity,
+  stale-handoff, and PhaseClose regression coverage;
 - canonical/user-level Codex skill synchronization;
 - verified Android command-line-tool installation;
 - dedicated Galaxy S24 API-36 AVD ensure/verify/boot behavior;

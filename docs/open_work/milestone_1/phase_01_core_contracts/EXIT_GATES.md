@@ -12,5 +12,5 @@
   - Evidence: Pending.
 - [ ] `M1-P01-G06` All core suites pass twice with identical hashes and no engine errors.
   - Evidence: Pending.
-- [ ] `M1-P01-G07` P01 hygiene passes and immutable tag `m1-p01` is published.
+- [ ] `M1-P01-G07` A fresh substantive source-level review verifies every checked P01 task and gate against authority, implementation, and tests; all findings are resolved or the owning task is reopened; P01 hygiene passes; and immutable tag `m1-p01` is published.
   - Evidence: Pending.

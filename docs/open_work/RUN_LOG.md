@@ -233,6 +233,28 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: add/run capital-capture regression, then record two matching full core hash runs and complete P01 closeout.
 
+### M1-RUN-20260719-001 / autonomous-continuity remediation / M1-P01-T07
+
+- Status: Progress; workflow correction and substantive phase review recorded, with implementation remediation intentionally assigned back to the earliest unmet task.
+- Branch/ref: `milestone/m1-vertical-slice` at `efb3397` before this workflow checkpoint.
+- Files or artifacts: `AGENTS.md`; canonical Geometory skills; engineering, milestone, hygiene, autonomous-run, tracker, and P01 phase documents; tracker-linter regression coverage.
+- Decisions: milestone authorization persists across nonterminal boundaries; status/review questions do not pause autonomous work; final responses require an explicit terminal condition; phase closeout requires a fresh source-level review; automation is supporting rather than substantive evidence; false-complete tasks are reopened immediately.
+- Validation and exact result: existing commit `efb3397` passed GitHub Actions run `29700145449`; two local pinned core runs produced identical hash `0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e`; three-size UI smoke passed. Independent review nevertheless found unmet T04–T06 definitions of done and missing T07 coverage, proving the previous closeout path was premature.
+- Blockers or risks: none. This is a workflow and evidence-quality correction, not a request to pause implementation.
+- Paid call and ledger entry: None
+- Exact next action: finish the tracker/linter/skill regression changes, validate and publish this checkpoint, then resume `M1-P01-T04` from red tests in a fresh GPT-5.6 Terra / Think High thread without stopping at task or phase summaries.
+
+### M1-RUN-20260719-001 / workflow-correction validation / M1-P01-T07
+
+- Status: Complete for the autonomous-workflow correction checkpoint; reopened core implementation remains at the exact T04 handoff.
+- Branch/ref: `milestone/m1-vertical-slice` after `efb3397`, before the workflow checkpoint commit.
+- Files or artifacts: schema-2 INDEX contract; P01 tracker corrections; strengthened canonical skills and generated open-work interface; expanded work-state/PhaseClose regression suite; stored Terra/High prompt.
+- Decisions: task/phase summaries are nonterminal in autonomous mode; exact next action must name only the current task; pause/approval prose is invalid in autonomous handoffs; P01+ PhaseClose requires Complete state, all ten evidence-bearing hygiene checks, one resolvable substantive-review record, and review freshness through its immutable phase tag. P00's already-published legacy review record is explicitly grandfathered.
+- Validation and exact result: Resume/Audit structural pass with zero warnings; all checker regressions pass in Resume/Audit and PhaseClose paths; all five skills quick-validate and mirror Check passes; follow-up independent workflow review returned Pass. A fresh Terra/High read-only agent recovered T04 and the terminal policy, then correctly refused implementation because this coordinator-owned checkpoint was not yet committed.
+- Blockers or risks: none. A clean-state forward-test is intentionally sequenced after publication so dirty-work ownership is no longer ambiguous.
+- Paid call and ledger entry: None
+- Exact next action: commit/push this T07 workflow checkpoint, require green public CI, rerun a clean Terra/High resume forward-test, and provide the new-thread prompt; the receiving thread then starts T04 red tests without a phase prompt.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

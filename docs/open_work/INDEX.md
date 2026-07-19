@@ -1,14 +1,15 @@
 ---
-schema_version: 1
+schema_version: 2
 milestone: "M1"
 workflow_state: "active"
+continuation_mode: "autonomous"
 active_phase: "M1-P01"
-current_task: "M1-P01-T07"
+current_task: "M1-P01-T04"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Complete M1-P01-T07 deterministic regression evidence, run P01 exit gates twice, complete hygiene, publish m1-p01, and activate P02."
+exact_next_action: "Add failing contract tests for gameplay-only canonical hashing and documented RNG stream derivation, then repair M1-P01-T04 before proceeding to the other reopened P01 tasks."
 last_completed_phase_tag: "m1-p00"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
-last_green_validation: "P00 closeout commit 153efbc passed GitHub Actions run 29698512789; immutable tag m1-p00 and the physical S24 contract are published/recorded."
+last_green_validation: "Commit efb3397 passed GitHub Actions run 29700145449; two pinned Godot 4.6.3 core runs produced identical hash 0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e and the three-size UI smoke suite passed, but substantive review reopened T04-T06."
 ---
 
 # Milestone 1 Work Index
@@ -18,7 +19,8 @@ last_green_validation: "P00 closeout commit 153efbc passed GitHub Actions run 29
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P01`
-- Active coordinator task: `M1-P01-T01` (not started; awaiting the requested user report boundary)
+- Active coordinator task: `M1-P01-T04`
+- Continuation mode: `autonomous`
 - Open blockers: none
 
 ## Phase Status
@@ -37,8 +39,11 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-P00 is complete at immutable tag `m1-p00`; its closeout commit passed GitHub
-Actions run `29698512789`, and the physical S24 contract artifact is
-`20260719_131542`. P01 is tracker-active at `M1-P01-T01`; only autonomous-handoff
-skill preparation has occurred. The prepared GPT-5.6 Terra / Think High prompt
-is explicit authorization to begin contract reconciliation and failing tests.
+- Current task: `M1-P01-T04`
+- Continuation mode: `autonomous`
+- Exact handoff: P00 remains complete at immutable tag `m1-p00`. P01 has green
+  supporting test evidence, but a fresh source-level review found that three
+  checked tasks did not satisfy their definitions of done. Start by writing
+  red tests for gameplay-only canonical hashing and the documented RNG stream
+  contract, then repair the implementation and continue the reopened work in
+  dependency order. There is no open blocker; work may proceed immediately.

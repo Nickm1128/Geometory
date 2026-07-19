@@ -28,6 +28,12 @@ description: "Use when working in C:\\Users\\milin\\Documents\\Geometory on the 
 - Take the current phase/task only from `docs/open_work/INDEX.md`; never encode or trust a stale phase from conversation context.
 - For behavioral work, proceed contract-first: reconcile authority and interfaces, add a focused failing test, implement the smallest coherent slice, then run focused and required regression validation.
 - Prefer extracting responsibilities behind stable facades over broad rewrites. Preserve `GameCore` callers while moving deterministic logic into independently testable modules.
+- Count an extraction complete only when ownership and a meaningful test entry
+  point move out of the facade. Tiny helper delegates around logic still owned
+  by `GameCore` do not satisfy a modularization task.
+- Treat bot observations as recursively filtered capabilities. Project event
+  payloads and metadata through explicit public schemas; never copy a visible
+  event wholesale when it can carry exact private strength or economy data.
 - Verify that a documented command, fixture, runner, or capability exists before invoking or claiming it. A planned artifact is not an implemented one.
 
 Deliver the polished 1v1 vertical slice before additional maps, players, units, or networking. P2P and runtime LLM behavior are outside Milestone 1.

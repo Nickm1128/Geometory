@@ -37,6 +37,11 @@ replace the active phase tracker or its exit gates.
   a published tag, or force-push autonomously.
 - At task/context/blocker boundaries, immediately update evidence, notes, run
   log, validation state, and the exact next action.
+- Milestone authorization persists across task and phase boundaries. While
+  `INDEX.md` says `continuation_mode: autonomous`, ordinary status/review
+  questions are checkpoints: answer in commentary and continue. A final response
+  is reserved for milestone completion, an explicit user pause, or every safe
+  lane being recorded as blocked.
 
 ## Validate And Close
 
@@ -51,5 +56,13 @@ UI, Android, visual, replay, simulation, bot, and AI changes also run their
 phase-specific matrices and safety gates. A checkbox becomes `[x]` only after
 implementation, required validation, evidence, and affected docs are complete.
 
+Before phase hygiene/tagging, obtain a fresh source-first independent review of
+all checked work against definitions, authorities, implementation, negative
+cases, and test coverage. Record its reviewer/ref/scope/findings/resolutions.
+Linters, green CI, and passing suites are evidence for that review, not a
+replacement. Reopen and remediate any task that was over-credited.
+
 Use one task ID per task commit. After every phase, complete the full hygiene
-checklist and publish only the permitted immutable tag/checkpoint sequence.
+checklist and publish only the permitted immutable tag/checkpoint sequence. If
+continuation remains autonomous, activate and begin the next approved phase
+without waiting for another prompt.

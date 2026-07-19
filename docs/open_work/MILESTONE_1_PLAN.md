@@ -42,3 +42,9 @@ P2P, lobbies, accounts, networking, more than two players, additional maps, mult
 ## Operating Rule
 
 Requirements and gates may be strengthened. They may not be weakened or silently reinterpreted. Any scope change requires a dated phase note and promotion to the relevant authority document.
+
+Authorization to execute this milestone is continuous across its task and phase
+boundaries unless `INDEX.md` records an explicit user-requested report pause or
+all eligible lanes are blocked. Before each phase tag, a fresh substantive
+source review must verify checked definitions against authority, implementation,
+and tests; structural lint and green automation cannot certify the phase alone.

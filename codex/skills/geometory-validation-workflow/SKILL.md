@@ -38,5 +38,16 @@ description: "Validate, test, export, or certify Geometory work in C:\\Users\\mi
 - For deterministic/hash gates, run the required suite twice and compare the recorded outputs or hashes rather than relying on two successful exit codes.
 - For a remote CI failure, inspect the actual job step/log before editing. Reproduce the environment-sensitive boundary locally where practical and never weaken assertions to accommodate a runner.
 - A documentation-only checkpoint may rely on the most recent green runtime suite only when no runtime/config/package input changed and the active gate permits it. Phase closure still requires the complete documented evidence set.
+- A structural tracker pass, green CI run, or green aggregate suite proves only
+  what it checks. Before phase closure, independently compare each checked
+  definition of done and applicable requirement/gate with the actual ownership,
+  data exposure, serialization, negative cases, and implementation boundaries.
+- Privacy tests must recursively inspect every observable surface, including
+  event histories and metadata, rather than checking only top-level keys.
+- Serialization/determinism tests must reject or normalize unsupported and
+  unknown input fields and prove gameplay hashes exclude presentation-only data.
+- Reopen a checked task when substantive review finds missing behavior or
+  evidence; never hide that remediation inside a later closeout task while the
+  owning checkbox remains inaccurately complete.
 
 Do not check a task or gate merely because a command exited successfully. Record what was exercised, the result, and artifact/evidence location in the active phase files.

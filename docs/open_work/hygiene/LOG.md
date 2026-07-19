@@ -19,18 +19,19 @@ remaining items are explicit.
 - Remediation tasks: None open; `B-001` resolved with current physical evidence.
 - Phase tag after pass: `m1-p00`, published at validated closeout commit `153efbc`.
 
-## Entry Template — M1-P00 / YYYY-MM-DD
+## Entry Template — M1-PNN / YYYY-MM-DD
 
-- [ ] `HYG-01` Tracker integrity. Evidence: Pending.
+- [ ] `HYG-01` Tracker integrity. Evidence: structured INDEX frontmatter, Live State, Resume Handoff, continuation mode, current task, blocker state, and exact next action agree; Resume/Audit pass. Pending.
 - [ ] `HYG-02` Authority sync. Evidence: Pending.
-- [ ] `HYG-03` Repository organization. Evidence: Pending.
+- [ ] `HYG-03` Repository organization. Evidence: ownership and module boundaries are substantive; forwarding helpers or duplicate/dead paths are not accepted as completed extraction. Pending.
 - [ ] `HYG-04` Data integrity. Evidence: Pending.
-- [ ] `HYG-05` Validation. Evidence: Pending.
+- [ ] `HYG-05` Validation. Evidence: automated suites pass and a fresh source-first independent review verifies every checked task, applicable requirement, and exit gate; all findings are resolved or owning tasks are reopened. Pending.
+- Independent review: reviewer=Pending; ref=Pending; scope=Pending; result=Pending; findings=Pending; resolutions=Pending
 - [ ] `HYG-06` Visual/device evidence. Evidence: Pending.
 - [ ] `HYG-07` Artifact and secret safety. Evidence: Pending.
 - [ ] `HYG-08` Git integrity. Evidence: Pending.
 - [ ] `HYG-09` Skill integrity. Evidence: Pending.
-- [ ] `HYG-10` Handoff quality. Evidence: Pending.
+- [ ] `HYG-10` Handoff quality. Evidence: exact next action is executable and, while continuation mode is autonomous, the next dependency-safe phase/task is activated without a report boundary. Pending.
 - Result: Pending
 - Remediation tasks: None
 - Phase tag after pass: Pending

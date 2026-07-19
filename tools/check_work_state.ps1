@@ -3,13 +3,16 @@ param(
   [string]$Mode = "Resume",
   [string]$TaskId = "",
   [string]$PhaseId = "",
+  [string]$IndexOverridePath = "",
+  [string]$HygieneOverridePath = "",
   [switch]$SkipSkillMirror
 )
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $workRoot = Join-Path $repoRoot "docs/open_work"
-$indexPath = Join-Path $workRoot "INDEX.md"
+$indexPath = if ($IndexOverridePath) { [System.IO.Path]::GetFullPath($IndexOverridePath) } else { Join-Path $workRoot "INDEX.md" }
+$hygienePath = if ($HygieneOverridePath) { [System.IO.Path]::GetFullPath($HygieneOverridePath) } else { Join-Path $workRoot "hygiene/LOG.md" }
 $errors = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
 $allTasks = @{}
@@ -56,6 +59,16 @@ function Get-IndexFrontmatter([string]$Text) {
     }
   }
   return $values
+}
+
+function Get-MarkdownSection([string]$Text, [string]$Heading) {
+  $escapedHeading = [regex]::Escape($Heading)
+  $match = [regex]::Match($Text, "(?ms)^## $escapedHeading\s*\r?\n(?<body>.*?)(?=^## |\z)")
+  if (-not $match.Success) {
+    Add-Error "INDEX.md is missing the $Heading section."
+    return ""
+  }
+  return $match.Groups['body'].Value
 }
 
 function Get-RelativeDataFiles([string]$Root) {
@@ -240,13 +253,17 @@ foreach ($gate in $allGates.Values) {
 
 $indexText = Read-Text $indexPath
 $indexValues = Get-IndexFrontmatter $indexText
-$requiredIndexKeys = @("schema_version", "milestone", "workflow_state", "active_phase", "current_task", "run_id", "exact_next_action", "last_completed_phase_tag", "last_checkpoint_ref", "last_green_validation")
+$requiredIndexKeys = @("schema_version", "milestone", "workflow_state", "continuation_mode", "active_phase", "current_task", "run_id", "exact_next_action", "last_completed_phase_tag", "last_checkpoint_ref", "last_green_validation")
 foreach ($key in $requiredIndexKeys) {
   if (-not $indexValues.ContainsKey($key)) { Add-Error "INDEX.md frontmatter is missing $key." }
 }
-if ($indexValues['schema_version'] -ne '1') { Add-Error "INDEX.md schema_version must be 1." }
+if ($indexValues['schema_version'] -ne '2') { Add-Error "INDEX.md schema_version must be 2." }
 if ($indexValues['milestone'] -ne 'M1') { Add-Error "INDEX.md milestone must be M1." }
 if ($indexValues['workflow_state'] -notin @('active', 'blocked', 'complete')) { Add-Error "Unsupported workflow_state in INDEX.md." }
+if ($indexValues['continuation_mode'] -notin @('autonomous', 'report_required', 'blocked', 'complete')) { Add-Error "Unsupported continuation_mode in INDEX.md." }
+if ($indexValues['workflow_state'] -eq 'active' -and $indexValues['continuation_mode'] -notin @('autonomous', 'report_required')) { Add-Error "An active workflow must use continuation_mode autonomous or report_required." }
+if ($indexValues['workflow_state'] -eq 'blocked' -and $indexValues['continuation_mode'] -ne 'blocked') { Add-Error "A blocked workflow must use continuation_mode blocked." }
+if ($indexValues['workflow_state'] -eq 'complete' -and $indexValues['continuation_mode'] -ne 'complete') { Add-Error "A complete workflow must use continuation_mode complete." }
 if (-not $indexValues['run_id'] -or $indexValues['run_id'] -notmatch '^M1-RUN-\d{8}-\d{3}$') { Add-Error "INDEX.md run_id must match M1-RUN-YYYYMMDD-NNN." }
 if (-not $indexValues['exact_next_action']) { Add-Error "INDEX.md exact_next_action must not be empty." }
 
@@ -267,6 +284,66 @@ if ($livePhases.Count -eq 1 -and $indexValues['active_phase'] -ne $livePhases[0]
 if ($indexValues['active_phase'] -and -not $expectedPhases.Contains($indexValues['active_phase'])) { Add-Error "INDEX.md active_phase is unknown." }
 
 $currentTaskId = $indexValues['current_task']
+$nextActionTaskIds = @([regex]::Matches([string]$indexValues['exact_next_action'], 'M1-P\d{2}-T\d{2}') | ForEach-Object { $_.Value } | Select-Object -Unique)
+if ($indexValues['workflow_state'] -eq 'active') {
+  if ($currentTaskId -notin $nextActionTaskIds) {
+    Add-Error "INDEX.md exact_next_action must name current_task $currentTaskId."
+  }
+  foreach ($nextActionTaskId in $nextActionTaskIds) {
+    if ($nextActionTaskId -ne $currentTaskId) { Add-Error "INDEX.md exact_next_action contains stale task ID $nextActionTaskId; current task is $currentTaskId." }
+  }
+}
+$liveStateText = Get-MarkdownSection $indexText "Live State"
+$resumeHandoffText = Get-MarkdownSection $indexText "Resume Handoff"
+
+$liveTaskMatches = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task: `(?<value>M1-P\d{2}-T\d{2})`$')
+$liveTaskLines = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task:.*$')
+if ($liveTaskMatches.Count -ne 1 -or $liveTaskLines.Count -ne 1) {
+  Add-Error "INDEX.md Live State must contain exactly '- Active coordinator task: ``M1-PNN-TNN``' with no suffix."
+} elseif ($liveTaskMatches[0].Groups['value'].Value -ne $currentTaskId) {
+  Add-Error "INDEX.md Live State task does not match frontmatter current_task $currentTaskId."
+}
+
+$resumeTaskMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Current task: `(?<value>M1-P\d{2}-T\d{2})`$')
+$resumeTaskLines = [regex]::Matches($resumeHandoffText, '(?m)^- Current task:.*$')
+if ($resumeTaskMatches.Count -ne 1 -or $resumeTaskLines.Count -ne 1) {
+  Add-Error "INDEX.md Resume Handoff must contain exactly '- Current task: ``M1-PNN-TNN``' with no suffix."
+} elseif ($resumeTaskMatches[0].Groups['value'].Value -ne $currentTaskId) {
+  Add-Error "INDEX.md Resume Handoff task does not match frontmatter current_task $currentTaskId."
+}
+
+$liveContinuationMatches = [regex]::Matches($liveStateText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`$')
+$liveContinuationLines = [regex]::Matches($liveStateText, '(?m)^- Continuation mode:.*$')
+if ($liveContinuationMatches.Count -ne 1 -or $liveContinuationLines.Count -ne 1) {
+  Add-Error "INDEX.md Live State must contain exactly one structured Continuation mode line with no suffix."
+} elseif ($liveContinuationMatches[0].Groups['value'].Value -ne $indexValues['continuation_mode']) {
+  Add-Error "INDEX.md Live State continuation mode does not match frontmatter continuation_mode."
+}
+
+$resumeContinuationMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`$')
+$resumeContinuationLines = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode:.*$')
+if ($resumeContinuationMatches.Count -ne 1 -or $resumeContinuationLines.Count -ne 1) {
+  Add-Error "INDEX.md Resume Handoff must contain exactly one structured Continuation mode line with no suffix."
+} elseif ($resumeContinuationMatches[0].Groups['value'].Value -ne $indexValues['continuation_mode']) {
+  Add-Error "INDEX.md Resume Handoff continuation mode does not match frontmatter continuation_mode."
+}
+
+foreach ($sectionRecord in @(
+  [pscustomobject]@{ Name = 'Live State'; Text = $liveStateText },
+  [pscustomobject]@{ Name = 'Resume Handoff'; Text = $resumeHandoffText }
+)) {
+  $taskIds = @([regex]::Matches($sectionRecord.Text, 'M1-P\d{2}-T\d{2}') | ForEach-Object { $_.Value } | Select-Object -Unique)
+  foreach ($taskIdInSection in $taskIds) {
+    if ($taskIdInSection -ne $currentTaskId) { Add-Error "INDEX.md $($sectionRecord.Name) contains stale task ID $taskIdInSection; current task is $currentTaskId." }
+  }
+}
+if ($indexValues['continuation_mode'] -eq 'autonomous') {
+  $stalePausePattern = '(?i)(\b(?:await|awaiting|wait|waiting|hold|pause|paused|stop|stopped|confirmation|approval|permission)\b|acknowledg|report boundary|report back|resume only after)'
+  if ($liveStateText -match $stalePausePattern -or $resumeHandoffText -match $stalePausePattern -or $indexValues['exact_next_action'] -match $stalePausePattern) {
+    Add-Error "INDEX.md autonomous handoff contains stale pause/report language."
+  }
+}
+
 if ($indexValues['workflow_state'] -eq 'active') {
   if (-not $allTasks.ContainsKey($currentTaskId)) {
     Add-Error "INDEX.md current_task is missing or unknown: $currentTaskId"
@@ -451,10 +528,67 @@ if ($Mode -eq 'PhaseClose') {
   if (-not $PhaseId) { Add-Error "PhaseClose requires -PhaseId." }
   elseif (-not $expectedPhases.Contains($PhaseId)) { Add-Error "Unknown PhaseId: $PhaseId" }
   else {
+    if ($phaseStatus[$PhaseId] -ne 'Complete') { Add-Error "$PhaseId cannot close until its INDEX phase row is Complete." }
     foreach ($task in $allTasks.Values | Where-Object Phase -eq $PhaseId) { if (-not $task.Checked) { Add-Error "$PhaseId cannot close with unchecked task $($task.Id)." } }
     foreach ($gate in $allGates.Values | Where-Object Phase -eq $PhaseId) { if (-not $gate.Checked) { Add-Error "$PhaseId cannot close with unchecked gate $($gate.Id)." } }
-    $hygieneText = Read-Text (Join-Path $workRoot "hygiene/LOG.md")
-    if ($hygieneText -notmatch "(?ms)^## .*?$([regex]::Escape($PhaseId)).*?^- Result: Pass\b") { Add-Error "$PhaseId has no passing hygiene log entry." }
+    $hygieneText = Read-Text $hygienePath
+    $phaseHygieneMatches = [regex]::Matches($hygieneText, "(?ms)^## [^\r\n]*$([regex]::Escape($PhaseId))[^\r\n]*\r?\n(?<body>.*?)(?=^## |\z)")
+    $phaseHygieneMatch = if ($phaseHygieneMatches.Count -gt 0) { $phaseHygieneMatches[$phaseHygieneMatches.Count - 1] } else { $null }
+    if ($null -eq $phaseHygieneMatch -or $phaseHygieneMatch.Groups['body'].Value -notmatch '(?m)^- Result: Pass\.?$') {
+      Add-Error "$PhaseId has no passing hygiene log entry."
+    } else {
+      $phaseHygieneBody = $phaseHygieneMatch.Groups['body'].Value
+      $hygieneCheckboxMatches = [regex]::Matches($phaseHygieneBody, '(?m)^- \[[ xX]\] `HYG-(?:0[1-9]|10)`')
+      $hygieneItemMatches = [regex]::Matches($phaseHygieneBody, '(?m)^- \[(?<check>[ xX])\] `(?<id>HYG-(?:0[1-9]|10))`[^\r\n]* Evidence: (?<evidence>[^\r\n]+)\r?$')
+      $hygieneItemIds = @($hygieneItemMatches | ForEach-Object { $_.Groups['id'].Value } | Select-Object -Unique)
+      $invalidHygieneEvidence = @($hygieneItemMatches | Where-Object { Is-PendingEvidence ($_.Groups['evidence'].Value) })
+      if ($hygieneCheckboxMatches.Count -ne 10 -or $hygieneItemMatches.Count -ne 10 -or $hygieneItemIds.Count -ne 10 -or @($hygieneItemMatches | Where-Object { $_.Groups['check'].Value -notmatch '[xX]' }).Count -gt 0 -or $invalidHygieneEvidence.Count -gt 0) {
+        Add-Error "$PhaseId cannot close until all ten unique hygiene items are checked with non-pending Evidence fields in its latest passing entry."
+      }
+
+      # P00 was published before the structured independent-review record was
+      # introduced. Its immutable legacy evidence is grandfathered; P01+ must
+      # satisfy the stronger machine-checked contract.
+      if ($PhaseId -ne 'M1-P00') {
+        $independentReviewPattern = '(?m)^- Independent review: reviewer=(?<reviewer>[^;]+); ref=(?<ref>[^;]+); scope=(?<scope>[^;]+); result=Pass; findings=(?<findings>[^;]+); resolutions=(?<resolutions>[^\r\n]+)\r?$'
+        $independentReviewMatches = [regex]::Matches($phaseHygieneBody, $independentReviewPattern)
+        if ($independentReviewMatches.Count -ne 1) {
+          Add-Error "$PhaseId cannot close without exactly one structured passing independent-review record."
+        } else {
+          $review = $independentReviewMatches[0]
+          foreach ($fieldName in @('reviewer', 'ref', 'scope', 'findings', 'resolutions')) {
+            if ($review.Groups[$fieldName].Value.Trim() -match '^(Pending|TBD)\.?$') { Add-Error "$PhaseId independent-review $fieldName must not be pending." }
+          }
+          if ($review.Groups['scope'].Value -notmatch [regex]::Escape($PhaseId)) { Add-Error "$PhaseId independent-review scope must name the phase ID." }
+          $reviewRef = $review.Groups['ref'].Value.Trim()
+          $reviewCommitOutput = @(& git -C $repoRoot rev-parse --verify --quiet "$reviewRef^{commit}" 2>$null)
+          $reviewRefExitCode = $LASTEXITCODE
+          $reviewCommit = ($reviewCommitOutput -join '').Trim()
+          if ($reviewRefExitCode -ne 0 -or -not $reviewCommit) {
+            Add-Error "$PhaseId independent-review ref does not resolve to a Git commit: $reviewRef"
+          } else {
+            & git -C $repoRoot merge-base --is-ancestor $reviewCommit HEAD 2>$null
+            if ($LASTEXITCODE -ne 0) { Add-Error "$PhaseId independent-review ref is not an ancestor of the milestone branch: $reviewRef" }
+            $reviewPhaseNumber = ([regex]::Match($PhaseId, '^M1-P(?<number>\d{2})$')).Groups['number'].Value
+            $reviewTagPattern = "^m1-p$reviewPhaseNumber(?:-r\d+)?$"
+            $certificationTag = @(& git -C $repoRoot tag --list | Where-Object { $_ -match $reviewTagPattern } | Sort-Object { if ($_ -match '-r(?<revision>\d+)$') { [int]$Matches['revision'] } else { 0 } } -Descending | Select-Object -First 1)
+            if ($certificationTag.Count -gt 0) {
+              $certificationCommit = (& git -C $repoRoot rev-parse "$($certificationTag[0])^{}" 2>$null).Trim()
+              & git -C $repoRoot merge-base --is-ancestor $reviewCommit $certificationCommit 2>$null
+              if ($LASTEXITCODE -ne 0) {
+                Add-Error "$PhaseId independent-review ref must be an ancestor of certification tag $($certificationTag[0])."
+              } else {
+                $postReviewPaths = @(& git -C $repoRoot diff --name-only $reviewCommit $certificationCommit --)
+                $substantivePostReviewPaths = @($postReviewPaths | Where-Object { $_ -notmatch '^docs/open_work/' })
+                if ($substantivePostReviewPaths.Count -gt 0) {
+                  Add-Error "$PhaseId independent review is stale; substantive files changed before tag $($certificationTag[0]): $($substantivePostReviewPaths -join ', ')"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -464,8 +598,8 @@ Write-Host "Workflow: $($indexValues['workflow_state']); phase: $($indexValues['
 Write-Host "Parsed: $($allTasks.Count) tasks, $($allGates.Count) gates, $($blockerMatches.Count) recorded blockers ($openBlockerCount open)"
 foreach ($warning in $warnings) { Write-Warning $warning }
 if ($errors.Count -gt 0) {
-  foreach ($errorMessage in $errors) { Write-Error $errorMessage }
+  foreach ($errorMessage in $errors) { Write-Error $errorMessage -ErrorAction Continue }
   exit 1
 }
-Write-Host "PASS with $($warnings.Count) warning(s)."
+Write-Host "STRUCTURAL PASS with $($warnings.Count) warning(s)."
 exit 0

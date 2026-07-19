@@ -18,26 +18,26 @@
   - Definition of done: validate every executed adjacent edge; stop at invalid/walled edges; merge friendly cohorts deterministically, clear both queues, and emit an event; resolve controller-first defender combat before applying surviving control and capital transfer.
   - Evidence: 2026-07-19 movement revalidates each executed edge and preserves blocked queues with events; same-owner stacks merge into the stable destination, clear queues, and emit merge events; combat tiles resolve in stable order and control applies only after combat. Focused movement/combat assertions and full three-size UI smoke pass; core suite has only 3 intentional T04/T05 red assertions and no engine errors.
 
-- [x] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
+- [ ] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
   - Dependencies: M1-P01-T02, M1-P01-T03
   - Can run early: No
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
-  - Evidence: 2026-07-19 adds exact post-resolution turn-80 draw (`match_ended` reason `turn_cap_draw`), recorded research/combat/bot stream metadata, and stable-key canonical SHA-256 over gameplay/accepted-history state excluding rejected diagnostics. Focused hash/RNG/80-turn tests pass; core suite retains only 2 intentional T05 fog-observation red assertions with no engine errors.
+  - Evidence: Reopened 2026-07-19 after fresh source review. The turn-80 behavior and repeatability tests are green, but the canonical hash currently includes presentation-only fields and the RNG stream metadata/salts do not fully match the documented ownership contract; schedule-version coverage is also missing. Passing tests are supporting evidence only until focused red tests expose and the implementation resolves these contract gaps.
 
-- [x] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
+- [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02
   - Can run early: No
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
-  - Evidence: 2026-07-19 bot policy now accepts only `observable_state`; core provides full own data, public rules/schedule, filtered visible events/walls/tiles, and visible enemies as strength bands only. Explicit fog tests cover hidden enemy positions, queues, economy, research, wall state, and exact strength; pinned core suite passes with no engine errors.
+  - Evidence: Reopened 2026-07-19 after fresh source review. The bot no longer receives `GameCore` and existing snapshot tests are green, but `visible_events` copies raw event payloads that can reveal exact enemy spawn counts or combat damage. Recursive privacy projection and adversarial event-payload tests are still required.
 
-- [x] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
+- [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05
   - Can run early: No
   - Definition of done: separate command validation, movement, combat, fog/observation, hashing/RNG, and turn resolution without scene-tree dependencies or public behavior regression.
-  - Evidence: 2026-07-19 preserves `GameCore` callers while extracting scene-free RefCounted command, movement, combat, fog, state-hash/RNG, and turn-rule services; facade regression remains green in the pinned core suite with no Node/scene dependencies.
+  - Evidence: Reopened 2026-07-19 after fresh source review. Six scene-free helpers exist and regressions are green, but `GameCore` remains an approximately 899-line owner of most validation, movement, combat, observation, hashing, and turn-resolution behavior; duplicate/dead helper paths remain. Delegating helper calls without transferring substantive ownership does not satisfy this task.
 
 - [ ] `M1-P01-T07` Complete deterministic regression evidence and P01 hygiene.
   - Dependencies: M1-P01-T06
   - Can run early: No
-  - Definition of done: cover invalid commands, income/research, walls, casualties, capture/elimination/draw, merge queues, adjacency, fog, and repeated seeds; run suites twice with identical hashes; pass exit gates/hygiene; publish `m1-p01` and activate P02.
-  - Evidence: Pending.
+  - Definition of done: cover invalid and non-serializable commands, income/research, wall damage and destruction, casualty arithmetic, capture/elimination/draw, merge queues, adjacency, recursively projected fog/events, and repeated seeds; commission and resolve a fresh substantive review of every checked P01 task; run suites twice with identical hashes; pass exit gates/hygiene; publish `m1-p01`; activate P02; and continue without treating the phase boundary as a stop point while continuation mode is autonomous.
+  - Evidence: Partial. Commit `efb3397` added capital-capture coverage; two pinned Godot 4.6.3 core runs passed with identical hash `0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e`, three-size UI smoke passed, and GitHub Actions run `29700145449` is green. Fresh review then found unmet definitions of done in T04-T06 plus missing wall, casualty, malformed/non-serializable command, privacy-event, and stronger deterministic-combat coverage, so closeout remains incomplete.

@@ -36,7 +36,7 @@ jobs:
         shell: pwsh
         run: ./tools/check_work_state.ps1 -Mode Audit -SkipSkillMirror
 
-      - name: Verify PhaseClose targets its requested phase
+      - name: Verify work-state checker regressions
         shell: pwsh
         run: ./tools/test_check_work_state.ps1
 
