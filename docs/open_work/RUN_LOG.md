@@ -56,6 +56,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: close and commit T04, then certify the alias-only Galaxy S24/AVD profile for `M1-P00-T05`.
 
+### M1-RUN-20260719-001 / device-profile boundary / M1-P00-T05
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` after `0ee584b`
+- Files or artifacts: alias-only Galaxy S24 JSON profile, human-readable device authority, and dedicated-AVD ensure/verify tool; raw device identifiers remain untracked.
+- Decisions: physical S24 measurements are authoritative; the API-36 AVD reproduces resolution/density/font/navigation for automation but is not accepted as evidence for Samsung-specific cutout, corner, haptic, or adaptive-refresh behavior.
+- Validation and exact result: JSON/privacy scan and PowerShell parse passed; profile SHA-256 is `fda1cadcee962c096b3a2f1e6175d0aefb68f9627256f8e76983f5766166ceca`; static AVD verification and live boot/runtime property checks all matched the declared API36/x86_64/1080x2340/420-dpi/font-1.0/three-button profile.
+- Blockers or risks: none for T05. The physical phone was not altered to clear unrelated applications; clean visual capture remains a later visual-QA concern.
+- Paid call and ledger entry: None
+- Exact next action: close and commit T05, then validate the isolated visual-QA fixture/package foundation for `M1-P00-T06`.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

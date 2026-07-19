@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "alias": "primary_galaxy_s24",
+  "device_family": "Samsung Galaxy S24",
+  "model": "SM-S921U",
+  "android_release": "16",
+  "api_level": 36,
+  "cpu_abi": "arm64-v8a",
+  "display": {
+    "physical_width_px": 1080,
+    "physical_height_px": 2340,
+    "hardware_density_dpi": 480,
+    "active_density_dpi": 420,
+    "font_scale": 1.0,
+    "supported_refresh_hz": [10, 24, 30, 48, 60, 80, 120]
+  },
+  "safe_area_portrait_px": {
+    "top": 103,
+    "right": 0,
+    "bottom": 126,
+    "left": 0,
+    "cutout_bounds": [511, 0, 569, 103],
+    "corner_radius_physical_px": 108,
+    "corner_radius_app_content_px": 95
+  },
+  "navigation": {
+    "mode": "three_button",
+    "android_navigation_mode_value": 0
+  },
+  "observed_utc": "2026-07-19T17:16:34Z",
+  "identity_policy": "Alias-only. Never commit the ADB serial or another unique device identifier."
+}

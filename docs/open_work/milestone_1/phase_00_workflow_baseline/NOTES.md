@@ -37,3 +37,13 @@ Append dated findings and decisions. Link durable product changes to the relevan
 - Warning disposition: Android `aapt2` reports the stock-template `themed_icon.xml` reference as missing. The ordinary/adaptive icon resources remain packaged and the warning is nonblocking for the debug foundation; final icon/manifest inspection remains required in P05/P06.
 - Cross-phase impact: T06 owns the separate QA preset and feature route; P05/P06 must revisit launcher-icon polish and preserve the normal-package resource/permission boundary.
 - Exact next action: verify and document the non-identifying Galaxy S24 profile and dedicated API-36 AVD under `M1-P00-T05`.
+
+## 2026-07-19 — M1-P00-T05
+
+- Status: Complete.
+- Decision: tracked device evidence uses the stable alias `primary_galaxy_s24` and reusable layout/performance facts only. ADB serials and other unique identifiers are forbidden from tracked evidence.
+- Physical profile: Android 16/API 36, 1080x2340, hardware/active density 480/420 dpi, font scale 1.0, 103 px top cutout-safe inset, 126 px visible navigation inset, three-button navigation, physical/app-content corner radii 108/95 px, and refresh modes through 120 Hz.
+- Emulator validation: `Geometory_Galaxy_S24_API36` passed static verification and a live boot. Runtime inspection returned Android 16/API 36, x86_64, 1080x2340 at 420 dpi, font 1.0, and navigation mode 0; the owned configuration specifies Google Play, four cores, 4096 MB RAM, portrait, and no device frame.
+- Fidelity boundary: emulator cutout, corners, haptics, and 60-Hz behavior are not substitutes for physical S24 certification.
+- Cross-phase impact: P05 visual structure and P06 performance/lifecycle work must use the physical profile as authority while treating emulator-specific pixels as noncanonical.
+- Exact next action: certify the deterministic 26-scenario contract foundation, separate QA package, and direct emulator/phone launch path under `M1-P00-T06`.

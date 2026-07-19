@@ -24,11 +24,11 @@
   - Definition of done: install Godot 4.6.3 and matching export templates while retaining 4.5.1 rollback; configure SDK 36/Java; add pinned lightweight GitHub Actions checks for tracker/docs, data parity, core, and UI smoke suites; update tooling/workflow authority; export and inspect an API-36 APK with min SDK 24 and no unnecessary normal-app network permission.
   - Evidence: Official Godot `4.6.3.stable.official.7d41c59c4`, its managed executable/archive/template hashes, Android SDK/build tools 36, command-line tools 20.0, ADB 36.0.0, and Android Studio JBR 21 are recorded in `tools/toolchain.json`; pinned lookup, PowerShell/JSON/YAML parsing, data parity, core tests, and the 360x800/393x852/480x960 UI matrix passed on 2026-07-19. `.github/workflows/validate.yml` uses the official verified Linux archive. Exported normal APK SHA-256 `a9b6808d7e29644b49d6cdfd9c646a6fd9fc976fea47845c2b75ef2ce9cc61e8` reports min SDK 24, target/compile SDK 36, arm64-v8a plus x86_64, only `VIBRATE`, and no tests or visual-QA resources.
 
-- [ ] `M1-P00-T05` Record and reproduce the Galaxy S24 validation profile.
+- [x] `M1-P00-T05` Record and reproduce the Galaxy S24 validation profile.
   - Dependencies: M1-P00-T01
   - Can run early: Yes
   - Definition of done: document the non-identifying Android 16/API 36, 1080x2340, density 420, font scale 1.0, top/bottom insets, navigation mode, refresh capability, and rounded-corner evidence; create `Geometory_Galaxy_S24_API36` with API 36 Google Play x86_64, 1080x2340, density 420, 4 cores, 4096 MB RAM, portrait/no-frame capture, and three-button navigation; boot and verify it without altering other project AVDs.
-  - Evidence: Pending.
+  - Evidence: `docs/device_validation_profile.md` and alias-only profile SHA-256 `fda1cadcee962c096b3a2f1e6175d0aefb68f9627256f8e76983f5766166ceca` record Android 16/API 36, 1080x2340, active density 420, font scale 1.0, top 103 px/bottom 126 px insets, three-button navigation, rounded-corner provenance, and refresh modes without a device serial. `tools/ensure_geometory_avd.ps1 -Mode Verify -Launch` booted `Geometory_Galaxy_S24_API36`; runtime checks returned boot complete, Android 16/API 36, Google Play x86_64, 1080x2340 at 420 dpi, font 1.0, navigation mode 0, with its static 4-core/4096-MB/no-frame/portrait configuration verified on 2026-07-19.
 
 - [ ] `M1-P00-T06` Establish the deterministic visual-QA foundation and isolated QA Android package.
   - Dependencies: M1-P00-T04, M1-P00-T05
