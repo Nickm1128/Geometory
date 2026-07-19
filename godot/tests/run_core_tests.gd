@@ -19,6 +19,7 @@ func _init() -> void:
   _test_research_reproducibility(configs)
   _test_commands_and_path(core)
   _test_p01_contract_red_cases(configs)
+  _test_movement_resolution_contracts(configs)
   _test_bot(configs)
   _test_replay_reproducibility(configs)
 
@@ -159,6 +160,48 @@ func _test_p01_contract_red_cases(configs: Dictionary) -> void:
   if hashed_a.has_method("canonical_state_hash") and hashed_b.has_method("canonical_state_hash"):
     _assert(hashed_a.call("canonical_state_hash") == hashed_b.call("canonical_state_hash"), "contract: equal setups have equal canonical hashes")
 
+func _test_movement_resolution_contracts(configs: Dictionary) -> void:
+  var invalid_edge = GameCoreScript.new()
+  invalid_edge.setup(configs["rules"], configs["map"], 201)
+  var invalid_stack: String = invalid_edge.get_stack_at_tile_for_player("T_-4_0", "P1")
+  invalid_edge.state["stacks"][invalid_stack]["tile_id"] = "T_-2_0"
+  invalid_edge.state["stacks"][invalid_stack]["waypoints"] = ["T_0_0"]
+  invalid_edge.call("_resolve_player_movement", "P1")
+  _assert(invalid_edge.state["stacks"][invalid_stack]["tile_id"] == "T_-2_0", "contract: non-adjacent edge never executes")
+  _assert(invalid_edge.state["stacks"][invalid_stack]["waypoints"] == ["T_0_0"], "contract: invalid edge stops and retains queue")
+  _assert(_has_event(invalid_edge.snapshot()["replay_events"], "movement_blocked"), "contract: invalid edge emits stable blocked event")
+
+  var merged = GameCoreScript.new()
+  merged.setup(configs["rules"], configs["map"], 202)
+  var template: Dictionary = merged.state["stacks"][merged.get_stack_at_tile_for_player("T_-4_0", "P1")].duplicate(true)
+  template["id"] = "S_A"
+  template["tile_id"] = "T_-3_0"
+  template["waypoints"] = ["T_-2_0"]
+  merged.state["stacks"]["S_A"] = template
+  var absorbed: Dictionary = template.duplicate(true)
+  absorbed["id"] = "S_B"
+  absorbed["waypoints"] = ["T_-1_0"]
+  merged.state["stacks"]["S_B"] = absorbed
+  merged.call("_merge_same_owner_stacks")
+  _assert(merged.state["stacks"].has("S_A") and not merged.state["stacks"].has("S_B"), "contract: lowest friendly stack ID absorbs deterministically")
+  _assert(merged.state["stacks"]["S_A"]["waypoints"].is_empty(), "contract: merged friendly queues are cleared")
+  _assert(_has_event(merged.snapshot()["replay_events"], "friendly_stacks_merged"), "contract: friendly merge emits stable event")
+
+  var combat = GameCoreScript.new()
+  combat.setup(configs["rules"], configs["map"], 203)
+  var p1_stack: String = combat.get_stack_at_tile_for_player("T_-4_0", "P1")
+  combat.state["stacks"][p1_stack]["tile_id"] = "T_4_0"
+  for cohort in combat.state["stacks"][p1_stack]["cohorts"]:
+    cohort["count"] = 5
+    cohort["max_health_per_soldier"] = 20000
+    cohort["current_total_health"] = 100000
+    cohort["damage_mean_per_soldier"] = 20000
+  combat.call("_resolve_all_combats")
+  _assert(combat.state["tiles"]["T_4_0"]["controlled_by"] == "P2", "contract: combat does not apply control before post-resolution step")
+  _assert(_has_combat_defender(combat.snapshot()["replay_events"], "P2"), "contract: current controller resolves as defender")
+  combat.call("_apply_post_resolution_control")
+  _assert(combat.state["tiles"]["T_4_0"]["controlled_by"] == "P1", "contract: surviving combatant receives control after combat")
+
 func _test_bot(configs: Dictionary) -> void:
   var core = GameCoreScript.new()
   core.setup(configs["rules"], configs["map"], 777)
@@ -212,6 +255,18 @@ func _home_count(state: Dictionary, player_id: String) -> int:
     if tile["home_owner"] == player_id:
       count += 1
   return count
+
+func _has_event(events: Array, event_type: String) -> bool:
+  for event in events:
+    if String(event.get("type", "")) == event_type:
+      return true
+  return false
+
+func _has_combat_defender(events: Array, defender: String) -> bool:
+  for event in events:
+    if String(event.get("type", "")) == "combat_exchange" and String(event.get("defender", "")) == defender:
+      return true
+  return false
 
 func _assert(condition: bool, message: String) -> void:
   if condition:

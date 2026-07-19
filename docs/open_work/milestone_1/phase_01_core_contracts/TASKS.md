@@ -12,11 +12,11 @@
   - Definition of done: validate required keys/types, player, turn, phase, monotonic source sequence, allocation ranges/bank, stack ownership/liveness, waypoint IDs, append/replace mode, and duplicates; rejected commands produce diagnostics but never enter replay or mutate state.
   - Evidence: 2026-07-19 centralized pre-mutation validator now requires common/type-specific keys and types, current player/turn/phase, positive accepted-only per-player sequence, allocation/bank, live ownership, valid waypoint IDs, and valid mode; accepted commands are copied only after resolution and rejected diagnostics are stable. Focused assertions pass; full core suite retains exactly 3 intentional T04/T05 red assertions (hash and fog) with no engine errors.
 
-- [ ] `M1-P01-T03` Correct movement-edge validation, friendly merges, combat ordering, and post-resolution control.
+- [x] `M1-P01-T03` Correct movement-edge validation, friendly merges, combat ordering, and post-resolution control.
   - Dependencies: M1-P01-T01, M1-P01-T02
   - Can run early: No
   - Definition of done: validate every executed adjacent edge; stop at invalid/walled edges; merge friendly cohorts deterministically, clear both queues, and emit an event; resolve controller-first defender combat before applying surviving control and capital transfer.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 movement revalidates each executed edge and preserves blocked queues with events; same-owner stacks merge into the stable destination, clear queues, and emit merge events; combat tiles resolve in stable order and control applies only after combat. Focused movement/combat assertions and full three-size UI smoke pass; core suite has only 3 intentional T04/T05 red assertions and no engine errors.
 
 - [ ] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
   - Dependencies: M1-P01-T02, M1-P01-T03

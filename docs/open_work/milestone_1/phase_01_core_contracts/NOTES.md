@@ -31,3 +31,11 @@ Append-only. No implementation entries yet.
 - Validation: focused command assertions pass for rejected legacy/accepted history separation, diagnostics, no gameplay mutation, turn, duplicate/reusable sequence, invalid path mode, and unknown waypoint. The pinned full suite has exactly three remaining intentional red assertions owned by T04/T05 (canonical hash and fogged enemy strength/path), with no parser/crash error.
 - Blockers or risks: none. The bot now owns a monotonically increasing local command sequence; its direct `GameCore` parameter remains T05 work.
 - Exact next action: implement `M1-P01-T03` movement-edge validation, deterministic friendly merges, combat/control ordering, and focused tests.
+
+## 2026-07-19 — M1-P01-T03 movement/combat boundary
+
+- Status: Complete. Movement now revalidates the executed hex edge, preserves an invalid/walled queue with a stable blocked event, and never captures before resolution. Friendly merge selects the stable destination, clears queues, orders cohorts, and emits a merge event. Combat/control runs in stable tile order and applies control after combat before elimination.
+- Files changed: `godot/scripts/core/game_core.gd` and `godot/tests/run_core_tests.gd`.
+- Validation: focused tests pass for non-adjacent-edge prevention, retained invalid queue/event, deterministic merge/queue-clear/event, controller-first defender, and post-combat control. Pinned three-size UI smoke passed. The core suite retains exactly three intended T04/T05 red assertions (hash and fog) with no engine errors.
+- Blockers or risks: none.
+- Exact next action: implement `M1-P01-T04` turn-cap draw behavior, owned RNG stream metadata, canonical SHA-256 hashing, and deterministic tests.

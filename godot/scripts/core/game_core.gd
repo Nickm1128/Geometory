@@ -355,6 +355,7 @@ func _apply_end_phase(command: Dictionary) -> Dictionary:
   _resolve_player_movement(player_id)
   _merge_same_owner_stacks()
   _resolve_all_combats()
+  _apply_post_resolution_control()
   _check_eliminations()
   if not state.get("game_over", false):
     _advance_to_next_player()
@@ -493,8 +494,8 @@ func _resolve_player_movement(player_id: String) -> void:
       continue
     var from_tile = String(stack["tile_id"])
     var to_tile = String(stack["waypoints"][0])
-    if not state["tiles"].has(to_tile):
-      stack["waypoints"].pop_front()
+    if not state["tiles"].has(to_tile) or not get_neighbor_tile_ids(from_tile).has(to_tile):
+      _event("movement_blocked", {"stack_id": stack_id, "player_id": player_id, "from": from_tile, "to": to_tile, "reason": "invalid_edge"})
       continue
     var wall_id = HexUtils.edge_id(from_tile, to_tile)
     if _is_wall_blocking(wall_id, player_id):
@@ -502,10 +503,6 @@ func _resolve_player_movement(player_id: String) -> void:
       continue
     stack["tile_id"] = to_tile
     stack["waypoints"].pop_front()
-    if state["tiles"][to_tile]["controlled_by"] != player_id:
-      var previous = String(state["tiles"][to_tile]["controlled_by"])
-      state["tiles"][to_tile]["controlled_by"] = player_id
-      _event("tile_control_changed", {"tile_id": to_tile, "from": previous, "to": player_id})
     _event("stack_moved", {"stack_id": stack_id, "player_id": player_id, "from": from_tile, "to": to_tile})
 
 func _is_wall_blocking(wall_id: String, player_id: String) -> bool:
@@ -541,9 +538,16 @@ func _merge_same_owner_stacks() -> void:
     var target: Dictionary = state["stacks"][target_id]
     for cohort in stack["cohorts"]:
       target["cohorts"].append(cohort)
-    for waypoint in stack.get("waypoints", []):
-      target["waypoints"].append(waypoint)
+    target["cohorts"].sort_custom(func(a: Dictionary, b: Dictionary): return _cohort_id_order(String(a["cohort_id"])) < _cohort_id_order(String(b["cohort_id"])))
+    target["waypoints"] = []
+    stack["waypoints"] = []
     state["stacks"].erase(stack_id)
+    _event("friendly_stacks_merged", {"owner": target["owner"], "tile_id": target["tile_id"], "destination_stack_id": target_id, "absorbed_stack_id": stack_id})
+
+func _cohort_id_order(cohort_id: String) -> int:
+  if cohort_id.length() > 1 and cohort_id.substr(0, 1) == "C" and cohort_id.substr(1).is_valid_int():
+    return int(cohort_id.substr(1))
+  return 2147483647
 
 func _resolve_all_combats() -> void:
   var tiles_to_owners = {}
@@ -552,7 +556,9 @@ func _resolve_all_combats() -> void:
     if not tiles_to_owners.has(tile_id):
       tiles_to_owners[tile_id] = {}
     tiles_to_owners[tile_id][stack["owner"]] = true
-  for tile_id in tiles_to_owners.keys():
+  var tile_ids: Array = tiles_to_owners.keys()
+  tile_ids.sort()
+  for tile_id in tile_ids:
     var owners = tiles_to_owners[tile_id].keys()
     if owners.size() < 2:
       continue
@@ -577,10 +583,21 @@ func _resolve_all_combats() -> void:
       exchange += 1
     var survivors = _living_owners_on_tile(tile_id)
     if survivors.size() == 1:
-      var winner = String(survivors[0])
-      var previous = String(state["tiles"][tile_id]["controlled_by"])
-      state["tiles"][tile_id]["controlled_by"] = winner
-      _event("combat_resolved", {"tile_id": tile_id, "winner": winner, "previous_controller": previous})
+      _event("combat_resolved", {"tile_id": tile_id, "winner": String(survivors[0]), "previous_controller": state["tiles"][tile_id]["controlled_by"]})
+
+func _apply_post_resolution_control() -> void:
+  var tile_ids: Array = state["tiles"].keys()
+  tile_ids.sort()
+  for tile_id in tile_ids:
+    var owners: Array = _living_owners_on_tile(tile_id)
+    owners.sort()
+    if owners.size() != 1:
+      continue
+    var controller: String = owners[0]
+    var previous: String = state["tiles"][tile_id]["controlled_by"]
+    if controller != previous:
+      state["tiles"][tile_id]["controlled_by"] = controller
+      _event("tile_control_changed", {"tile_id": tile_id, "from": previous, "to": controller})
 
 func _combat_exchange(tile_id: String, attacker_stack_id: String, defender_stack_id: String, exchange: int) -> void:
   var attacker: Dictionary = state["stacks"][attacker_stack_id]

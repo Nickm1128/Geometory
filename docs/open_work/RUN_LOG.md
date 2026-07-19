@@ -178,6 +178,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: implement `M1-P01-T03` movement/combat/control contract.
 
+### M1-RUN-20260719-001 / M1-P01-T03 movement/combat boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T03 boundary.
+- Files or artifacts: deterministic movement/combat/control changes and focused core tests.
+- Decisions: leave invalid/walled queued step in place; friendly merges clear all participating queues; delayed post-combat control is the only capture point.
+- Validation and exact result: focused T03 assertions and all three UI-smoke portrait sizes passed. Core run retains exactly 3 red assertions owned by T04/T05 and no engine errors.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: implement `M1-P01-T04` hashing/RNG/turn-cap slice.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
