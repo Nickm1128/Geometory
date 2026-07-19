@@ -1,0 +1,37 @@
+# M1-P03 Tasks — Competent Fair Baseline Bot
+
+- [ ] `M1-P03-T01` Freeze the prototype opponent and validate the champion profile schema.
+  - Dependencies: M1-P02-G08
+  - Can run early: No
+  - Definition of done: preserve immutable prototype code/profile/hash for comparisons; define types, bounds, defaults, and compatibility for every retained bot parameter.
+  - Evidence: Pending.
+- [ ] `M1-P03-T02` Implement fog-safe strategic feature derivation.
+  - Dependencies: M1-P03-T01
+  - Can run early: No
+  - Definition of done: derive income, frontier, neutral reach, capital threat, visible strength, own regional strength, wall pressure, consolidation, and opportunity features from observable state only, with focused fixtures.
+  - Evidence: Pending.
+- [ ] `M1-P03-T03` Implement profile-driven allocation and reserve strategy.
+  - Dependencies: M1-P03-T02
+  - Can run early: No
+  - Definition of done: make expansion, defense, attack, research, economy, military, risk, and minimum-reserve fields affect legal deterministic allocation across early, threatened, and advantaged states.
+  - Evidence: Pending.
+- [ ] `M1-P03-T04` Implement profile-driven movement and tactical strategy modules.
+  - Dependencies: M1-P03-T02, M1-P03-T03
+  - Can run early: No
+  - Definition of done: cover early expansion, capital defense, favorable attacks, wall pressure, frontier support, consolidation, queued-order continuity, and suicidal-attack avoidance using valid commands.
+  - Evidence: Pending.
+- [ ] `M1-P03-T05` Add tactical behavior scenarios and hard fairness diagnostics.
+  - Dependencies: M1-P03-T04
+  - Can run early: No
+  - Definition of done: version fixtures for every required strategy; fail on invalid commands, direct core access, hidden-field access, or non-seeded random behavior; emit human-readable decision reasons.
+  - Evidence: Pending.
+- [ ] `M1-P03-T06` Build paired league scoring and deterministic bootstrap reports.
+  - Dependencies: M1-P03-T01, M1-P03-T05
+  - Can run early: No
+  - Definition of done: run side-swapped development/holdout match pairs, measure termination/side bias/match score, and compute a deterministic paired-bootstrap 95% interval with versioned inputs and reports.
+  - Evidence: Pending.
+- [ ] `M1-P03-T07` Tune, certify, and close the baseline bot phase.
+  - Dependencies: M1-P03-T06
+  - Can run early: No
+  - Definition of done: meet every P03 quantitative/behavior gate without weakening it; complete a phone human-vs-bot sanity playtest; reconcile bot/simulation docs; pass hygiene; publish `m1-p03` and activate P04.
+  - Evidence: Pending.

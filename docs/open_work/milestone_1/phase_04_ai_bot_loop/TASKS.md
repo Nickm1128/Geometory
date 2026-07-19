@@ -1,0 +1,37 @@
+# M1-P04 Tasks — Guarded AI-Assisted Bot Workbench
+
+- [ ] `M1-P04-T01` Define strict proposal/candidate schemas and a mocked Python CLI skeleton.
+  - Dependencies: M1-P03-G07
+  - Can run early: No
+  - Definition of done: provide Python 3.11 `propose`, `evaluate`, `promote`, and `cycle` commands; strict JSON Schema; exact champion-base hash; allowlisted scalar/toggle operations; deterministic normalized output; no paid call in tests.
+  - Evidence: Pending.
+- [ ] `M1-P04-T02` Implement the privacy-safe, fail-closed OpenRouter client and cost ledger.
+  - Dependencies: M1-P04-T01
+  - Can run early: No
+  - Definition of done: fixed default model/settings, strict response format, required-parameter/data-deny routing, dedicated capped-key validation, integer-microdollar reservation/reconciliation, coordinator lock, one request per cycle, no ambiguous retry, redacted ignored transport.
+  - Evidence: Pending.
+- [ ] `M1-P04-T03` Validate and materialize candidate profile patches safely.
+  - Dependencies: M1-P04-T01
+  - Can run early: No
+  - Definition of done: reject unknown/stale/duplicate/out-of-range fields and non-allowlisted paths; apply normalized operations only to a copy; schema/hash/sync/determinism checks leave champion untouched.
+  - Evidence: Pending.
+- [ ] `M1-P04-T04` Implement champion/challenger development and holdout evaluation reports.
+  - Dependencies: M1-P03-T06, M1-P04-T03
+  - Can run early: No
+  - Definition of done: run 200 paired development and 500 paired holdout seeds and calculate invalid/fog/max-turn/side-bias/duration/match-score/bootstrap promotion gates without exposing holdout inputs to the model.
+  - Evidence: Pending.
+- [ ] `M1-P04-T05` Implement transactional automatic promotion on the milestone branch.
+  - Dependencies: M1-P04-T04
+  - Can run early: No
+  - Definition of done: promote only a gate-passing profile; synchronize runtime data; rerun required validation; create an auditable task commit; leave champion byte-identical on rejection or failure.
+  - Evidence: Pending.
+- [ ] `M1-P04-T06` Prove mocked success and failure behavior.
+  - Dependencies: M1-P04-T02, M1-P04-T03, M1-P04-T04, M1-P04-T05
+  - Can run early: No
+  - Definition of done: cover valid, malformed, range, stale-base, privacy, budget, timeout, provider/API, ledger, evaluation, and promotion-rollback cases with no network calls.
+  - Evidence: Pending.
+- [ ] `M1-P04-T07` Execute one capped live accept-or-reject cycle and close P04.
+  - Dependencies: M1-P04-T06
+  - Can run early: No
+  - Definition of done: validate a dedicated key limit no greater than $10, reserve budget, make exactly one proposal call, reconcile recorded cost, deterministically reject or promote, pass exit gates/hygiene, publish `m1-p04`, and activate P05. If credentials alone are unavailable, record a blocker and allow eligible P05 work early.
+  - Evidence: Pending.

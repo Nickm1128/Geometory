@@ -1,0 +1,37 @@
+# M1-P06 Tasks — Certification And Closeout
+
+- [ ] `M1-P06-T01` Run the integrated deterministic, bot, replay, persistence, visual, and end-to-end regression matrix.
+  - Dependencies: M1-P03-G07, M1-P04-G05, M1-P05-G07
+  - Can run early: No
+  - Definition of done: execute all milestone suites from clean state, retain commands/versions/results/artifacts, and resolve every regression without weakening prior gates.
+  - Evidence: Pending.
+- [ ] `M1-P06-T02` Tune and verify the intended 10–20 minute pacing envelope.
+  - Dependencies: M1-P06-T01
+  - Can run early: No
+  - Definition of done: combine deterministic simulation distributions and human matches to tune pacing while preserving core, fairness, promotion, and readability gates; document any accepted outliers.
+  - Evidence: Pending.
+- [ ] `M1-P06-T03` Certify install, upgrade, lifecycle, resume, replay, and repeated-match behavior.
+  - Dependencies: M1-P06-T01
+  - Can run early: No
+  - Definition of done: validate clean install, upgrade from 0.1.0 debug, cold launch, background/process kill and resume, corruption recovery, completed replay, repeated matches, victory, and defeat on emulator and phone.
+  - Evidence: Pending.
+- [ ] `M1-P06-T04` Certify physical-phone gestures, safe areas, UI scale, haptics, and performance.
+  - Dependencies: M1-P06-T01
+  - Can run early: No
+  - Definition of done: run ten pans and pinches, accidental-command checks, transient system bars, UI scale 1.30, safe-area/cutout, haptics, and warm pan/zoom sampling; meet the approved FPS/freeze thresholds with raw evidence.
+  - Evidence: Pending.
+- [ ] `M1-P06-T05` Produce and inspect the 0.2.0-m1 normal and QA deliverables.
+  - Dependencies: M1-P06-T03, M1-P06-T04
+  - Can run early: No
+  - Definition of done: export internal/debug APKs, inspect package/version/min-target SDK/ABI/permissions/QA isolation, install both, record SHA-256 and tool versions, and preserve final logs/screenshots/manifests in the documented artifact layout.
+  - Evidence: Pending.
+- [ ] `M1-P06-T06` Reconcile documentation and deliver the evidence-based status/playtest report.
+  - Dependencies: M1-P06-T02, M1-P06-T05
+  - Can run early: No
+  - Definition of done: align README, vision, assumptions, rules, technical/UI/bot/simulation designs, roadmap, blockers, skills, and trackers; report final readiness and residual risk; give one concise user playtest checklist and record subjective sign-off or blocker.
+  - Evidence: Pending.
+- [ ] `M1-P06-T07` Close milestone hygiene and publish immutable refs.
+  - Dependencies: M1-P06-T06
+  - Can run early: No
+  - Definition of done: pass final work-state/hygiene audits, produce a clean intentional tree, publish `m1-p06` and `v0.2.0-m1`, push milestone branch/tags, verify remote refs, and leave `main` unmerged.
+  - Evidence: Pending.

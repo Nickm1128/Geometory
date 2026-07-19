@@ -1,0 +1,37 @@
+# M1-P05 Tasks — Mobile Aesthetics And UX
+
+- [ ] `M1-P05-T01` Extract reusable presentation components and centralize design/interaction tokens.
+  - Dependencies: M1-P02-G08
+  - Can run early: Yes
+  - Definition of done: split screen shell, HUD, sheets, modals, results, replay, and state visuals from monolithic scripts; centralize color/type/spacing/stroke/shape/motion/haptic tokens; bundle stable fonts; persist UI scale, tips, and reduced motion; use production safe-area input.
+  - Evidence: Pending.
+- [ ] `M1-P05-T02` Implement the macro-region and tactical board visual system.
+  - Dependencies: M1-P05-T01
+  - Can run early: Yes
+  - Definition of done: show macro boundaries/grouping, non-color ownership cues, fog frontier, capitals, wall health/damage/breach, queued paths, selection/threat, stack state, and useful zoom-level hierarchy without obscuring input.
+  - Evidence: Pending.
+- [ ] `M1-P05-T03` Complete in-match strategic feedback and summaries.
+  - Dependencies: M1-P05-T01, M1-P05-T02
+  - Can run early: Yes
+  - Definition of done: show selected stack health/quality and visible strength, allocation/income consequences, confirmed orders, combat outcomes, territory changes, wall breaches, turn summary, and clear win/loss feedback.
+  - Evidence: Pending.
+- [ ] `M1-P05-T04` Polish every shell, match, resume, result, and replay flow.
+  - Dependencies: M1-P02-T07, M1-P05-T01, M1-P05-T03
+  - Can run early: Yes
+  - Definition of done: polish Main Menu, Continue, Review Last Match, Quick Play, How to Play, Settings, allocation, movement, warning, pause, turn summary, game over, and replay with consistent navigation and no Dev Tools dependency.
+  - Evidence: Pending.
+- [ ] `M1-P05-T05` Certify accessibility, target sizing, gesture safety, and layout scaling.
+  - Dependencies: M1-P05-T04
+  - Can run early: Yes
+  - Definition of done: critical controls are at least 48 logical px, primary actions at least 56, critical spacing at least 8; ownership is not color-only; UI scales 1.00/1.15/1.30 avoid clipping; pan/pinch/tap do not accidentally issue commands.
+  - Evidence: Pending.
+- [ ] `M1-P05-T06` Complete the 26-state deterministic visual fixture and canonical-golden suite.
+  - Dependencies: M1-P00-T06, M1-P05-T04
+  - Can run early: Yes
+  - Definition of done: directly render the approved shell, allocation, movement, pause, results, frontline/fog/enemy, wall, combat, victory, and defeat scenarios; verify request nonce/seed/profile/state/viewport/APK/assertions; track only explicit 393x852 Windows/OpenGL/Godot-4.6.3 goldens and enforce approved update/diff policy.
+  - Evidence: Pending.
+- [ ] `M1-P05-T07` Pass desktop/emulator/phone visual matrices and close P05.
+  - Dependencies: M1-P05-T05, M1-P05-T06, M1-P04-G05
+  - Can run early: No
+  - Definition of done: pass 360x800, 393x852, 480x960 and all UI scales; pass all scenarios on matched emulator and S24 with no safe-area/clipping/overlap/ellipsis/crash/ANR errors; pass hygiene; publish `m1-p05`; activate P06.
+  - Evidence: Pending.
