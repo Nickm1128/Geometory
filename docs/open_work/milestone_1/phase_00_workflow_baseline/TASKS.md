@@ -40,4 +40,4 @@
   - Dependencies: M1-P00-T02, M1-P00-T03, M1-P00-T04, M1-P00-T05, M1-P00-T06
   - Can run early: No
   - Definition of done: correct stale README, roadmap, assumptions, tooling, workflow, version, and minimum-SDK statements; archive starter notes according to the approved repository policy; pass all P00 exit gates and hygiene items; commit the phase checkpoint, publish annotated tag `m1-p00`, push branch/tag, and activate P01 without merging `main`.
-  - Evidence: Pending.
+  - Evidence: Authorities, archive, tracker regression, local suites, inspected APKs, green GitHub Actions, emulator contract, and current physical S24 contract are complete. P00 hygiene passes with no open blocker; the required closeout commit, immutable `m1-p00` publication, and transition record remain.

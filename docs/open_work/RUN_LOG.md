@@ -111,6 +111,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: publish this CI evidence checkpoint, then obtain the physical S24 current-build handshake.
 
+### M1-RUN-20260719-001 / physical-device closure / M1-P00-T07
+
+- Status: Progress
+- Branch/ref: `milestone/m1-vertical-slice` at `d954a4d`
+- Files or artifacts: ignored physical artifact `artifacts/visual_qa/20260719_131542/movement_pending_path`; tracker/hygiene closeout changes only.
+- Decisions: accept the physical launch/ready contract for P00 while explicitly preserving the visible safe-area/layout debt for P05; do not claim visual certification.
+- Validation and exact result: exactly one authorized physical target; current QA install succeeded; nonce/build/seed/scale/profile echoed; viewport 1080x2340 and live safe area `(0,103,1080,2237)` recorded; overlay/window/fatal checks passed; zero sensitive-key matches in request/ready/manifest.
+- Blockers or risks: `B-001` resolved. No open blocker; phase publication remains.
+- Paid call and ledger entry: None
+- Exact next action: commit passed hygiene, require green CI, tag/push immutable `m1-p00`, record P01-ready transition, and stop before P01 implementation for the user report.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
