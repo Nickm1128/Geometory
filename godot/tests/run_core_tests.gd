@@ -7,6 +7,7 @@ const CombatRulesScript := preload("res://scripts/core/combat_rules.gd")
 const RngRulesScript := preload("res://scripts/core/rng_rules.gd")
 const FogRulesScript := preload("res://scripts/core/fog_rules.gd")
 const ReplayCodecScript := preload("res://scripts/core/replay_codec.gd")
+const ReplayRunnerScript := preload("res://scripts/core/replay_runner.gd")
 
 var failures := 0
 
@@ -30,6 +31,7 @@ func _init() -> void:
   _test_bot(configs)
   _test_replay_reproducibility(configs)
   _test_gmty1_serialization_contract(configs)
+  _test_gmty1_reconstruction_contract(configs)
 
   if failures == 0:
     print("All Geometory core tests passed.")
@@ -405,6 +407,25 @@ func _test_gmty1_serialization_contract(configs: Dictionary) -> void:
   _assert(parsed["record"]["setup"]["ruleset_sha256"] == core.snapshot()["ruleset_sha256"] and parsed["record"]["steps"].size() == 1 and typeof(parsed["record"]["steps"][0]["command"]["client_sequence"]) == TYPE_INT and parsed["record"]["steps"][0]["command"]["client_sequence"] == 1 and parsed["record"]["steps"][0]["state_hash"].length() == 64 and parsed["record"]["final"]["state_hash"] == core.canonical_state_hash(), "GMTY1 carries setup, accepted command sequence, step hash, and final hash")
   var malformed: Dictionary = ReplayCodecScript.parse("{not-json")
   _assert(not malformed.get("ok", true) and malformed["code"] == "malformed_json", "GMTY1 parser diagnoses malformed input")
+
+func _test_gmty1_reconstruction_contract(configs: Dictionary) -> void:
+  var source = GameCoreScript.new()
+  source.setup(configs["rules"], configs["map"], 502)
+  source.apply_command({"type": "allocate_resources", "player_id": "P1", "turn": 1, "phase": "allocation", "economy_cents": 0, "military_cents": 0, "research_cents": 0, "client_sequence": 1})
+  var record: Dictionary = ReplayCodecScript.from_match(source.snapshot(), source.canonical_state_hash())
+  var parsed_record: Dictionary = ReplayCodecScript.parse(ReplayCodecScript.serialize(record))["record"]
+  var reconstructed: Dictionary = ReplayRunnerScript.reconstruct(parsed_record, configs["rules"], configs["map"])
+  _assert(reconstructed.get("ok", false) and reconstructed["final_hash"] == source.canonical_state_hash() and reconstructed["state"]["accepted_command_history"].size() == 1, "GMTY1 replay reconstructs production core state and final hash")
+  var stale: Dictionary = record.duplicate(true)
+  stale["setup"]["ruleset_sha256"] = "stale"
+  _assert(ReplayRunnerScript.reconstruct(stale, configs["rules"], configs["map"])["code"] == "stale_config", "GMTY1 replay diagnoses stale configuration")
+  var illegal: Dictionary = record.duplicate(true)
+  illegal["steps"][0]["command"]["player_id"] = "P2"
+  _assert(ReplayRunnerScript.reconstruct(illegal, configs["rules"], configs["map"])["code"] == "illegal_command", "GMTY1 replay diagnoses illegal accepted command")
+  var mismatch: Dictionary = record.duplicate(true)
+  mismatch["steps"][0]["state_hash"] = "0".repeat(64)
+  _assert(ReplayRunnerScript.reconstruct(mismatch, configs["rules"], configs["map"])["code"] == "step_hash_mismatch", "GMTY1 replay diagnoses mismatched step hash")
+  _assert(ReplayRunnerScript.reconstruct({"format": "GMTY1", "format_version": 1, "setup": {}, "steps": [], "final": {"state_hash": ""}}, configs["rules"], configs["map"])["code"] == "truncated_record", "GMTY1 replay diagnoses truncated record sections")
 
 func _home_count(state: Dictionary, player_id: String) -> int:
   var count := 0

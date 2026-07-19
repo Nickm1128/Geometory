@@ -6,11 +6,11 @@
   - Definition of done: include rules/map IDs and hashes, seed, player/bot setup, research schedule or derivation contract, every accepted command field/sequence, step hashes, final hash, winner/draw, and format version; provide deterministic serializer/parser behavior.
   - Evidence: 2026-07-19 defined `core/contracts/replay.md` and added scene-free `ReplayCodec`. GMTY1 canonical JSON carries format/version, rules/map IDs and hashes, seed, RNG/research setup, player/bot setup, exact accepted commands and post-resolution step hashes, plus final hash/winner/draw. Parser normalizes integral JSON numbers back to GDScript integers and returns stable malformed/format/version/envelope diagnostics. Focused red test failed because the codec was absent; pinned Godot 4.6.3 post-implementation suite passes deterministic round-trip and malformed-input contracts.
 
-- [ ] `M1-P02-T02` Reconstruct matches and diagnose corrupt or incompatible replay records.
+- [x] `M1-P02-T02` Reconstruct matches and diagnose corrupt or incompatible replay records.
   - Dependencies: M1-P02-T01
   - Can run early: No
   - Definition of done: replay accepted commands through the production validator/core; verify step/final hashes; return structured diagnostics for malformed, truncated, stale-config, unsupported-version, illegal-command, and mismatched-hash input.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 added scene-free `ReplayRunner`, which rebuilds GMTY1 through production `GameCore.apply_command`, verifies each post-command and final hash/outcome, and returns structured `malformed_json`, `truncated_record`, `stale_config`, `unsupported_version`, `illegal_command`, `step_hash_mismatch`, `final_hash_mismatch`, and final-outcome diagnostics. Focused red preload failed before implementation; pinned Godot 4.6.3 tests now pass parsed-record reconstruction and all required corruption cases.
 
 - [ ] `M1-P02-T03` Build the rendered-free full-match runner, metrics, manifests, and CLI.
   - Dependencies: M1-P02-T02
