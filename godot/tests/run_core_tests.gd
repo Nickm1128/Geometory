@@ -20,6 +20,7 @@ func _init() -> void:
   _test_commands_and_path(core)
   _test_p01_contract_red_cases(configs)
   _test_movement_resolution_contracts(configs)
+  _test_turn_cap_rng_and_hash_contracts(configs)
   _test_bot(configs)
   _test_replay_reproducibility(configs)
 
@@ -202,6 +203,31 @@ func _test_movement_resolution_contracts(configs: Dictionary) -> void:
   combat.call("_apply_post_resolution_control")
   _assert(combat.state["tiles"]["T_4_0"]["controlled_by"] == "P1", "contract: surviving combatant receives control after combat")
 
+func _test_turn_cap_rng_and_hash_contracts(configs: Dictionary) -> void:
+  var hash_core = GameCoreScript.new()
+  hash_core.setup(configs["rules"], configs["map"], 301)
+  var before_hash: String = hash_core.canonical_state_hash()
+  hash_core.apply_command({"type": "invalid", "player_id": "P1", "turn": 1, "phase": "allocation", "client_sequence": 1})
+  _assert(before_hash == hash_core.canonical_state_hash(), "contract: rejected diagnostics do not alter canonical hash")
+  _assert(hash_core.canonical_state_hash().length() == 64, "contract: canonical hash is SHA-256 hex")
+  _assert(hash_core.state["rng_streams"].has("research") and hash_core.state["rng_streams"].has("combat") and hash_core.state["rng_streams"].has("bot"), "contract: owned research combat and bot streams are recorded")
+
+  var capped = GameCoreScript.new()
+  capped.setup(configs["rules"], configs["map"], 302)
+  var sequences := {"P1": 1, "P2": 1}
+  while not capped.state["game_over"]:
+    var player_id: String = capped.state["active_player"]
+    var sequence: int = sequences[player_id]
+    var allocation = capped.apply_command({"type": "allocate_resources", "player_id": player_id, "turn": capped.state["turn"], "phase": "allocation", "economy_cents": 0, "military_cents": 0, "research_cents": 0, "client_sequence": sequence})
+    _assert(allocation["ok"], "contract: zero allocation is accepted before turn cap")
+    sequences[player_id] = sequence + 1
+    sequence = sequences[player_id]
+    var ending = capped.apply_command({"type": "end_phase", "player_id": player_id, "turn": capped.state["turn"], "phase": "movement", "client_sequence": sequence})
+    _assert(ending["ok"], "contract: end phase resolves before turn cap")
+    sequences[player_id] = sequence + 1
+  _assert(capped.state["turn"] == 80 and capped.state["winner"] == "", "contract: unresolved player-turn 80 ends as draw without turn 81")
+  _assert(_has_draw_end(capped.snapshot()["replay_events"]), "contract: turn-cap draw emits a stable match-ended event")
+
 func _test_bot(configs: Dictionary) -> void:
   var core = GameCoreScript.new()
   core.setup(configs["rules"], configs["map"], 777)
@@ -265,6 +291,12 @@ func _has_event(events: Array, event_type: String) -> bool:
 func _has_combat_defender(events: Array, defender: String) -> bool:
   for event in events:
     if String(event.get("type", "")) == "combat_exchange" and String(event.get("defender", "")) == defender:
+      return true
+  return false
+
+func _has_draw_end(events: Array) -> bool:
+  for event in events:
+    if String(event.get("type", "")) == "match_ended" and String(event.get("winner", "")) == "" and String(event.get("reason", "")) == "turn_cap_draw":
       return true
   return false
 

@@ -17,6 +17,7 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
   rules = new_rules.duplicate(true)
   map_config = new_map_config.duplicate(true)
   state = {
+    "schema_version": 1,
     "seed": seed,
     "turn": 1,
     "active_player": PLAYER_HUMAN,
@@ -28,6 +29,12 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
     "players": {},
     "stacks": {},
     "research_schedule": [],
+    "rng_streams": {
+      "derivation_version": "fnv1a32_seed_mix_v1",
+      "research": "research",
+      "combat": "combat",
+      "bot": "bot"
+    },
     "replay_events": [],
     "accepted_command_history": [],
     "rejected_command_diagnostics": [],
@@ -35,6 +42,10 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
     "next_stack_index": 1,
     "next_cohort_index": 1
   }
+  state["ruleset_id"] = String(rules.get("ruleset_id", "unknown"))
+  state["ruleset_sha256"] = _sha256(_canonical_json(rules))
+  state["map_id"] = String(map_config.get("map_id", "unknown"))
+  state["map_sha256"] = _sha256(_canonical_json(map_config))
   _generate_research_schedule()
   _generate_alpha_medium_map()
   _create_players()
@@ -43,6 +54,32 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
 
 func snapshot() -> Dictionary:
   return state.duplicate(true)
+
+func canonical_state_hash() -> String:
+  return _sha256(_canonical_json({
+    "schema_version": state["schema_version"],
+    "seed": state["seed"],
+    "ruleset_id": state["ruleset_id"],
+    "ruleset_sha256": state["ruleset_sha256"],
+    "map_id": state["map_id"],
+    "map_sha256": state["map_sha256"],
+    "rng_streams": state["rng_streams"],
+    "turn": state["turn"],
+    "active_player": state["active_player"],
+    "phase": state["phase"],
+    "winner": state["winner"],
+    "game_over": state["game_over"],
+    "players": state["players"],
+    "tiles": state["tiles"],
+    "walls": state["walls"],
+    "stacks": state["stacks"],
+    "research_schedule": state["research_schedule"],
+    "accepted_command_history": state["accepted_command_history"],
+    "last_accepted_client_sequence": state["last_accepted_client_sequence"],
+    "replay_events": state["replay_events"],
+    "next_stack_index": state["next_stack_index"],
+    "next_cohort_index": state["next_cohort_index"]
+  }))
 
 func get_player_ids() -> Array[String]:
   return [PLAYER_HUMAN, PLAYER_BOT]
@@ -476,6 +513,9 @@ func _begin_player_turn(player_id: String) -> void:
   _event("income_added", {"player_id": player_id, "income": income, "bank_cents": player["bank_cents"]})
 
 func _advance_to_next_player() -> void:
+  if int(state["turn"]) >= int(rules["match"]["max_turns"]):
+    _end_match_as_draw()
+    return
   var current = String(state["active_player"])
   var next = PLAYER_BOT if current == PLAYER_HUMAN else PLAYER_HUMAN
   state["turn"] = int(state["turn"]) + 1
@@ -653,6 +693,11 @@ func _check_eliminations() -> void:
     state["winner"] = alive[0] if alive.size() == 1 else ""
     _event("match_ended", {"winner": state["winner"], "turns": state["turn"]})
 
+func _end_match_as_draw() -> void:
+  state["game_over"] = true
+  state["winner"] = ""
+  _event("match_ended", {"winner": "", "turns": state["turn"], "reason": "turn_cap_draw"})
+
 func _eliminate_player(player_id: String, capturer_id: String) -> void:
   if bool(state["players"][player_id]["eliminated"]):
     return
@@ -741,7 +786,7 @@ func _roll_stack_damage(stack: Dictionary, salt: String) -> int:
   var stddev = int(rules["soldier"]["base_damage_stddev"]) * soldiers
   var noise = 0.0
   for i in range(6):
-    noise += _unit_random("%s_%d" % [salt, i])
+    noise += _unit_random("combat", "%s_%d" % [salt, i])
   noise = noise - 3.0
   return max(1, int(round(float(mean) + noise * float(stddev) / 2.0)))
 
@@ -778,11 +823,17 @@ func _command_result(ok: bool, message: String, code: String = "") -> Dictionary
 
 func _deterministic_range(stream: String, index: int, min_value: int, max_value: int) -> int:
   var span = max_value - min_value + 1
-  return min_value + int(abs(_hash("%s_%d" % [stream, index])) % span)
+  return min_value + int(abs(_stream_hash(stream, str(index))) % span)
 
-func _unit_random(salt: String) -> float:
-  var value = abs(_hash("%s_%s_%d" % [salt, state.get("seed", 0), state.get("turn", 0)])) % 1000000
+func _unit_random(stream: String, salt: String) -> float:
+  var value = abs(_stream_hash(stream, "%s_%d" % [salt, state.get("turn", 0)])) % 1000000
   return float(value) / 1000000.0
+
+func bot_random_unit(salt: String) -> float:
+  return _unit_random("bot", salt)
+
+func _stream_hash(stream: String, salt: String) -> int:
+  return _hash("%s|%s" % [stream, salt])
 
 func _hash(text: String) -> int:
   var h = 2166136261
@@ -790,3 +841,32 @@ func _hash(text: String) -> int:
     h = int((h ^ text.unicode_at(i)) * 16777619) & 0x7fffffff
   h = int((h ^ int(state.get("seed", 1))) * 1103515245 + 12345) & 0x7fffffff
   return h
+
+func _sha256(text: String) -> String:
+  var context := HashingContext.new()
+  context.start(HashingContext.HASH_SHA256)
+  context.update(text.to_utf8_buffer())
+  return context.finish().hex_encode()
+
+func _canonical_json(value: Variant) -> String:
+  match typeof(value):
+    TYPE_NIL:
+      return "null"
+    TYPE_BOOL:
+      return "true" if value else "false"
+    TYPE_INT, TYPE_FLOAT, TYPE_STRING:
+      return JSON.stringify(value)
+    TYPE_ARRAY:
+      var items: Array[String] = []
+      for item in value:
+        items.append(_canonical_json(item))
+      return "[" + ",".join(items) + "]"
+    TYPE_DICTIONARY:
+      var keys: Array = value.keys()
+      keys.sort_custom(func(a, b): return String(a) < String(b))
+      var entries: Array[String] = []
+      for key in keys:
+        entries.append(JSON.stringify(String(key)) + ":" + _canonical_json(value[key]))
+      return "{" + ",".join(entries) + "}"
+    _:
+      return JSON.stringify(str(value))

@@ -39,3 +39,11 @@ Append-only. No implementation entries yet.
 - Validation: focused tests pass for non-adjacent-edge prevention, retained invalid queue/event, deterministic merge/queue-clear/event, controller-first defender, and post-combat control. Pinned three-size UI smoke passed. The core suite retains exactly three intended T04/T05 red assertions (hash and fog) with no engine errors.
 - Blockers or risks: none.
 - Exact next action: implement `M1-P01-T04` turn-cap draw behavior, owned RNG stream metadata, canonical SHA-256 hashing, and deterministic tests.
+
+## 2026-07-19 — M1-P01-T04 deterministic hash/turn-cap boundary
+
+- Status: Complete. State now records schema/config hashes and named RNG stream metadata; canonical stable-key serialization is hashed with SHA-256 and deliberately excludes rejected diagnostics. After resolving player-turn 80, an otherwise unfinished match emits one deterministic draw and does not start turn 81.
+- Files changed: `godot/scripts/core/game_core.gd` and `godot/tests/run_core_tests.gd`.
+- Validation: focused tests pass for equal SHA-256 hashes, rejected-diagnostic hash exclusion, 64-hex output, recorded research/combat/bot streams, and a complete 80-turn zero-allocation draw cycle. The core suite retains exactly two intentional T05 fog-observation red assertions, with no engine errors.
+- Blockers or risks: none.
+- Exact next action: implement `M1-P01-T05` fog-safe observable snapshots, remove direct `GameCore` access from bot policy, and prove private data is absent.

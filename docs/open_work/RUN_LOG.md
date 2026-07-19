@@ -189,6 +189,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: implement `M1-P01-T04` hashing/RNG/turn-cap slice.
 
+### M1-RUN-20260719-001 / M1-P01-T04 deterministic hash/turn-cap boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T04 boundary.
+- Files or artifacts: state/config/rng metadata, canonical SHA-256 serializer, draw handling, and deterministic tests.
+- Decisions: rejected diagnostics remain observable but excluded from gameplay hash; turn cap ends immediately after player-turn 80 resolution; named stream derivation isolates research, combat, and bot randomness.
+- Validation and exact result: focused SHA/RNG/80-turn draw tests passed; full core suite retains exactly 2 T05 fog-red assertions and no engine errors.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: implement `M1-P01-T05` observable snapshot/bot-interface boundary.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
