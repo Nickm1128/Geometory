@@ -255,6 +255,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit/push this T07 workflow checkpoint, require green public CI, rerun a clean Terra/High resume forward-test, and provide the new-thread prompt; the receiving thread then starts T04 red tests without a phase prompt.
 
+### M1-RUN-20260719-001 / public-CI line-ending remediation / M1-P01-T07
+
+- Status: Progress; first workflow-checkpoint CI failed and the exact cross-platform parser defect is locally remediated.
+- Branch/ref: published checkpoint `e637238`; failed GitHub Actions run `29702657606`.
+- Files or artifacts: decoded job `88234245776` logs; `tools/check_work_state.ps1`; `tools/test_check_work_state.ps1`.
+- Decisions: preserve strict exact structured lines while accepting the repository's declared CRLF checkout convention. Do not loosen suffix/content validation.
+- Validation and exact result: public Ubuntu `pwsh` failed only the four structured Live State/Resume Handoff matches because `.gitattributes` checks text out as CRLF while the new end anchors accepted LF only. End anchors now explicitly accept optional carriage returns; a dedicated CRLF INDEX fixture passes both Resume and Audit locally, alongside every prior regression.
+- Blockers or risks: corrected public CI is pending. No product/runtime blocker.
+- Paid call and ledger entry: None
+- Exact next action: commit/push the focused T07 cross-platform fix, require a green replacement run, then complete the clean Terra/High handoff verification and deliver the prompt.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

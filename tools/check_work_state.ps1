@@ -296,32 +296,32 @@ if ($indexValues['workflow_state'] -eq 'active') {
 $liveStateText = Get-MarkdownSection $indexText "Live State"
 $resumeHandoffText = Get-MarkdownSection $indexText "Resume Handoff"
 
-$liveTaskMatches = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task: `(?<value>M1-P\d{2}-T\d{2})`$')
-$liveTaskLines = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task:.*$')
+$liveTaskMatches = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task: `(?<value>M1-P\d{2}-T\d{2})`\r?$')
+$liveTaskLines = [regex]::Matches($liveStateText, '(?m)^- Active coordinator task:.*\r?$')
 if ($liveTaskMatches.Count -ne 1 -or $liveTaskLines.Count -ne 1) {
   Add-Error "INDEX.md Live State must contain exactly '- Active coordinator task: ``M1-PNN-TNN``' with no suffix."
 } elseif ($liveTaskMatches[0].Groups['value'].Value -ne $currentTaskId) {
   Add-Error "INDEX.md Live State task does not match frontmatter current_task $currentTaskId."
 }
 
-$resumeTaskMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Current task: `(?<value>M1-P\d{2}-T\d{2})`$')
-$resumeTaskLines = [regex]::Matches($resumeHandoffText, '(?m)^- Current task:.*$')
+$resumeTaskMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Current task: `(?<value>M1-P\d{2}-T\d{2})`\r?$')
+$resumeTaskLines = [regex]::Matches($resumeHandoffText, '(?m)^- Current task:.*\r?$')
 if ($resumeTaskMatches.Count -ne 1 -or $resumeTaskLines.Count -ne 1) {
   Add-Error "INDEX.md Resume Handoff must contain exactly '- Current task: ``M1-PNN-TNN``' with no suffix."
 } elseif ($resumeTaskMatches[0].Groups['value'].Value -ne $currentTaskId) {
   Add-Error "INDEX.md Resume Handoff task does not match frontmatter current_task $currentTaskId."
 }
 
-$liveContinuationMatches = [regex]::Matches($liveStateText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`$')
-$liveContinuationLines = [regex]::Matches($liveStateText, '(?m)^- Continuation mode:.*$')
+$liveContinuationMatches = [regex]::Matches($liveStateText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`\r?$')
+$liveContinuationLines = [regex]::Matches($liveStateText, '(?m)^- Continuation mode:.*\r?$')
 if ($liveContinuationMatches.Count -ne 1 -or $liveContinuationLines.Count -ne 1) {
   Add-Error "INDEX.md Live State must contain exactly one structured Continuation mode line with no suffix."
 } elseif ($liveContinuationMatches[0].Groups['value'].Value -ne $indexValues['continuation_mode']) {
   Add-Error "INDEX.md Live State continuation mode does not match frontmatter continuation_mode."
 }
 
-$resumeContinuationMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`$')
-$resumeContinuationLines = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode:.*$')
+$resumeContinuationMatches = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode: `(?<value>autonomous|report_required|blocked|complete)`\r?$')
+$resumeContinuationLines = [regex]::Matches($resumeHandoffText, '(?m)^- Continuation mode:.*\r?$')
 if ($resumeContinuationMatches.Count -ne 1 -or $resumeContinuationLines.Count -ne 1) {
   Add-Error "INDEX.md Resume Handoff must contain exactly one structured Continuation mode line with no suffix."
 } elseif ($resumeContinuationMatches[0].Groups['value'].Value -ne $indexValues['continuation_mode']) {

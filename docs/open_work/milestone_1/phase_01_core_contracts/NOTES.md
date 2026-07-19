@@ -96,3 +96,10 @@ Append-only. No implementation entries yet.
 - Fresh Terra/High test: a no-context read-only agent recovered `M1-P01-T04`, the correct red-test slice, automatic task/phase continuation, and all three valid terminal conditions. It correctly declined to implement while the coordinator-owned workflow checkpoint was still dirty; a clean-state verification remains after publication.
 - Independent review: the first read-only review found checker gaps in exact action, pause prose, hygiene completeness, review freshness, and hard-coded fixtures. Those findings were remediated; the follow-up review returned Pass. Remaining direct tag-freshness fixture coverage is deferred because tests must not create or move phase tags.
 - Exact next action: publish this single-ID workflow checkpoint, require green CI, rerun a clean fresh-context Terra/High resume, and then hand the stored autonomous prompt to the user.
+
+## 2026-07-19 — Cross-platform checker correction
+
+- Public evidence: GitHub Actions run `29702657606`, job `88234245776`, failed only `Verify autonomous work state`. Ubuntu checked Markdown out with the repository-declared CRLF policy, while four new structured-line regexes accepted LF endings only.
+- Remediation: task and continuation structured-line anchors now accept optional carriage returns without accepting suffixes. The regression suite dynamically writes a CRLF copy of canonical INDEX and requires both Resume and Audit to return `STRUCTURAL PASS`.
+- Local result: canonical Audit and the complete work-state regression suite pass; no runtime or product file changed.
+- Exact next action: publish the focused correction and require the replacement GitHub Actions run to pass before the new-thread handoff.

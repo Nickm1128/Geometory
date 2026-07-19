@@ -77,10 +77,10 @@ $hygieneFixturePath = Join-Path $tempDirectory "HYGIENE_LOG.md"
 [void](New-Item -ItemType Directory -Path $tempDirectory)
 try {
   $canonicalText = [System.IO.File]::ReadAllText($canonicalIndex)
-  $currentTaskMatch = [regex]::Match($canonicalText, '(?m)^current_task: "(?<value>M1-P\d{2}-T\d{2})"$')
-  $continuationMatch = [regex]::Match($canonicalText, '(?m)^continuation_mode: "(?<value>autonomous|report_required|blocked|complete)"$')
-  $workflowStateMatch = [regex]::Match($canonicalText, '(?m)^workflow_state: "(?<value>active|blocked|complete)"$')
-  $exactActionMatch = [regex]::Match($canonicalText, '(?m)^exact_next_action: "(?<value>[^"\r\n]+)"$')
+  $currentTaskMatch = [regex]::Match($canonicalText, '(?m)^current_task: "(?<value>M1-P\d{2}-T\d{2})"\r?$')
+  $continuationMatch = [regex]::Match($canonicalText, '(?m)^continuation_mode: "(?<value>autonomous|report_required|blocked|complete)"\r?$')
+  $workflowStateMatch = [regex]::Match($canonicalText, '(?m)^workflow_state: "(?<value>active|blocked|complete)"\r?$')
+  $exactActionMatch = [regex]::Match($canonicalText, '(?m)^(?<line>exact_next_action: "(?<value>[^"\r\n]+)")\r?$')
   if (-not $currentTaskMatch.Success -or -not $continuationMatch.Success -or -not $workflowStateMatch.Success -or -not $exactActionMatch.Success) { throw "Canonical INDEX frontmatter is not parseable by the regression fixture." }
   $currentTask = $currentTaskMatch.Groups['value'].Value
   $otherTask = if ($currentTask -ne 'M1-P00-T01') { 'M1-P00-T01' } else { 'M1-P00-T02' }
@@ -97,15 +97,26 @@ try {
   Assert-OverrideFailure "Live State stale suffix" $canonicalText $liveTaskLine ($liveTaskLine + ' (awaiting report)') 'INDEX.md Live State must contain exactly' $fixturePath
   Assert-OverrideFailure "Resume continuation mismatch" $canonicalText $continuationLine $otherContinuationLine 'INDEX.md Resume Handoff continuation mode' $fixturePath "Last"
   if ($workflowStateMatch.Groups['value'].Value -eq 'active') {
-    $exactActionLine = $exactActionMatch.Value
+    $exactActionLine = $exactActionMatch.Groups['line'].Value
     $staleActionLine = $exactActionLine.Replace($currentTask, $otherTask)
     Assert-OverrideFailure "Exact next-action task mismatch" $canonicalText $exactActionLine $staleActionLine 'INDEX.md exact_next_action must name current_task' $fixturePath
   }
   if ($continuationMode -eq 'autonomous') {
-    $handoffLineMatch = [regex]::Match($canonicalText, '(?m)^- Exact handoff:.*$')
+    $handoffLineMatch = [regex]::Match($canonicalText, '(?m)^(?<line>- Exact handoff:[^\r\n]*)\r?$')
     if (-not $handoffLineMatch.Success) { throw "Canonical Resume Handoff has no Exact handoff line for the pause-language fixture." }
-    Assert-OverrideFailure "Autonomous stale pause prose" $canonicalText $handoffLineMatch.Value ($handoffLineMatch.Value + ' Wait for user confirmation.') 'INDEX.md autonomous handoff contains' $fixturePath
+    $handoffLine = $handoffLineMatch.Groups['line'].Value
+    Assert-OverrideFailure "Autonomous stale pause prose" $canonicalText $handoffLine ($handoffLine + ' Wait for user confirmation.') 'INDEX.md autonomous handoff contains' $fixturePath
   }
+
+  $crlfCanonicalText = [regex]::Replace($canonicalText, '(?<!\r)\n', "`r`n")
+  [System.IO.File]::WriteAllText($fixturePath, $crlfCanonicalText, [System.Text.UTF8Encoding]::new($false))
+  foreach ($mode in @("Resume", "Audit")) {
+    $crlfResult = Invoke-Checker @("-Mode", $mode, "-SkipSkillMirror", "-IndexOverridePath", $fixturePath)
+    if ($crlfResult.ExitCode -ne 0 -or $crlfResult.Text -notmatch 'STRUCTURAL PASS') {
+      throw "CRLF INDEX regression failed $mode.`n$($crlfResult.Text)"
+    }
+  }
+  Write-Host "PASS: structured INDEX contract accepts the repository's CRLF checkout convention."
 
   $canonicalHygiene = [System.IO.File]::ReadAllText((Join-Path $repoRoot 'docs/open_work/hygiene/LOG.md'))
   $syntheticP01Hygiene = @"
