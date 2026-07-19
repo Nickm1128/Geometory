@@ -2,12 +2,13 @@ param(
   [ValidateSet("Resume", "TaskClose", "PhaseClose", "Audit")]
   [string]$Mode = "Resume",
   [string]$TaskId = "",
-  [string]$PhaseId = ""
+  [string]$PhaseId = "",
+  [switch]$SkipSkillMirror
 )
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$workRoot = Join-Path $repoRoot "docs\open_work"
+$workRoot = Join-Path $repoRoot "docs/open_work"
 $indexPath = Join-Path $workRoot "INDEX.md"
 $errors = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
@@ -72,14 +73,14 @@ function Get-RelativeDataFiles([string]$Root) {
 
 $expectedRootFiles = @(
   "AGENTS.md",
-  "docs\README.md",
-  "docs\open_work\INDEX.md",
-  "docs\open_work\MILESTONE_1_PLAN.md",
-  "docs\open_work\BLOCKERS.md",
-  "docs\open_work\RUN_LOG.md",
-  "docs\open_work\AUTONOMOUS_RUN.md",
-  "docs\open_work\hygiene\CHECKLIST.md",
-  "docs\open_work\hygiene\LOG.md"
+  "docs/README.md",
+  "docs/open_work/INDEX.md",
+  "docs/open_work/MILESTONE_1_PLAN.md",
+  "docs/open_work/BLOCKERS.md",
+  "docs/open_work/RUN_LOG.md",
+  "docs/open_work/AUTONOMOUS_RUN.md",
+  "docs/open_work/hygiene/CHECKLIST.md",
+  "docs/open_work/hygiene/LOG.md"
 )
 foreach ($relative in $expectedRootFiles) {
   $path = Join-Path $repoRoot $relative
@@ -327,7 +328,7 @@ foreach ($match in $blockerMatches) {
 if ($indexValues['workflow_state'] -eq 'blocked' -and $openBlockerCount -eq 0) { Add-Error "Workflow is blocked but no open blocker entry exists." }
 
 $rootData = Get-RelativeDataFiles (Join-Path $repoRoot "data")
-$runtimeData = Get-RelativeDataFiles (Join-Path $repoRoot "godot\data")
+$runtimeData = Get-RelativeDataFiles (Join-Path $repoRoot "godot/data")
 foreach ($relative in $rootData.Keys) {
   if (-not $runtimeData.ContainsKey($relative)) {
     Add-Error "Godot runtime data is missing $relative."
@@ -341,7 +342,7 @@ foreach ($relative in $runtimeData.Keys) {
   }
 }
 
-$manifestPath = Join-Path $repoRoot "codex\skills\manifest.json"
+$manifestPath = Join-Path $repoRoot "codex/skills/manifest.json"
 if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
   try {
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -349,34 +350,36 @@ if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     $skillNames = @($manifest.managed_skills)
     if ($skillNames.Count -ne 5 -or @($skillNames | Select-Object -Unique).Count -ne 5) { Add-Error "Skill manifest must list five unique managed skills." }
     foreach ($skillName in $skillNames) {
-      $packageRoot = Join-Path $repoRoot "codex\skills\$skillName"
-      foreach ($requiredSkillFile in @("SKILL.md", "agents\openai.yaml")) {
+      $packageRoot = Join-Path (Join-Path $repoRoot "codex/skills") $skillName
+      foreach ($requiredSkillFile in @("SKILL.md", "agents/openai.yaml")) {
         if (-not (Test-Path -LiteralPath (Join-Path $packageRoot $requiredSkillFile) -PathType Leaf)) { Add-Error "Skill $skillName is missing $requiredSkillFile." }
       }
     }
-    $skillTaskComplete = $allTasks.ContainsKey('M1-P00-T03') -and $allTasks['M1-P00-T03'].Checked
-    $destinationRoot = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex\skills' }
-    foreach ($skillName in $skillNames) {
-      $sourceRoot = Join-Path $repoRoot "codex\skills\$skillName"
-      $destination = Join-Path $destinationRoot $skillName
-      if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
-        if ($skillTaskComplete) { Add-Error "Managed skill mirror is missing: $skillName" } else { Add-Warning "Managed skill mirror is not yet installed: $skillName" }
-        continue
-      }
-      $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -File -Recurse
-      foreach ($sourceFile in $sourceFiles) {
-        $relative = $sourceFile.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')
-        $destinationFile = Join-Path $destination $relative
-        $same = (Test-Path -LiteralPath $destinationFile -PathType Leaf) -and ((Get-FileHash $sourceFile.FullName -Algorithm SHA256).Hash -eq (Get-FileHash $destinationFile -Algorithm SHA256).Hash)
-        if (-not $same) {
-          if ($skillTaskComplete) { Add-Error "Managed skill mirror differs: $skillName/$relative" } else { Add-Warning "Managed skill mirror pending sync: $skillName/$relative" }
+    if (-not $SkipSkillMirror) {
+      $skillTaskComplete = $allTasks.ContainsKey('M1-P00-T03') -and $allTasks['M1-P00-T03'].Checked
+      $destinationRoot = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }
+      foreach ($skillName in $skillNames) {
+        $sourceRoot = Join-Path (Join-Path $repoRoot "codex/skills") $skillName
+        $destination = Join-Path $destinationRoot $skillName
+        if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
+          if ($skillTaskComplete) { Add-Error "Managed skill mirror is missing: $skillName" } else { Add-Warning "Managed skill mirror is not yet installed: $skillName" }
+          continue
         }
-      }
-      $destinationFiles = @(Get-ChildItem -LiteralPath $destination -File -Recurse)
-      foreach ($destinationFile in $destinationFiles) {
-        $relative = $destinationFile.FullName.Substring($destination.Length).TrimStart('\', '/')
-        if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot $relative) -PathType Leaf)) {
-          if ($skillTaskComplete) { Add-Error "Managed skill mirror has unexpected file: $skillName/$relative" } else { Add-Warning "Managed skill mirror cleanup pending: $skillName/$relative" }
+        $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -File -Recurse
+        foreach ($sourceFile in $sourceFiles) {
+          $relative = $sourceFile.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')
+          $destinationFile = Join-Path $destination $relative
+          $same = (Test-Path -LiteralPath $destinationFile -PathType Leaf) -and ((Get-FileHash $sourceFile.FullName -Algorithm SHA256).Hash -eq (Get-FileHash $destinationFile -Algorithm SHA256).Hash)
+          if (-not $same) {
+            if ($skillTaskComplete) { Add-Error "Managed skill mirror differs: $skillName/$relative" } else { Add-Warning "Managed skill mirror pending sync: $skillName/$relative" }
+          }
+        }
+        $destinationFiles = @(Get-ChildItem -LiteralPath $destination -File -Recurse)
+        foreach ($destinationFile in $destinationFiles) {
+          $relative = $destinationFile.FullName.Substring($destination.Length).TrimStart('\', '/')
+          if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot $relative) -PathType Leaf)) {
+            if ($skillTaskComplete) { Add-Error "Managed skill mirror has unexpected file: $skillName/$relative" } else { Add-Warning "Managed skill mirror cleanup pending: $skillName/$relative" }
+          }
         }
       }
     }
@@ -445,7 +448,7 @@ if ($Mode -eq 'PhaseClose') {
   else {
     foreach ($task in $allTasks.Values | Where-Object Phase -eq $PhaseId) { if (-not $task.Checked) { Add-Error "$PhaseId cannot close with unchecked task $($task.Id)." } }
     foreach ($gate in $allGates.Values | Where-Object Phase -eq $PhaseId) { if (-not $gate.Checked) { Add-Error "$PhaseId cannot close with unchecked gate $($gate.Id)." } }
-    $hygieneText = Read-Text (Join-Path $workRoot "hygiene\LOG.md")
+    $hygieneText = Read-Text (Join-Path $workRoot "hygiene/LOG.md")
     if ($hygieneText -notmatch "(?ms)^## .*?$([regex]::Escape($PhaseId)).*?^- Result: Pass\b") { Add-Error "$PhaseId has no passing hygiene log entry." }
   }
 }

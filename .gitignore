@@ -10,8 +10,19 @@ build/
 exports/
 *.apk
 *.aab
+*.idsig
+*.pck
 *.keystore
 *.jks
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Android/Gradle local state
+.gradle/
+local.properties
+*.iml
 
 # Local/editor files
 .vscode/
@@ -20,6 +31,23 @@ exports/
 *.log
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+
+# Python bot-workbench and validation caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.coverage
+htmlcov/
 
 # Simulation/training artifacts
 artifacts/

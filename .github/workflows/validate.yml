@@ -1,0 +1,78 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - main
+      - milestone/**
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geometory-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Core, UI, data, and work-state checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GODOT_VERSION: 4.6.3
+      GODOT_RELEASE: 4.6.3-stable
+      GODOT_ZIP: Godot_v4.6.3-stable_linux.x86_64.zip
+      GODOT_SHA512: a035258da32b77f966a5376f9fa29c30a6adde826a85ba918e1605bd1fc9823eba7d85f1dd5e748956bd2ba72827c0025ffa11bb82aec91128c407a2e723c99c
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify autonomous work state
+        shell: pwsh
+        run: ./tools/check_work_state.ps1 -Mode Audit -SkipSkillMirror
+
+      - name: Verify canonical and runtime data parity
+        shell: pwsh
+        run: |
+          $pairs = @(
+            @('data/rules/default_rules.json', 'godot/data/rules/default_rules.json'),
+            @('data/maps/alpha_handcrafted.map.json', 'godot/data/maps/alpha_handcrafted.map.json'),
+            @('data/bots/baseline_rule_bot.json', 'godot/data/bots/baseline_rule_bot.json')
+          )
+
+          foreach ($pair in $pairs) {
+            $canonical = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair[0]).Hash
+            $runtime = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair[1]).Hash
+            if ($canonical -ne $runtime) {
+              throw "Runtime data is stale: $($pair[1]) does not match $($pair[0])."
+            }
+          }
+
+      - name: Download verified Godot release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .ci/godot-dist
+          base_url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}"
+          curl --fail --location --retry 3 --output ".ci/${GODOT_ZIP}" "${base_url}/${GODOT_ZIP}"
+          printf '%s  %s\n' "${GODOT_SHA512}" "${GODOT_ZIP}" > .ci/godot.sha512
+          (cd .ci && sha512sum --check godot.sha512)
+          unzip -q ".ci/${GODOT_ZIP}" -d .ci/godot-dist
+          mv ".ci/godot-dist/Godot_v${GODOT_RELEASE}_linux.x86_64" .ci/godot
+          chmod +x .ci/godot
+          printf '%s\n' "$PWD/.ci" >> "$GITHUB_PATH"
+
+      - name: Record engine version
+        shell: bash
+        run: godot --version
+
+      - name: Run deterministic core tests
+        shell: bash
+        run: godot --headless --path godot --script res://tests/run_core_tests.gd
+
+      - name: Run portrait UI smoke matrix
+        shell: bash
+        run: godot --headless --path godot --script res://tests/run_ui_smoke_tests.gd

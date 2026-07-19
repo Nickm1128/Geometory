@@ -45,6 +45,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: reconcile the completed local toolchain/export evidence, update Android authorities, and close `M1-P00-T04`.
 
+### M1-RUN-20260719-001 / toolchain boundary / M1-P00-T04
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` after `3c8455e`
+- Files or artifacts: pinned toolchain inventory and installers/resolvers/export helper; API-36 normal APK under ignored `exports/`; GitHub Actions validation; updated tooling and Android authority documents.
+- Decisions: use only verified Godot 4.6.3 for M1; retain 4.5.1 solely for rollback; derive min/target SDK from the verified 4.6.3 templates; keep generated APKs and raw inspection output ignored.
+- Validation and exact result: independent static audit passed after remediating unsafe broad executable probing; core and three-size UI suites passed; data copies matched; normal APK `a9b6808d7e29644b49d6cdfd9c646a6fd9fc976fea47845c2b75ef2ce9cc61e8` is min24/target36/compile36, arm64+x86_64, only `VIBRATE`, with zero QA/test resources.
+- Blockers or risks: no blocker. Stock-template `themed_icon.xml` warning is recorded for P05/P06 icon certification.
+- Paid call and ledger entry: None
+- Exact next action: close and commit T04, then certify the alias-only Galaxy S24/AVD profile for `M1-P00-T05`.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

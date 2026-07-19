@@ -1,12 +1,12 @@
 ﻿; Engine configuration file.
-; This scaffold targets Godot 4.x. Confirm the installed editor version before implementation.
+; Milestone 1 is pinned to the maintenance release recorded in tools/toolchain.json.
 
 config_version=5
 
 [application]
 config/name="Geometory"
 run/main_scene="res://scenes/main/Main.tscn"
-config/features=PackedStringArray("4.5", "Mobile")
+config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
 [display]
