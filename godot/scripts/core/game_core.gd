@@ -129,6 +129,7 @@ func _accept_command(command: Dictionary) -> void:
   var accepted: Dictionary = command.duplicate(true)
   state["accepted_command_history"].append(accepted)
   state["last_accepted_client_sequence"][accepted["player_id"]] = accepted["client_sequence"]
+  accepted["state_hash"] = canonical_state_hash()
 
 func _reject_command(command: Dictionary, code: String, message: String) -> Dictionary:
   state["rejected_command_diagnostics"].append({

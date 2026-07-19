@@ -6,6 +6,7 @@ const BaselineBotScript := preload("res://scripts/core/baseline_bot.gd")
 const CombatRulesScript := preload("res://scripts/core/combat_rules.gd")
 const RngRulesScript := preload("res://scripts/core/rng_rules.gd")
 const FogRulesScript := preload("res://scripts/core/fog_rules.gd")
+const ReplayCodecScript := preload("res://scripts/core/replay_codec.gd")
 
 var failures := 0
 
@@ -28,6 +29,7 @@ func _init() -> void:
   _test_fog_observation_contract(configs)
   _test_bot(configs)
   _test_replay_reproducibility(configs)
+  _test_gmty1_serialization_contract(configs)
 
   if failures == 0:
     print("All Geometory core tests passed.")
@@ -388,6 +390,21 @@ func _test_replay_reproducibility(configs: Dictionary) -> void:
   _assert(a.snapshot()["players"]["P1"] == b.snapshot()["players"]["P1"], "same seed and command reproduces state")
   _assert(a.canonical_state_hash() == b.canonical_state_hash(), "same seed and command reproduces canonical hash")
   print("DETERMINISM_HASH: %s" % a.canonical_state_hash())
+
+func _test_gmty1_serialization_contract(configs: Dictionary) -> void:
+  var core = GameCoreScript.new()
+  core.setup(configs["rules"], configs["map"], 501)
+  var accepted := core.apply_command({"type": "allocate_resources", "player_id": "P1", "turn": 1, "phase": "allocation", "economy_cents": 0, "military_cents": 0, "research_cents": 0, "client_sequence": 1})
+  _assert(accepted["ok"], "GMTY1 fixture command is accepted")
+  var record: Dictionary = ReplayCodecScript.from_match(core.snapshot(), core.canonical_state_hash())
+  var encoded_a: String = ReplayCodecScript.serialize(record)
+  var encoded_b: String = ReplayCodecScript.serialize(record.duplicate(true))
+  var parsed: Dictionary = ReplayCodecScript.parse(encoded_a)
+  _assert(encoded_a == encoded_b, "GMTY1 serializer has stable canonical output")
+  _assert(parsed.get("ok", false) and parsed["record"]["format"] == "GMTY1" and int(parsed["record"]["format_version"]) == 1, "GMTY1 parser returns the versioned envelope")
+  _assert(parsed["record"]["setup"]["ruleset_sha256"] == core.snapshot()["ruleset_sha256"] and parsed["record"]["steps"].size() == 1 and typeof(parsed["record"]["steps"][0]["command"]["client_sequence"]) == TYPE_INT and parsed["record"]["steps"][0]["command"]["client_sequence"] == 1 and parsed["record"]["steps"][0]["state_hash"].length() == 64 and parsed["record"]["final"]["state_hash"] == core.canonical_state_hash(), "GMTY1 carries setup, accepted command sequence, step hash, and final hash")
+  var malformed: Dictionary = ReplayCodecScript.parse("{not-json")
+  _assert(not malformed.get("ok", true) and malformed["code"] == "malformed_json", "GMTY1 parser diagnoses malformed input")
 
 func _home_count(state: Dictionary, player_id: String) -> int:
   var count := 0

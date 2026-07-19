@@ -190,6 +190,12 @@ GMTY1 carries schema/version, setup, configuration hashes, all accepted command
 types/sequences, and step/final hashes. Unsupported, corrupt, truncated, or stale
 records fail safely and are quarantined with recoverable diagnostics.
 
+GMTY1 version 1 is defined in `core/contracts/replay.md`: it stores only
+JSON-compatible setup metadata, accepted commands in arrival order, each
+post-resolution canonical step hash, and final hash/winner/draw state. Its
+serializer is canonical stable-key JSON; parser shape/version diagnostics are
+separate from P02 reconstruction and compatibility diagnostics.
+
 ## Networking Preparation
 
 Do not implement networking in Milestone 1. P2P, lobbies, accounts, servers, and

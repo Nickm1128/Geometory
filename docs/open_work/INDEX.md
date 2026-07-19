@@ -4,9 +4,9 @@ milestone: "M1"
 workflow_state: "active"
 continuation_mode: "autonomous"
 active_phase: "M1-P02"
-current_task: "M1-P02-T01"
+current_task: "M1-P02-T02"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "M1-P02-T01: reconcile replay authority, define GMTY1 serialization/parser contracts, add focused failing round-trip and malformed-input tests, then implement the smallest lossless slice."
+exact_next_action: "M1-P02-T02: replay parsed GMTY1 steps through a production GameCore, verify every step/final hash, and add structured diagnostics for malformed, truncated, stale-config, unsupported-version, illegal-command, and mismatched-hash records."
 last_completed_phase_tag: "m1-p01"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
@@ -19,7 +19,7 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P02`
-- Active coordinator task: `M1-P02-T01`
+- Active coordinator task: `M1-P02-T02`
 - Continuation mode: `autonomous`
 - Open blockers: none
 
@@ -39,8 +39,8 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-- Current task: `M1-P02-T01`
+- Current task: `M1-P02-T02`
 - Continuation mode: `autonomous`
-- Exact handoff: P01 completed at immutable remote-verified tag `m1-p01`.
-  Begin P02-T01 with its authoritative GMTY1 replay contract and focused red
-  serializer/parser tests; P02 may proceed immediately under autonomous mode.
+- Exact handoff: P01 completed at immutable remote-verified tag `m1-p01` and
+  P02-T01 now owns canonical GMTY1 serialization. Continue with T02 production
+  reconstruction and structured corruption/compatibility diagnostics.

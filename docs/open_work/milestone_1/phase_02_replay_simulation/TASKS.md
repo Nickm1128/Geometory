@@ -1,10 +1,10 @@
 # M1-P02 Tasks — Replay, Simulation, Resume, And Evidence
 
-- [ ] `M1-P02-T01` Specify and implement the lossless GMTY1 versioned serialization contract.
+- [x] `M1-P02-T01` Specify and implement the lossless GMTY1 versioned serialization contract.
   - Dependencies: M1-P01-G07
   - Can run early: No
   - Definition of done: include rules/map IDs and hashes, seed, player/bot setup, research schedule or derivation contract, every accepted command field/sequence, step hashes, final hash, winner/draw, and format version; provide deterministic serializer/parser behavior.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 defined `core/contracts/replay.md` and added scene-free `ReplayCodec`. GMTY1 canonical JSON carries format/version, rules/map IDs and hashes, seed, RNG/research setup, player/bot setup, exact accepted commands and post-resolution step hashes, plus final hash/winner/draw. Parser normalizes integral JSON numbers back to GDScript integers and returns stable malformed/format/version/envelope diagnostics. Focused red test failed because the codec was absent; pinned Godot 4.6.3 post-implementation suite passes deterministic round-trip and malformed-input contracts.
 
 - [ ] `M1-P02-T02` Reconstruct matches and diagnose corrupt or incompatible replay records.
   - Dependencies: M1-P02-T01
