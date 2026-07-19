@@ -123,3 +123,11 @@ Append-only. No implementation entries yet.
 - Validation: focused red run failed exactly the three intended contract assertions with no parser/crash errors; post-repair pinned core test passed. Two subsequent pinned Godot 4.6.3 full-core runs matched `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; all canonical/runtime data SHA-256 pairs matched and tracker Audit passed.
 - Blockers or risks: none.
 - Exact next action: start reopened `M1-P01-T05` with an adversarial visible-event payload test, then replace raw event copies with recursive fog-safe projections.
+
+## 2026-07-19 — M1-P01-T05 reopened event-privacy repair
+
+- Status: Complete. Observable events now pass through `FogRules.project_visible_event`, an explicit per-type public schema. No raw event dictionary or nested payload is copied; combat damage and wall attack damage are absent, while only normal fog-visible wall state remains available.
+- Files changed: bot/fog authority docs, `fog_rules.gd`, `game_core.gd`, and focused adversarial privacy contracts.
+- Validation: the red pinned-core run failed exactly one intended assertion because raw visible combat events exposed exact damage plus nested enemy-strength/path fields. The repaired pinned suite passed the recursive privacy assertion and all existing bot-observable/command contracts without parser or engine errors.
+- Blockers or risks: no simulator evaluation was claimed or invented; P01 owns the production fog interface and P02 owns a runner.
+- Exact next action: start reopened `M1-P01-T06` by auditing substantive ownership still retained in `GameCore`, then extract real command, movement, combat, fog, hashing/RNG, and turn-resolution behavior.

@@ -37,6 +37,10 @@ A tile is visible to player P when any of these are true:
 - P has a living stack on the tile.
 
 Bots receive the same observable state as a human player. Hidden tiles must not reveal enemy stack counts, destinations, wall damage, or combat details unless visible through the same rules.
+Visible event history is type-projected rather than copied: observed combat
+events identify participants and tile but never exact damage or nested private
+values; visible wall events may report remaining wall HP but not attack damage.
+Unknown event types and fields are omitted.
 
 ## Turn Structure
 

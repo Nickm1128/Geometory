@@ -78,7 +78,10 @@ choices. Revisit this file before changing behavior.
   `medium`, `large`, or `overwhelming`); it never exposes cohort data, exact
   soldiers/health/damage, queues, or intended destinations. Enemy economy,
   research, pending soldiers, hidden positions, hidden wall HP, and hidden
-  events remain absent.
+  events remain absent. Visible events are copied only through an explicit
+  type-specific public schema: combat events never expose exact damage or nested
+  payloads; wall events may expose visible remaining HP but not damage; unknown
+  event fields are absent at every nesting level.
 - AI assistance: external Python tooling may propose allowlisted bot-profile
   leaf changes only. The Android app has no API key/model code; arbitrary
   AI-authored source changes are forbidden.

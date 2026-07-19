@@ -4,9 +4,9 @@ milestone: "M1"
 workflow_state: "active"
 continuation_mode: "autonomous"
 active_phase: "M1-P01"
-current_task: "M1-P01-T05"
+current_task: "M1-P01-T06"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Add an adversarial visible-event payload test and repair M1-P01-T05 with recursive fog-safe event projection before beginning the reopened core extraction."
+exact_next_action: "Audit GameCore responsibility ownership, add focused extraction tests, and move real command, movement, combat, fog, hashing/RNG, and turn-resolution behavior out of the facade for M1-P01-T06."
 last_completed_phase_tag: "m1-p00"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
@@ -19,7 +19,7 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P01`
-- Active coordinator task: `M1-P01-T05`
+- Active coordinator task: `M1-P01-T06`
 - Continuation mode: `autonomous`
 - Open blockers: none
 
@@ -39,9 +39,10 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-- Current task: `M1-P01-T05`
+- Current task: `M1-P01-T06`
 - Continuation mode: `autonomous`
 - Exact handoff: P00 remains complete at immutable tag `m1-p00`. Reopened T04
-  is repaired and has repeatable pinned-core evidence. Continue with T05's
-  adversarial visible-event privacy test and recursive projection; T06 remains
-  blocked on T05. There is no open blocker; work may proceed immediately.
+  and T05 are repaired with focused pinned-core evidence. Continue with T06:
+  transfer substantive command, movement, combat, fog, hashing/RNG, and turn
+  ownership out of `GameCore`, then remove duplicate/dead paths. There is no
+  open blocker; work may proceed immediately.

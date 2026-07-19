@@ -262,16 +262,19 @@ func _observable_enemy_stack(stack: Dictionary) -> Dictionary:
 func _visible_events(player_id: String, visible: Dictionary) -> Array:
   var result: Array = []
   for event in state["replay_events"]:
+    var is_visible = false
     if String(event.get("player_id", "")) == player_id:
-      result.append(event.duplicate(true))
-      continue
-    if event.has("tile_id") and visible.has(String(event["tile_id"])):
-      result.append(event.duplicate(true))
-      continue
-    if event.has("wall_id") and state["walls"].has(String(event["wall_id"])):
+      is_visible = true
+    elif event.has("tile_id") and visible.has(String(event["tile_id"])):
+      is_visible = true
+    elif event.has("wall_id") and state["walls"].has(String(event["wall_id"])):
       var wall: Dictionary = state["walls"][String(event["wall_id"])]
       if visible.has(String(wall["from"])) or visible.has(String(wall["to"])):
-        result.append(event.duplicate(true))
+        is_visible = true
+    if is_visible:
+      var projected = FogRules.project_visible_event(event)
+      if not projected.is_empty():
+        result.append(projected)
   return result
 
 func get_neighbor_tile_ids(tile_id: String) -> Array[String]:

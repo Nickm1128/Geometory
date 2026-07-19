@@ -80,6 +80,10 @@ Own stacks retain full data; visible enemies expose only ID, owner, tile, and a
 public deterministic strength band (`tiny`, `small`, `medium`, `large`, or
 `overwhelming`), never exact soldier/health/damage values, cohorts, queues,
 economy, or research.
+Visible replay events are recursively safe value projections selected by
+event-type schemas. The projection never forwards raw payload dictionaries:
+combat excludes exact damage, and wall observations expose only wall information
+that is visible through the normal fog rules.
 
 ## State Model
 

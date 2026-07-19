@@ -288,10 +288,22 @@ func _test_fog_observation_contract(configs: Dictionary) -> void:
 
   fog.state["stacks"][p2_stack]["tile_id"] = "T_-3_0"
   fog.state["stacks"][p2_stack]["waypoints"] = ["T_3_0"]
+  fog.state["replay_events"].append({
+    "type": "combat_exchange",
+    "player_id": "P2",
+    "tile_id": "T_-3_0",
+    "attacker": "P2",
+    "defender": "P1",
+    "attacker_damage": 9876,
+    "defender_damage": 4321,
+    "private_payload": {"exact_enemy_soldiers": 99, "queued_path": ["T_3_0"]}
+  })
   var visible: Dictionary = fog.observable_state("P1")
   var enemy: Dictionary = visible["stacks"][p2_stack]
   _assert(enemy.has("strength_band") and not enemy.has("cohorts") and not enemy.has("waypoints"), "contract: visible enemy exposes only strength band without private cohort/path data")
   _assert(visible["player"]["bank_cents"] != 987654 and visible["player"]["research_health_bps"] != 7654, "contract: enemy economy and research are absent from own bot state")
+  var observed_combat: Dictionary = _event_with_type(visible["visible_events"], "combat_exchange")
+  _assert(not observed_combat.has("attacker_damage") and not observed_combat.has("defender_damage") and not _has_recursive_key(observed_combat, "exact_enemy_soldiers") and not _has_recursive_key(observed_combat, "queued_path"), "contract: visible combat events recursively omit exact enemy damage, strength, and paths")
 
 func _test_replay_reproducibility(configs: Dictionary) -> void:
   var a = GameCoreScript.new()
@@ -343,6 +355,23 @@ func _has_event_for_player(events: Array, event_type: String, player_id: String)
   for event in events:
     if String(event.get("type", "")) == event_type and String(event.get("player_id", "")) == player_id:
       return true
+  return false
+
+func _event_with_type(events: Array, event_type: String) -> Dictionary:
+  for event in events:
+    if String(event.get("type", "")) == event_type:
+      return event
+  return {}
+
+func _has_recursive_key(value: Variant, prohibited_key: String) -> bool:
+  if typeof(value) == TYPE_DICTIONARY:
+    for key in value.keys():
+      if String(key) == prohibited_key or _has_recursive_key(value[key], prohibited_key):
+        return true
+  elif typeof(value) == TYPE_ARRAY:
+    for item in value:
+      if _has_recursive_key(item, prohibited_key):
+        return true
   return false
 
 func _assert(condition: bool, message: String) -> void:

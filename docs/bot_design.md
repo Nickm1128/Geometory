@@ -38,7 +38,10 @@ Observable state includes:
   soldier count, health, damage, cohort, or queued-path data
 - visible wall segments and HP only if visible
 - public rules and public match metadata
-- visible replay/event history
+- visible replay/event history, projected through type-specific public schemas
+  rather than copied raw. Combat events expose participants/tile but no exact
+  damage; wall events expose only otherwise-visible wall state; unknown and
+  nested payload fields are absent.
 
 Observable state excludes hidden enemy positions, hidden queues, hidden income, hidden exact research, and hidden wall damage.
 

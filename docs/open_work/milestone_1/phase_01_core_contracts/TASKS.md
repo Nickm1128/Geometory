@@ -24,11 +24,11 @@
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
   - Evidence: Reopened 2026-07-19 after fresh source review. Focused red tests then failed exactly for presentation-only player fields changing the hash, an unstructured research stream, and a missing schedule generation version. `StateHasher.gameplay_projection` now selects gameplay fields explicitly; state records immutable research/combat/bot stream descriptors under `fnv1a32_seed_mix_v1`, and the data-driven public schedule version is persisted. Two pinned Godot 4.6.3 full-core runs passed with the identical `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; canonical/runtime data parity passed.
 
-- [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
+- [x] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02
   - Can run early: No
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
-  - Evidence: Reopened 2026-07-19 after fresh source review. The bot no longer receives `GameCore` and existing snapshot tests are green, but `visible_events` copies raw event payloads that can reveal exact enemy spawn counts or combat damage. Recursive privacy projection and adversarial event-payload tests are still required.
+  - Evidence: Reopened 2026-07-19 after fresh source review. An adversarial visible combat event initially leaked exact damage and nested enemy-strength/path fields. `FogRules.project_visible_event` now applies an allowlisted schema for every visible event (including own events), omitting unknown/nested fields, combat damage, and wall attack damage. The pinned core suite passes the recursive event-privacy assertion alongside existing fog contracts.
 
 - [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05

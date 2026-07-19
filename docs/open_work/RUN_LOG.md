@@ -299,6 +299,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: close and commit T04, then begin T05's adversarial visible-event privacy test.
 
+### M1-RUN-20260719-001 / M1-P01-T05 reopened event-privacy repair
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted task-close boundary.
+- Files or artifacts: fog-safe event projection in the production core, authoritative observable-event rules, and an adversarial nested-payload privacy contract.
+- Decisions: every observable event uses a per-type allowlist. No raw event or unknown nested field crosses the bot boundary; visible combat excludes exact damage and visible wall events exclude attack damage.
+- Validation and exact result: the focused pinned-core run failed exactly one intended event-privacy assertion before implementation. The post-repair core suite passed that recursive assertion, existing observable-state checks, bot command legality, and deterministic replay checks with no parser/engine errors.
+- Blockers or risks: no P02 simulation runner exists yet, so no bot evaluation claim is made.
+- Paid call and ledger entry: None
+- Exact next action: close and commit T05, then begin substantive T06 responsibility extraction.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
