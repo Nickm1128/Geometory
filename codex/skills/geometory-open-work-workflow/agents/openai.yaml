@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geometory Open Work"
+  short_description: "Resume and run Geometory milestone work safely"
+  default_prompt: "Use $geometory-open-work-workflow to resume the current Geometory milestone task from repository state."

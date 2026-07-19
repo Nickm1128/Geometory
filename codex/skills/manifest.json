@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "managed_skills": [
+    "geometory-project-context",
+    "geometory-validation-workflow",
+    "geometory-open-work-workflow",
+    "geometory-visual-qa",
+    "geometory-bot-training-workflow"
+  ]
+}

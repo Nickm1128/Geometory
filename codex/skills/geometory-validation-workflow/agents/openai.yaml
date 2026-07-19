@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geometory Validation Workflow"
+  short_description: "Validate Geometory core, UI, bots, and Android"
+  default_prompt: "Use $geometory-validation-workflow to validate the current Geometory task and record gate evidence."

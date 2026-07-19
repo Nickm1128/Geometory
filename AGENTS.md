@@ -4,11 +4,11 @@ This repository is the durable source of truth for Geometory work. Do not rely o
 
 ## Resume Before Acting
 
-1. Inspect `git status --short --branch`, `git log -5 --oneline --decorate`, and the configured remotes. Fetch remote refs, but never pull or resolve divergence automatically.
-2. Run `tools/sync_codex_skills.ps1 -Mode Check` when that tool exists. During P00, an absent sync tool is tracked work rather than permission to improvise a different workflow.
-3. Read the canonical `geometory-open-work-workflow` skill, then `docs/open_work/INDEX.md` and `docs/open_work/MILESTONE_1_PLAN.md`.
-4. Read the active phase's `REQUIREMENTS.md`, `TASKS.md`, `EXIT_GATES.md`, and `NOTES.md`.
-5. Run `tools/check_work_state.ps1 -Mode Resume`.
+1. Run `tools/sync_codex_skills.ps1 -Mode Check` when that tool exists. During P00, an absent sync tool is tracked work rather than permission to improvise a different workflow.
+2. Read the canonical `geometory-open-work-workflow` skill, then `docs/open_work/INDEX.md` and `docs/open_work/MILESTONE_1_PLAN.md`.
+3. Read the active phase's `REQUIREMENTS.md`, `TASKS.md`, `EXIT_GATES.md`, and `NOTES.md`.
+4. Run `tools/check_work_state.ps1 -Mode Resume`.
+5. Fetch remote refs without pulling, then inspect `git status --short --branch`, `git log -5 --oneline --decorate`, configured remotes, and the task-relevant diff. Never resolve divergence automatically.
 6. Load only the authority documents and code needed for the current task. Continue from the exact next action in `INDEX.md` and the latest phase note.
 
 ## Document Authority

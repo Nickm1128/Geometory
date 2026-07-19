@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geometory Bot Training"
+  short_description: "Run safe deterministic Geometory bot evaluations"
+  default_prompt: "Use $geometory-bot-training-workflow to evaluate or improve a Geometory bot candidate safely."

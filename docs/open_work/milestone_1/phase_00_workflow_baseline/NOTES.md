@@ -18,3 +18,12 @@ Append dated findings and decisions. Link durable product changes to the relevan
 - Validation: `tools/check_work_state.ps1 -Mode Resume` and `-Mode Audit` both passed with 50 parsed tasks, 50 parsed gates, zero blockers, and zero warnings.
 - Cross-phase impact: all later work must use stable IDs, immediate checkbox/evidence updates, and phase hygiene.
 - Exact next action: validate, synchronize, and fresh-context forward-test the five canonical skills under `M1-P00-T03`.
+
+## 2026-07-19 — M1-P00-T03
+
+- Status: Complete.
+- Decision: `codex/skills/` is canonical and the five names in `manifest.json` are the complete managed set; user-level packages are generated mirrors, and differing managed copies are backed up without touching unmanaged skills.
+- Validation: all five packages passed skill-creator validation and mirror inventory checks. Fresh agents correctly resumed the open task, routed a command-contract diagnostic to P01 without editing early, refused premature bot evaluation/paid work, and passed the patched P00/P05 visual capability boundary.
+- Remediation: forward tests made the phase-publication sequence explicit, corrected the Android validation-document route, required dependency-aware bot refusal, and stopped the visual skill from implying that future P05 matrix/golden tooling already exists.
+- Cross-phase impact: fresh agents can rebuild bounded context from repository state; P03/P04 and P05 workflows must continue to refuse nonexistent or dependency-blocked commands instead of inventing them.
+- Exact next action: certify the installed Godot 4.6.3/API-36 toolchain and package evidence under `M1-P00-T04`.

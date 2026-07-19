@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geometory Visual QA"
+  short_description: "Validate Geometory screens on desktop and Android"
+  default_prompt: "Use $geometory-visual-qa to capture and validate the affected Geometory visual scenarios."

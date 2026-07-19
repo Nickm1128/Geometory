@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geometory Project Context"
+  short_description: "Apply Geometory rules and architecture context"
+  default_prompt: "Use $geometory-project-context to work in Geometory with the documented rules and boundaries."

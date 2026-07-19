@@ -12,11 +12,11 @@
   - Definition of done: create `AGENTS.md`, the documentation authority map, M1 index/plan/blocker/run/hygiene files, all seven four-file phase sets, and `tools/check_work_state.ps1`; prove `Resume` and `Audit` modes report state without modifying tracked files.
   - Evidence: `AGENTS.md`, `docs/README.md`, the complete `docs/open_work/` tree, and `tools/check_work_state.ps1`; both `-Mode Resume` and `-Mode Audit` passed on 2026-07-19 after parsing 50 tasks and 50 gates with zero warnings.
 
-- [ ] `M1-P00-T03` Create, validate, synchronize, and forward-test all five canonical Geometory skills.
+- [x] `M1-P00-T03` Create, validate, synchronize, and forward-test all five canonical Geometory skills.
   - Dependencies: M1-P00-T02
   - Can run early: No
   - Definition of done: version the two migrated and three new skill packages under `codex/skills`; generate compliant `agents/openai.yaml`; add the managed manifest and safe `Check|Apply` sync tool; run skill-creator validation; synchronize user-level mirrors; forward-test each skill in fresh context and record results.
-  - Evidence: Pending.
+  - Evidence: Five canonical packages and `codex/skills/manifest.json`; skill-creator `quick_validate.py` passed for all five; `tools/sync_codex_skills.ps1 -Mode Apply|Check` produced exact SHA-256 inventory parity while backing up only differing managed packages; fresh contexts passed project/validation routing, open-work resume, bot safety refusal, and remediated visual-QA capability-boundary tests on 2026-07-19.
 
 - [ ] `M1-P00-T04` Upgrade and certify the local/CI Godot and Android toolchain.
   - Dependencies: M1-P00-T01
