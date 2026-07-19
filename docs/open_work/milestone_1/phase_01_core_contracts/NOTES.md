@@ -70,3 +70,9 @@ Append-only. No implementation entries yet.
 - Validated to date: pinned core suite passed after T05/T06; three-size UI smoke passed after command, movement, and bot-interface changes. The phase-close evidence still needs two recorded identical full-core hash runs, the capital-capture focused case, gate/hygiene evidence, immutable tag publication, and remote phase-close verification.
 - Blockers or risks: no blocker. Do not mark T07 or P01 gates complete before the remaining explicit evidence exists.
 - Exact next action: add/run the focused capital-capture regression, then execute and compare two full pinned core runs before completing the P01 hygiene/publication sequence.
+
+## 2026-07-19 — M1-P01-T07 deterministic regression progress
+
+- Added focused capital-capture/elimination assertions after post-combat control.
+- Validation: two pinned Godot 4.6.3 core runs exited 0 with matching `DETERMINISM_HASH` `0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e`.
+- Remaining: record every P01 gate and hygiene item, commit closeout, publish/fetch-verify immutable `m1-p01`, then commit the P02 activation transition and run PhaseClose.

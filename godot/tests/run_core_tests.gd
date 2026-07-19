@@ -203,6 +203,9 @@ func _test_movement_resolution_contracts(configs: Dictionary) -> void:
   _assert(_has_combat_defender(combat.snapshot()["replay_events"], "P2"), "contract: current controller resolves as defender")
   combat.call("_apply_post_resolution_control")
   _assert(combat.state["tiles"]["T_4_0"]["controlled_by"] == "P1", "contract: surviving combatant receives control after combat")
+  combat.call("_check_eliminations")
+  _assert(combat.state["players"]["P2"]["eliminated"], "contract: enemy capital capture eliminates its owner after control")
+  _assert(combat.state["tiles"]["T_4_0"]["controlled_by"] == "P1", "contract: capital capture retains capturer control")
 
 func _test_turn_cap_rng_and_hash_contracts(configs: Dictionary) -> void:
   var hash_core = GameCoreScript.new()
@@ -301,6 +304,8 @@ func _test_replay_reproducibility(configs: Dictionary) -> void:
   a.apply_command(command)
   b.apply_command(command)
   _assert(a.snapshot()["players"]["P1"] == b.snapshot()["players"]["P1"], "same seed and command reproduces state")
+  _assert(a.canonical_state_hash() == b.canonical_state_hash(), "same seed and command reproduces canonical hash")
+  print("DETERMINISM_HASH: %s" % a.canonical_state_hash())
 
 func _home_count(state: Dictionary, player_id: String) -> int:
   var count := 0
