@@ -417,7 +417,12 @@ foreach ($task in $allTasks.Values | Where-Object { $_.Checked -and $_.Id -ne 'M
   }
 }
 foreach ($phaseRow in $phaseStatus.GetEnumerator() | Where-Object { $_.Value -eq 'Complete' }) {
-  $phaseNumber = $phaseRow.Key.Substring(5, 2)
+  $phaseIdMatch = [regex]::Match([string]$phaseRow.Key, '^M1-P(?<number>\d{2})$')
+  if (-not $phaseIdMatch.Success) {
+    Add-Error "Completed phase has an invalid ID: $($phaseRow.Key)"
+    continue
+  }
+  $phaseNumber = $phaseIdMatch.Groups['number'].Value
   $tagPattern = "^m1-p$phaseNumber(?:-r\d+)?$"
   $tags = @(& git -C $repoRoot tag --list)
   $matchingTags = @($tags | Where-Object { $_ -match $tagPattern })

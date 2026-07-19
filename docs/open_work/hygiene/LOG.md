@@ -12,12 +12,12 @@ remaining items are explicit.
 - [x] `HYG-05` Validation. Evidence: all pinned local suites and final APK inspections pass. Initial run `29697954513` exposed and drove remediation of a Linux-only mirror-path error; corrected Validate run `29698045899` passed tracker, PhaseClose, data, verified-engine, core, UI, and visual-contract steps.
 - [x] `HYG-06` Visual/device evidence. Evidence: AVD boot/current emulator fixture and physical S24 artifact `20260719_131542/movement_pending_path` pass the P00 launch/contract boundary. The physical capture remains explicitly uncertified visually; visible fixed-margin/compressed-sheet debt is assigned to P05.
 - [x] `HYG-07` Artifact and secret safety. Evidence: artifacts/exports/caches are ignored; tracked files contain no secret or physical serial, generated sensitive file, or file over 1 MiB.
-- [x] `HYG-08` Git integrity. Evidence: baseline/tag and branch ownership are understood, origin and local were 0/0 before closeout, the worktree contained no unknown changes, and publication will follow the immutable closeout-commit/tag/transition sequence without pull, force, merge, or tag movement.
+- [x] `HYG-08` Git integrity. Evidence: baseline/tag and branch ownership are understood; closeout commit `153efbc` is green and published; immutable annotated tag `m1-p00` is remote at that commit; the transition uses the same T07 ID without pull, force, merge, or tag movement.
 - [x] `HYG-09` Skill integrity. Evidence: all five canonical packages validate, mirrors match by SHA-256 inventory, and required fresh-context tests pass.
 - [x] `HYG-10` Handoff quality. Evidence: T07 notes/run boundary and INDEX point to one executable CI/device next action with cross-phase debt assigned.
 - Result: Pass.
 - Remediation tasks: None open; `B-001` resolved with current physical evidence.
-- Phase tag after pass: `m1-p00` pending publication at the validated closeout commit.
+- Phase tag after pass: `m1-p00`, published at validated closeout commit `153efbc`.
 
 ## Entry Template — M1-P00 / YYYY-MM-DD
 

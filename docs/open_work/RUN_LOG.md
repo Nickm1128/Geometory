@@ -122,6 +122,18 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit passed hygiene, require green CI, tag/push immutable `m1-p00`, record P01-ready transition, and stop before P01 implementation for the user report.
 
+### M1-RUN-20260719-001 / P00 publication and report boundary / M1-P00-T07
+
+- Status: Complete
+- Branch/ref: closeout commit `153efbc`; immutable annotated tag `m1-p00`; transition on `milestone/m1-vertical-slice`.
+- Files or artifacts: GitHub Actions run `29698512789`, remote tag `m1-p00`, and the P00/P01 tracker transition.
+- Decisions: activate P01 in repository state but perform no P01 implementation before the user-requested phone/P00 report.
+- Validation and exact result: closeout CI passed; tag object/target and remote branch were verified; P00 TaskClose and PhaseClose are required after the transition push.
+- Blockers or risks: none open. Known phone layout/safe-area debt remains assigned to P05 and is not visual certification.
+- Paid call and ledger entry: None
+- Exact next action: push/fetch-verify this transition, run `PhaseClose M1-P00`, then report and wait for user acknowledgement before `M1-P01-T01`.
+- Remediation before commit: completed-phase tag validation sliced the phase ID at an invalid offset and crashed. It now parses the two-digit phase number with an anchored regex; Audit, TaskClose, the regression, and final PhaseClose must pass before publication.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
