@@ -158,3 +158,9 @@ Append-only. No implementation entries yet.
 - Status: Complete. Named RNG derivation now includes the full documented descriptor tuple, and combat operation salts include tile/exchange plus sorted attacker and defender cohort identities.
 - Validation: pinned Godot 4.6.3 core contracts passed descriptor-separation and combat-salt-scope assertions with deterministic repeated combat output.
 - Exact next action: repair T05 nested income-event projection.
+
+## 2026-07-19 - M1-P01-T05 recursive income projection repair
+
+- Status: Complete. `FogRules` now schema-projects `income_added.income` recursively to its documented integer fields instead of forwarding the raw nested dictionary.
+- Validation: pinned Godot 4.6.3 core contract passed an adversarial nested income payload and proved private nested values remain absent.
+- Exact next action: revalidate T06 ownership transfer after repaired dependencies.

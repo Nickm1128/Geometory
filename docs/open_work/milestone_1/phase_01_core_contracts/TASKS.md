@@ -24,11 +24,11 @@
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
   - Evidence: Reopened and repaired 2026-07-19. `RngRules` now mixes derivation version, `stream_id`, purpose, salt namespace, operation salt, and match seed. Combat's operation salt includes tile, exchange, sorted attacker cohort IDs, and sorted defender cohort IDs. Pinned Godot 4.6.3 contracts prove descriptor changes separate streams, cohort identities change combat salts, and repeat seeded combat identically.
 
-- [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
+- [x] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02
   - Can run early: No
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
-  - Evidence: Reopened 2026-07-19 after fresh source review: allowlisted event types omit raw unknown payloads, but `income_added` forwards the nested `income` dictionary without recursive schema projection. Remediate the nested public event schema and prove adversarial nested data remains absent.
+  - Evidence: Reopened and repaired 2026-07-19. `income_added.income` now recursively projects only integer `own`, `foreign`, `base`, `bonus_bps`, and `final` values. Pinned Godot 4.6.3 contracts prove an adversarial nested private field cannot reach a visible income event.
 
 - [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05

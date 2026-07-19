@@ -36,7 +36,20 @@ static func project_visible_event(event: Dictionary) -> Dictionary:
   var result := {}
   for field in VISIBLE_EVENT_FIELDS[event_type]:
     if event.has(field):
-      result[field] = event[field]
+      if event_type == "income_added" and field == "income":
+        result[field] = _project_income(event[field])
+      else:
+        result[field] = event[field]
+  return result
+
+static func _project_income(value: Variant) -> Dictionary:
+  if typeof(value) != TYPE_DICTIONARY:
+    return {}
+  var income: Dictionary = value
+  var result := {}
+  for field in ["own", "foreign", "base", "bonus_bps", "final"]:
+    if income.has(field) and typeof(income[field]) == TYPE_INT:
+      result[field] = income[field]
   return result
 
 static func visible_tile_ids(state: Dictionary, player_id: String, neighbors_for_tile: Callable) -> Dictionary:

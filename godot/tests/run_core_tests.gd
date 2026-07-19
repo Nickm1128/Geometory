@@ -5,6 +5,7 @@ const ConfigLoaderScript := preload("res://scripts/core/config_loader.gd")
 const BaselineBotScript := preload("res://scripts/core/baseline_bot.gd")
 const CombatRulesScript := preload("res://scripts/core/combat_rules.gd")
 const RngRulesScript := preload("res://scripts/core/rng_rules.gd")
+const FogRulesScript := preload("res://scripts/core/fog_rules.gd")
 
 var failures := 0
 
@@ -344,6 +345,11 @@ func _test_fog_observation_contract(configs: Dictionary) -> void:
   fog.state["stacks"][p2_stack]["tile_id"] = "T_-3_0"
   fog.state["stacks"][p2_stack]["waypoints"] = ["T_3_0"]
   fog.state["replay_events"].append({
+    "type": "income_added",
+    "player_id": "P1",
+    "income": {"own": 1900, "foreign": 0, "base": 1900, "bonus_bps": 0, "final": 1900, "private_nested": {"enemy_bank": 987654}}
+  })
+  fog.state["replay_events"].append({
     "type": "combat_exchange",
     "player_id": "P2",
     "tile_id": "T_-3_0",
@@ -359,6 +365,8 @@ func _test_fog_observation_contract(configs: Dictionary) -> void:
   _assert(visible["player"]["bank_cents"] != 987654 and visible["player"]["research_health_bps"] != 7654, "contract: enemy economy and research are absent from own bot state")
   var observed_combat: Dictionary = _event_with_type(visible["visible_events"], "combat_exchange")
   _assert(not observed_combat.has("attacker_damage") and not observed_combat.has("defender_damage") and not _has_recursive_key(observed_combat, "exact_enemy_soldiers") and not _has_recursive_key(observed_combat, "queued_path"), "contract: visible combat events recursively omit exact enemy damage, strength, and paths")
+  var projected_income: Dictionary = FogRulesScript.project_visible_event({"type": "income_added", "income": {"final": 1900, "private_nested": {"enemy_bank": 987654}}})
+  _assert(projected_income.get("income", {}).get("final", 0) == 1900 and not _has_recursive_key(projected_income, "private_nested") and not _has_recursive_key(projected_income, "enemy_bank"), "contract: visible income events recursively project nested public fields")
 
 func _test_replay_reproducibility(configs: Dictionary) -> void:
   var a = GameCoreScript.new()
