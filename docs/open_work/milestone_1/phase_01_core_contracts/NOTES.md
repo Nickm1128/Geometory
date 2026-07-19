@@ -55,3 +55,11 @@ Append-only. No implementation entries yet.
 - Validation: pinned core suite passes all contracts, including dedicated fog tests for hidden positions, paths, economy, research, walls, and exact strength; no engine errors.
 - Blockers or risks: none.
 - Exact next action: implement `M1-P01-T06` modular responsibility extraction behind the preserved `GameCore` facade, then run focused regression tests.
+
+## 2026-07-19 — M1-P01-T06 core-extraction boundary
+
+- Status: Complete. `GameCore` remains the public deterministic facade, with scene-free `RefCounted` services owning command schema rules, movement-edge/cohort rules, controller-first combat selection, fog strength policy, canonical hashing, and turn progression decisions.
+- Files changed: `godot/scripts/core/{command_rules,movement_rules,combat_rules,fog_rules,state_hasher,turn_resolver}.gd`, `godot/scripts/core/game_core.gd`, and `godot/scripts/core/README.md`.
+- Validation: pinned core suite passes with no parser/engine errors; no extracted script extends `Node` or references scene/input/rendering APIs.
+- Blockers or risks: none.
+- Exact next action: complete `M1-P01-T07` full deterministic regression evidence, repeated hashes, P01 gates/hygiene, publication, and P02 activation.

@@ -30,11 +30,11 @@
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
   - Evidence: 2026-07-19 bot policy now accepts only `observable_state`; core provides full own data, public rules/schedule, filtered visible events/walls/tiles, and visible enemies as strength bands only. Explicit fog tests cover hidden enemy positions, queues, economy, research, wall state, and exact strength; pinned core suite passes with no engine errors.
 
-- [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
+- [x] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05
   - Can run early: No
   - Definition of done: separate command validation, movement, combat, fog/observation, hashing/RNG, and turn resolution without scene-tree dependencies or public behavior regression.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 preserves `GameCore` callers while extracting scene-free RefCounted command, movement, combat, fog, state-hash/RNG, and turn-rule services; facade regression remains green in the pinned core suite with no Node/scene dependencies.
 
 - [ ] `M1-P01-T07` Complete deterministic regression evidence and P01 hygiene.
   - Dependencies: M1-P01-T06

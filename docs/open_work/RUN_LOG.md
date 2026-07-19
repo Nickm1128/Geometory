@@ -211,6 +211,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: implement `M1-P01-T06` modular core extraction.
 
+### M1-RUN-20260719-001 / M1-P01-T06 core-extraction boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T06 boundary.
+- Files or artifacts: six scene-free core services, stable `GameCore` facade delegation, and core-boundary README.
+- Decisions: facade compatibility stays primary; extracted helpers operate on serializable values and remain headless-testable.
+- Validation and exact result: pinned core suite passed with no engine errors; static review found no Node/scene/input/rendering references in extracted services.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: execute `M1-P01-T07` phase validation/hygiene/publication.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
