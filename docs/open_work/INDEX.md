@@ -3,11 +3,11 @@ schema_version: 2
 milestone: "M1"
 workflow_state: "active"
 continuation_mode: "autonomous"
-active_phase: "M1-P01"
-current_task: "M1-P01-T07"
+active_phase: "M1-P02"
+current_task: "M1-P02-T01"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "M1-P01-T07: run the repaired full validation matrix twice, commission a new source-first P01 review, record hygiene, publish m1-p01, and activate P02."
-last_completed_phase_tag: "m1-p00"
+exact_next_action: "M1-P02-T01: reconcile replay authority, define GMTY1 serialization/parser contracts, add focused failing round-trip and malformed-input tests, then implement the smallest lossless slice."
+last_completed_phase_tag: "m1-p01"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
 ---
@@ -18,8 +18,8 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
-- Earliest incomplete phase: `M1-P01`
-- Active coordinator task: `M1-P01-T07`
+- Earliest incomplete phase: `M1-P02`
+- Active coordinator task: `M1-P02-T01`
 - Continuation mode: `autonomous`
 - Open blockers: none
 
@@ -28,8 +28,8 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 | Phase | State | Purpose | Phase tag |
 |---|---|---|---|
 | `M1-P00` | Complete | Workflow, trustworthy baseline, and tooling | `m1-p00` |
-| `M1-P01` | Hygiene | Deterministic core correctness and modular contracts | Pending |
-| `M1-P02` | Planned | Replay, simulation, resume, and evidence | Pending |
+| `M1-P01` | Complete | Deterministic core correctness and modular contracts | `m1-p01` |
+| `M1-P02` | Active | Replay, simulation, resume, and evidence | Pending |
 | `M1-P03` | Planned | Competent fair baseline bot | Pending |
 | `M1-P04` | Planned | Guarded AI-assisted bot workbench | Pending |
 | `M1-P05` | Planned | Mobile aesthetics and UX vertical slice | Pending |
@@ -39,8 +39,8 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-- Current task: `M1-P01-T07`
+- Current task: `M1-P02-T01`
 - Continuation mode: `autonomous`
-- Exact handoff: P01's repaired runtime/gate evidence and fresh source review
-  pass. Hygiene is recorded; create and publish immutable `m1-p01`, then record
-  publication, complete T07/G07, mark P01 complete, and activate P02.
+- Exact handoff: P01 completed at immutable remote-verified tag `m1-p01`.
+  Begin P02-T01 with its authoritative GMTY1 replay contract and focused red
+  serializer/parser tests; P02 may proceed immediately under autonomous mode.

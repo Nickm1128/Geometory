@@ -177,3 +177,9 @@ Append-only. No implementation entries yet.
 - Result: Pass with no findings. The reviewer certified the three repaired prior findings: serializable diagnostic projections, full RNG descriptor/combat salt scope, and recursive nested income projection.
 - Validation: root/runtime data parity, pinned Godot `4.6.3.stable.official.7d41c59c4` core suite twice with identical `e390ad42e8508f6c8a0d8af894266e9150eacd7b0fa75e805e57a0ea39a79839`, UI smoke at 393x852/360x800/480x960, visual-QA contract suite, and work-state Audit all passed without engine errors.
 - Exact next action: commit P01 hygiene, publish immutable `m1-p01`, then complete transition evidence and activate P02.
+
+## 2026-07-19 - M1-P01 publication and transition
+
+- Status: Complete. Hygiene closeout commit `fe2eede` was tagged with immutable annotated `m1-p01`; local and `origin` resolve tag object `db945cd361632c0e48fba1ce16efa367a534dd44` without divergence.
+- Publication: milestone branch and tag pushed; no merge to `main`, pull, force-push, or tag movement.
+- Next phase: P02 is activated at T01 under autonomous continuation.
