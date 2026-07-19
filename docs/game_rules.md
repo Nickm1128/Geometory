@@ -96,6 +96,11 @@ research_schedule[turn] = {
 The complete 80-entry, one-based schedule is sampled by the named `research`
 RNG stream from the match seed and configured bounds, then stored with its
 generation version in match setup/replay data. It is immutable for that match.
+M1 uses `fnv1a32_seed_mix_v1`: each descriptor records its `stream_id`, purpose,
+and `salt_namespace`; the descriptor plus operation salt is mixed with the match
+seed, rather than advancing hidden PRNG state. Research owns
+`research_schedule_v1` and samples `turn:<n>:health` and `turn:<n>:damage`;
+combat owns `combat_roll_v1`; bot policy tiebreaks own `bot_policy_v1`.
 
 The complete schedule, ruleset hash, configured bounds, and schedule generation
 version are public information shown consistently to the player and exposed to
@@ -204,5 +209,6 @@ reconstruction at declared steps and match end. Its serialization includes the
 schema/version, ruleset/map IDs and hashes, seed/RNG derivation metadata, turn,
 active player/phase/end state, players, tiles, walls, stacks/cohorts, research
 schedule, accepted commands, replay events, and next-ID counters in sorted
-stable-ID/key order; rejected diagnostics and presentation-only fields are
-excluded.
+stable-ID/key order; rejected diagnostics and presentation-only fields
+(including player display names and colors) are excluded through an explicit
+gameplay projection.

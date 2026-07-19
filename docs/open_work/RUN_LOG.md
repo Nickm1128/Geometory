@@ -288,6 +288,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: publish this evidence-only handoff update, require its CI to remain green, then run the clean Terra/High resume test and return the stored prompt.
 
+### M1-RUN-20260719-001 / M1-P01-T04 reopened hash/RNG repair
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted task-close boundary.
+- Files or artifacts: explicit gameplay hash projection, documented immutable RNG stream descriptors, data-driven research schedule version, synchronized runtime rules, and focused core contracts.
+- Decisions: `fnv1a32_seed_mix_v1` derives named streams from the descriptor namespace, operation salt, and match seed; the hash projects gameplay fields and excludes display/color presentation state.
+- Validation and exact result: the initial focused core run failed exactly three intended assertions (presentation field hash leakage, unstructured research descriptor, missing schedule version) without parser/crash errors. The repair passed the pinned suite; two following full core runs matched `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`. Root/runtime data SHA-256 parity and tracker Audit passed.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: close and commit T04, then begin T05's adversarial visible-event privacy test.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary

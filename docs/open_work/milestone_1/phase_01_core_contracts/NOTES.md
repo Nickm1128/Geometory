@@ -115,3 +115,11 @@ Append-only. No implementation entries yet.
 - GitHub Actions run `29702830233` at `48fbb83` passed every tracker, checker-regression, parity, pinned-engine, deterministic-core, three-size UI-smoke, and visual-contract step.
 - P01 remains intentionally reopened at T04; green automation does not override the substantive review findings recorded above.
 - Exact next action: publish this evidence handoff, verify the branch is clean/synchronized with green CI, and forward-test the fresh Terra/High resume before giving the user the new-thread prompt.
+
+## 2026-07-19 — M1-P01-T04 reopened hash/RNG repair
+
+- Status: Complete. The earlier hash copied full player records; it now hashes an explicit gameplay projection and ignores display/color presentation values. RNG ownership is recorded as immutable research/combat/bot descriptors under `fnv1a32_seed_mix_v1`; research records the data-driven `research_schedule_v1` generation version and uses one-based documented operation salts.
+- Files changed: `data/rules/default_rules.json`, its synchronized `godot/data` copy, authority docs, `game_core.gd`, `state_hasher.gd`, and focused core contracts.
+- Validation: focused red run failed exactly the three intended contract assertions with no parser/crash errors; post-repair pinned core test passed. Two subsequent pinned Godot 4.6.3 full-core runs matched `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; all canonical/runtime data SHA-256 pairs matched and tracker Audit passed.
+- Blockers or risks: none.
+- Exact next action: start reopened `M1-P01-T05` with an adversarial visible-event payload test, then replace raw event copies with recursive fog-safe projections.

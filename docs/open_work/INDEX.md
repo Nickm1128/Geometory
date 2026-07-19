@@ -4,9 +4,9 @@ milestone: "M1"
 workflow_state: "active"
 continuation_mode: "autonomous"
 active_phase: "M1-P01"
-current_task: "M1-P01-T04"
+current_task: "M1-P01-T05"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Add failing contract tests for gameplay-only canonical hashing and documented RNG stream derivation, then repair M1-P01-T04 before proceeding to the other reopened P01 tasks."
+exact_next_action: "Add an adversarial visible-event payload test and repair M1-P01-T05 with recursive fog-safe event projection before beginning the reopened core extraction."
 last_completed_phase_tag: "m1-p00"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
@@ -19,7 +19,7 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P01`
-- Active coordinator task: `M1-P01-T04`
+- Active coordinator task: `M1-P01-T05`
 - Continuation mode: `autonomous`
 - Open blockers: none
 
@@ -39,11 +39,9 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-- Current task: `M1-P01-T04`
+- Current task: `M1-P01-T05`
 - Continuation mode: `autonomous`
-- Exact handoff: P00 remains complete at immutable tag `m1-p00`. P01 has green
-  supporting test evidence, but a fresh source-level review found that three
-  checked tasks did not satisfy their definitions of done. Start by writing
-  red tests for gameplay-only canonical hashing and the documented RNG stream
-  contract, then repair the implementation and continue the reopened work in
-  dependency order. There is no open blocker; work may proceed immediately.
+- Exact handoff: P00 remains complete at immutable tag `m1-p00`. Reopened T04
+  is repaired and has repeatable pinned-core evidence. Continue with T05's
+  adversarial visible-event privacy test and recursive projection; T06 remains
+  blocked on T05. There is no open blocker; work may proceed immediately.

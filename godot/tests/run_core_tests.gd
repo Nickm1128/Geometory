@@ -215,6 +215,13 @@ func _test_turn_cap_rng_and_hash_contracts(configs: Dictionary) -> void:
   _assert(before_hash == hash_core.canonical_state_hash(), "contract: rejected diagnostics do not alter canonical hash")
   _assert(hash_core.canonical_state_hash().length() == 64, "contract: canonical hash is SHA-256 hex")
   _assert(hash_core.state["rng_streams"].has("research") and hash_core.state["rng_streams"].has("combat") and hash_core.state["rng_streams"].has("bot"), "contract: owned research combat and bot streams are recorded")
+  var gameplay_hash: String = hash_core.canonical_state_hash()
+  hash_core.state["players"]["P1"]["display_name"] = "Presentation-only test name"
+  hash_core.state["players"]["P1"]["color"] = "#000000"
+  _assert(gameplay_hash == hash_core.canonical_state_hash(), "contract: presentation-only player fields do not alter canonical gameplay hash")
+  var research_stream = hash_core.state["rng_streams"].get("research", {})
+  _assert(typeof(research_stream) == TYPE_DICTIONARY and String(research_stream.get("stream_id", "")) == "research" and String(research_stream.get("purpose", "")) == "public_research_schedule" and String(research_stream.get("salt_namespace", "")) == "research_schedule_v1", "contract: research stream records its owned derivation namespace")
+  _assert(String(hash_core.state.get("research_schedule_generation_version", "")) == "research_schedule_v1", "contract: research schedule records its generation version")
 
   var capped = GameCoreScript.new()
   capped.setup(configs["rules"], configs["map"], 302)

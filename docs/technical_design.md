@@ -92,7 +92,13 @@ The core state should be serializable as dictionaries/JSON-compatible data:
   state/derivation metadata. Canonical serialization sorts all dictionary keys
   and stable-ID collections, includes every gameplay-relevant field plus
   accepted history/events, and excludes diagnostics/presentation fields so a
-  rejected input cannot change its SHA-256 hash.
+  rejected input cannot change its SHA-256 hash. M1 stream descriptors are
+  immutable serializable values (`stream_id`, purpose, `salt_namespace`, and
+  derivation version) for research, combat, and bot ownership; derivation uses
+  `fnv1a32_seed_mix_v1` plus the match seed, never an unrecorded mutable PRNG.
+  The hash builds an explicit gameplay projection, excluding player display and
+  color fields and other presentation-only state rather than hashing the raw
+  state dictionary.
 - `PlayerState`: bank cents, research bps, pending soldiers, economy bonuses, capital tile, eliminated flag.
 - `TileState`: axial coordinate, region ID, home owner, controller, terrain tags.
 - `WallState`: edge endpoints, owner, current HP, max HP, destroyed flag.

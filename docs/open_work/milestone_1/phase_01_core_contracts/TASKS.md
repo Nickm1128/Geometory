@@ -18,11 +18,11 @@
   - Definition of done: validate every executed adjacent edge; stop at invalid/walled edges; merge friendly cohorts deterministically, clear both queues, and emit an event; resolve controller-first defender combat before applying surviving control and capital transfer.
   - Evidence: 2026-07-19 movement revalidates each executed edge and preserves blocked queues with events; same-owner stacks merge into the stable destination, clear queues, and emit merge events; combat tiles resolve in stable order and control applies only after combat. Focused movement/combat assertions and full three-size UI smoke pass; core suite has only 3 intentional T04/T05 red assertions and no engine errors.
 
-- [ ] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
+- [x] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
   - Dependencies: M1-P01-T02, M1-P01-T03
   - Can run early: No
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
-  - Evidence: Reopened 2026-07-19 after fresh source review. The turn-80 behavior and repeatability tests are green, but the canonical hash currently includes presentation-only fields and the RNG stream metadata/salts do not fully match the documented ownership contract; schedule-version coverage is also missing. Passing tests are supporting evidence only until focused red tests expose and the implementation resolves these contract gaps.
+  - Evidence: Reopened 2026-07-19 after fresh source review. Focused red tests then failed exactly for presentation-only player fields changing the hash, an unstructured research stream, and a missing schedule generation version. `StateHasher.gameplay_projection` now selects gameplay fields explicitly; state records immutable research/combat/bot stream descriptors under `fnv1a32_seed_mix_v1`, and the data-driven public schedule version is persisted. Two pinned Godot 4.6.3 full-core runs passed with the identical `DETERMINISM_HASH` `40659adccf14646a26b0173e2d063c132c66407c77559fd24242d7993291d2d8`; canonical/runtime data parity passed.
 
 - [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02

@@ -43,7 +43,16 @@ choices. Revisit this file before changing behavior.
   configured bounds. Every entry is `{health_bps_per_point,
   damage_bps_per_point}`; the complete schedule, ruleset hash, and schedule
   generation version are public to both players and bots and are retained in
-  replay/setup data. Cumulative bonuses affect future cohorts only.
+  replay/setup data. Cumulative bonuses affect future cohorts only. M1 derives
+  every random value with `fnv1a32_seed_mix_v1`: the stream descriptor supplies
+  a stable `stream_id`, purpose, and `salt_namespace`, the caller supplies an
+  operation salt, and that tuple is mixed with the match seed. The recorded
+  descriptors are `research`/`public_research_schedule`/
+  `research_schedule_v1`, `combat`/`combat_damage_rolls`/`combat_roll_v1`, and
+  `bot`/`bot_policy_tiebreaks`/`bot_policy_v1`; no stream owns mutable PRNG
+  state. Research schedule samples use one-based `turn:<n>:health` and
+  `turn:<n>:damage` operation salts, and its configured
+  `schedule_generation_version` is part of gameplay state.
 - Soldiers: cohort-based stacks preserve spawn quality and current health.
 - Movement: active-player stacks advance at most one adjacent edge per own turn
   along queued paths; every executed edge is validated.
@@ -56,7 +65,9 @@ choices. Revisit this file before changing behavior.
   canonical hash. `client_sequence` is a positive integer monotonically
   increasing per player (one command source per player in M1); it advances only
   when that player's command is accepted. Canonical state hashes and explicitly
-  owned RNG streams establish deterministic reconstruction.
+  owned RNG streams establish deterministic reconstruction. Canonical hashes
+  project gameplay fields explicitly: player display names and colors (and all
+  other presentation-only fields) do not change a gameplay hash.
 - Resume: persist atomically after every accepted command and reconstruct from
   setup plus commands, not by trusting a snapshot. Keep one active match and the
   latest completed replay; no manual slots/library.

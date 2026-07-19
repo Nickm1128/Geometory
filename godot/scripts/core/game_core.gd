@@ -35,11 +35,12 @@ func setup(new_rules: Dictionary, new_map_config: Dictionary, seed: int) -> void
     "players": {},
     "stacks": {},
     "research_schedule": [],
+    "research_schedule_generation_version": String(rules.get("research", {}).get("schedule_generation_version", "research_schedule_v1")),
     "rng_streams": {
       "derivation_version": "fnv1a32_seed_mix_v1",
-      "research": "research",
-      "combat": "combat",
-      "bot": "bot"
+      "research": {"stream_id": "research", "purpose": "public_research_schedule", "salt_namespace": "research_schedule_v1"},
+      "combat": {"stream_id": "combat", "purpose": "combat_damage_rolls", "salt_namespace": "combat_roll_v1"},
+      "bot": {"stream_id": "bot", "purpose": "bot_policy_tiebreaks", "salt_namespace": "bot_policy_v1"}
     },
     "replay_events": [],
     "accepted_command_history": [],
@@ -62,30 +63,7 @@ func snapshot() -> Dictionary:
   return state.duplicate(true)
 
 func canonical_state_hash() -> String:
-  return StateHasher.sha256(StateHasher.canonical_json({
-    "schema_version": state["schema_version"],
-    "seed": state["seed"],
-    "ruleset_id": state["ruleset_id"],
-    "ruleset_sha256": state["ruleset_sha256"],
-    "map_id": state["map_id"],
-    "map_sha256": state["map_sha256"],
-    "rng_streams": state["rng_streams"],
-    "turn": state["turn"],
-    "active_player": state["active_player"],
-    "phase": state["phase"],
-    "winner": state["winner"],
-    "game_over": state["game_over"],
-    "players": state["players"],
-    "tiles": state["tiles"],
-    "walls": state["walls"],
-    "stacks": state["stacks"],
-    "research_schedule": state["research_schedule"],
-    "accepted_command_history": state["accepted_command_history"],
-    "last_accepted_client_sequence": state["last_accepted_client_sequence"],
-    "replay_events": state["replay_events"],
-    "next_stack_index": state["next_stack_index"],
-    "next_cohort_index": state["next_cohort_index"]
-  }))
+  return StateHasher.sha256(StateHasher.canonical_json(StateHasher.gameplay_projection(state)))
 
 func get_player_ids() -> Array[String]:
   return [PLAYER_HUMAN, PLAYER_BOT]
@@ -437,8 +415,9 @@ func _generate_research_schedule() -> void:
   state["research_schedule"] = []
   var turns = int(rules["research"].get("schedule_turns_to_generate", 80))
   for i in range(turns):
-    var h = _deterministic_range("research_h", i, int(rules["research"]["health_bps_per_point_min"]), int(rules["research"]["health_bps_per_point_max"]))
-    var d = _deterministic_range("research_d", i, int(rules["research"]["damage_bps_per_point_min"]), int(rules["research"]["damage_bps_per_point_max"]))
+    var turn_index = i + 1
+    var h = _deterministic_range("research", "turn:%d:health" % turn_index, int(rules["research"]["health_bps_per_point_min"]), int(rules["research"]["health_bps_per_point_max"]))
+    var d = _deterministic_range("research", "turn:%d:damage" % turn_index, int(rules["research"]["damage_bps_per_point_min"]), int(rules["research"]["damage_bps_per_point_max"]))
     state["research_schedule"].append({"health_bps_per_point": h, "damage_bps_per_point": d})
 
 func _generate_alpha_medium_map() -> void:
@@ -848,9 +827,9 @@ func _event_to_text(event: Dictionary) -> String:
 func _command_result(ok: bool, message: String, code: String = "") -> Dictionary:
   return {"ok": ok, "message": message, "code": code}
 
-func _deterministic_range(stream: String, index: int, min_value: int, max_value: int) -> int:
+func _deterministic_range(stream: String, operation_salt: String, min_value: int, max_value: int) -> int:
   var span = max_value - min_value + 1
-  return min_value + int(abs(_stream_hash(stream, str(index))) % span)
+  return min_value + int(abs(_stream_hash(stream, operation_salt)) % span)
 
 func _unit_random(stream: String, salt: String) -> float:
   var value = abs(_stream_hash(stream, "%s_%d" % [salt, state.get("turn", 0)])) % 1000000
@@ -860,7 +839,10 @@ func bot_random_unit(salt: String) -> float:
   return _unit_random("bot", salt)
 
 func _stream_hash(stream: String, salt: String) -> int:
-  return _hash("%s|%s" % [stream, salt])
+  var descriptor: Dictionary = state.get("rng_streams", {}).get(stream, {})
+  var derivation_version := String(state.get("rng_streams", {}).get("derivation_version", ""))
+  var stream_namespace := String(descriptor.get("salt_namespace", stream))
+  return _hash("%s|%s|%s" % [derivation_version, stream_namespace, salt])
 
 func _hash(text: String) -> int:
   var h = 2166136261

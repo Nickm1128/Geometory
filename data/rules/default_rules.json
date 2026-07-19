@@ -26,6 +26,7 @@
     "economy_bonus_cap_bps": 2000
   },
   "research": {
+    "schedule_generation_version": "research_schedule_v1",
     "research_point_cost_cents": 100,
     "schedule_turns_to_generate": 80,
     "health_bps_per_point_min": 100,
