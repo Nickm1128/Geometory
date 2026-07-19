@@ -170,3 +170,10 @@ Append-only. No implementation entries yet.
 - Status: Complete. The extracted service boundary remains substantive after T04/T05 repair: `GameCore` is 525 lines, each extracted owner exposes a real deterministic entry point, and none depends on scene-tree/input/rendering APIs.
 - Validation: pinned Godot 4.6.3 core suite passed with `DETERMINISM_HASH` `e390ad42e8508f6c8a0d8af894266e9150eacd7b0fa75e805e57a0ea39a79839`.
 - Exact next action: execute T07's full repaired validation, review, hygiene, publication, and P02 activation.
+
+## 2026-07-19 - M1-P01 repaired closeout review and validation
+
+- Reviewer: `/root/p01_final_review`; reviewed ref `a8629d3`; scope T01-T06, R01-R05, G01-G06, core services, authority, and contracts.
+- Result: Pass with no findings. The reviewer certified the three repaired prior findings: serializable diagnostic projections, full RNG descriptor/combat salt scope, and recursive nested income projection.
+- Validation: root/runtime data parity, pinned Godot `4.6.3.stable.official.7d41c59c4` core suite twice with identical `e390ad42e8508f6c8a0d8af894266e9150eacd7b0fa75e805e57a0ea39a79839`, UI smoke at 393x852/360x800/480x960, visual-QA contract suite, and work-state Audit all passed without engine errors.
+- Exact next action: commit P01 hygiene, publish immutable `m1-p01`, then complete transition evidence and activate P02.

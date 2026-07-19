@@ -28,7 +28,7 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 | Phase | State | Purpose | Phase tag |
 |---|---|---|---|
 | `M1-P00` | Complete | Workflow, trustworthy baseline, and tooling | `m1-p00` |
-| `M1-P01` | Active | Deterministic core correctness and modular contracts | Pending |
+| `M1-P01` | Hygiene | Deterministic core correctness and modular contracts | Pending |
 | `M1-P02` | Planned | Replay, simulation, resume, and evidence | Pending |
 | `M1-P03` | Planned | Competent fair baseline bot | Pending |
 | `M1-P04` | Planned | Guarded AI-assisted bot workbench | Pending |
@@ -41,7 +41,6 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 - Current task: `M1-P01-T07`
 - Continuation mode: `autonomous`
-- Exact handoff: Fresh source review reopened T02, T04, T05, and dependent T06.
-  T02 is repaired. Continue with T04 RNG tuple/combat salts, then T05 recursive
-  nested-event projection, revalidate T06 against its repaired dependencies,
-  and repeat the P01 review and closeout.
+- Exact handoff: P01's repaired runtime/gate evidence and fresh source review
+  pass. Hygiene is recorded; create and publish immutable `m1-p01`, then record
+  publication, complete T07/G07, mark P01 complete, and activate P02.
