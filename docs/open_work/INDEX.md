@@ -5,10 +5,10 @@ workflow_state: "active"
 active_phase: "M1-P00"
 current_task: "M1-P00-T07"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "Commit and push the CI-portability fix, require a green Validate run, then obtain a current-build QA ready handshake after the physical S24 reconnects."
+exact_next_action: "Obtain a current-build QA ready handshake after the physical S24 reconnects, then finish P00 hygiene/tag publication and activate P01."
 last_completed_phase_tag: ""
 last_checkpoint_ref: "milestone/m1-vertical-slice"
-last_green_validation: "Pinned local suites and APK/device-emulator checks passed on 2026-07-19; first public CI run exposed and locally verified a Linux-only skill-mirror regression, with the corrected rerun pending."
+last_green_validation: "GitHub Actions Validate run 29698045899 passed all tracker, PhaseClose, data, pinned Godot, core, UI, and visual-contract steps on 2026-07-19; current physical handshake remains pending."
 ---
 
 # Milestone 1 Work Index
@@ -38,8 +38,7 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 ## Resume Handoff
 
 P00 implementation lanes T01–T06 and T07 authority/local-validation work are
-green. Resume T07 by publishing the locally verified CI-portability fix and
-requiring a green Validate rerun, then resolve `B-001` with an alias-only
-current-build phone ready handshake.
+green, including GitHub Actions Validate run `29698045899`. Resume T07 by
+resolving `B-001` with an alias-only current-build phone ready handshake.
 After both lanes pass, complete hygiene, publish immutable `m1-p00`, and activate
 P01 without merging `main`.

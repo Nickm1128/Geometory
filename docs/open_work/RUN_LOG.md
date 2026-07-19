@@ -100,6 +100,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: commit/push the focused T07 CI fix, require a green Validate run, then retry the physical handshake.
 
+### M1-RUN-20260719-001 / public-CI green boundary / M1-P00-T07
+
+- Status: Progress
+- Branch/ref: `milestone/m1-vertical-slice` at `c33d62c`
+- Files or artifacts: GitHub Actions Validate run `29698045899`.
+- Decisions: accept HYG-05 only after the corrected pushed commit completes every workflow step; preserve the current-build physical gate separately.
+- Validation and exact result: all ten workflow steps passed, covering tracker, PhaseClose routing, data parity, verified Godot 4.6.3, core, three UI sizes, and visual-contract checks.
+- Blockers or risks: only `B-001` remains before final hygiene/tag publication; a documentation evidence commit will receive its own ordinary CI run.
+- Paid call and ledger entry: None
+- Exact next action: publish this CI evidence checkpoint, then obtain the physical S24 current-build handshake.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
