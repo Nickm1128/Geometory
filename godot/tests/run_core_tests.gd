@@ -21,6 +21,7 @@ func _init() -> void:
   _test_p01_contract_red_cases(configs)
   _test_movement_resolution_contracts(configs)
   _test_turn_cap_rng_and_hash_contracts(configs)
+  _test_fog_observation_contract(configs)
   _test_bot(configs)
   _test_replay_reproducibility(configs)
 
@@ -250,11 +251,37 @@ func _test_bot(configs: Dictionary) -> void:
   })
   var bot = BaselineBotScript.new()
   bot.setup(configs["bot"])
-  var commands: Array = bot.call("build_turn_commands", core, "P2")
+  var commands: Array = bot.call("build_turn_commands", core.observable_state("P2"))
   _assert(commands.size() >= 2, "bot emits allocation and end commands")
   for command in commands:
     var result: Dictionary = core.apply_command(command)
     _assert(result["ok"], "bot command is valid: %s" % command["type"])
+
+func _test_fog_observation_contract(configs: Dictionary) -> void:
+  var fog = GameCoreScript.new()
+  fog.setup(configs["rules"], configs["map"], 401)
+  fog.state["players"]["P2"]["bank_cents"] = 987654
+  fog.state["players"]["P2"]["research_health_bps"] = 7654
+  fog.state["replay_events"].append({"type": "allocation_applied", "player_id": "P2", "secret": "hidden"})
+  var p2_stack: String = fog.get_stack_at_tile_for_player("T_4_0", "P2")
+  var p2_wall := ""
+  for wall_id in fog.state["walls"].keys():
+    var wall: Dictionary = fog.state["walls"][wall_id]
+    if wall["owner"] == "P2":
+      p2_wall = String(wall_id)
+      break
+  var hidden: Dictionary = fog.observable_state("P1")
+  _assert(not hidden.has("players") and not hidden.has("rejected_command_diagnostics"), "contract: bot snapshot has no private player collection or diagnostics")
+  _assert(not hidden["stacks"].has(p2_stack), "contract: hidden enemy position is absent")
+  _assert(not hidden["walls"].has(p2_wall), "contract: hidden enemy wall state is absent")
+  _assert(not _has_event_for_player(hidden["visible_events"], "allocation_applied", "P2"), "contract: hidden enemy economy event is absent")
+
+  fog.state["stacks"][p2_stack]["tile_id"] = "T_-3_0"
+  fog.state["stacks"][p2_stack]["waypoints"] = ["T_3_0"]
+  var visible: Dictionary = fog.observable_state("P1")
+  var enemy: Dictionary = visible["stacks"][p2_stack]
+  _assert(enemy.has("strength_band") and not enemy.has("cohorts") and not enemy.has("waypoints"), "contract: visible enemy exposes only strength band without private cohort/path data")
+  _assert(visible["player"]["bank_cents"] != 987654 and visible["player"]["research_health_bps"] != 7654, "contract: enemy economy and research are absent from own bot state")
 
 func _test_replay_reproducibility(configs: Dictionary) -> void:
   var a = GameCoreScript.new()
@@ -297,6 +324,12 @@ func _has_combat_defender(events: Array, defender: String) -> bool:
 func _has_draw_end(events: Array) -> bool:
   for event in events:
     if String(event.get("type", "")) == "match_ended" and String(event.get("winner", "")) == "" and String(event.get("reason", "")) == "turn_cap_draw":
+      return true
+  return false
+
+func _has_event_for_player(events: Array, event_type: String, player_id: String) -> bool:
+  for event in events:
+    if String(event.get("type", "")) == event_type and String(event.get("player_id", "")) == player_id:
       return true
   return false
 

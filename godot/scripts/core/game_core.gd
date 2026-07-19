@@ -233,6 +233,8 @@ func visible_tile_ids(player_id: String) -> Dictionary:
   return visible
 
 func observable_state(player_id: String) -> Dictionary:
+  if not state["players"].has(player_id):
+    return {}
   var visible = visible_tile_ids(player_id)
   var tiles = {}
   for tile_id in visible.keys():
@@ -241,8 +243,10 @@ func observable_state(player_id: String) -> Dictionary:
   var stacks = {}
   for stack_id in state["stacks"].keys():
     var stack: Dictionary = state["stacks"][stack_id]
-    if stack["owner"] == player_id or visible.has(stack["tile_id"]):
-      stacks[stack_id] = _public_stack(stack)
+    if stack["owner"] == player_id:
+      stacks[stack_id] = stack.duplicate(true)
+    elif visible.has(stack["tile_id"]):
+      stacks[stack_id] = _observable_enemy_stack(stack)
   var walls = {}
   for wall_id in state["walls"].keys():
     var wall: Dictionary = state["walls"][wall_id]
@@ -258,8 +262,44 @@ func observable_state(player_id: String) -> Dictionary:
     "tiles": tiles,
     "walls": walls,
     "stacks": stacks,
-    "research_schedule": state["research_schedule"].duplicate(true)
+    "research_schedule": state["research_schedule"].duplicate(true),
+    "public_rules": rules.duplicate(true),
+    "visible_events": _visible_events(player_id, visible)
   }
+
+func _observable_enemy_stack(stack: Dictionary) -> Dictionary:
+  return {
+    "id": stack["id"],
+    "owner": stack["owner"],
+    "tile_id": stack["tile_id"],
+    "strength_band": _strength_band(_stack_soldier_count(stack))
+  }
+
+func _strength_band(soldiers: int) -> String:
+  if soldiers <= 2:
+    return "tiny"
+  if soldiers <= 5:
+    return "small"
+  if soldiers <= 10:
+    return "medium"
+  if soldiers <= 20:
+    return "large"
+  return "overwhelming"
+
+func _visible_events(player_id: String, visible: Dictionary) -> Array:
+  var result: Array = []
+  for event in state["replay_events"]:
+    if String(event.get("player_id", "")) == player_id:
+      result.append(event.duplicate(true))
+      continue
+    if event.has("tile_id") and visible.has(String(event["tile_id"])):
+      result.append(event.duplicate(true))
+      continue
+    if event.has("wall_id") and state["walls"].has(String(event["wall_id"])):
+      var wall: Dictionary = state["walls"][String(event["wall_id"])]
+      if visible.has(String(wall["from"])) or visible.has(String(wall["to"])):
+        result.append(event.duplicate(true))
+  return result
 
 func get_neighbor_tile_ids(tile_id: String) -> Array[String]:
   var coord = HexUtils.parse_tile_id(tile_id)

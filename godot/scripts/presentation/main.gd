@@ -724,7 +724,7 @@ func _run_bot_until_human() -> void:
   var before_events = core.snapshot()["replay_events"].size() if bot_started else 0
   var bot_command_count = 0
   while core != null and core.is_bot_turn() and not core.snapshot()["game_over"] and safety < 8:
-    var commands = bot.build_turn_commands(core, "P2")
+    var commands = bot.build_turn_commands(core.observable_state("P2"))
     bot_command_count += commands.size()
     for command in commands:
       var result = core.apply_command(command)

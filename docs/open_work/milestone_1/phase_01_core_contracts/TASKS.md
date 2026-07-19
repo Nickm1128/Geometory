@@ -24,11 +24,11 @@
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
   - Evidence: 2026-07-19 adds exact post-resolution turn-80 draw (`match_ended` reason `turn_cap_draw`), recorded research/combat/bot stream metadata, and stable-key canonical SHA-256 over gameplay/accepted-history state excluding rejected diagnostics. Focused hash/RNG/80-turn tests pass; core suite retains only 2 intentional T05 fog-observation red assertions with no engine errors.
 
-- [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
+- [x] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02
   - Can run early: No
   - Definition of done: expose full own data and only player-visible enemy/tile/wall/event data; remove `GameCore` access from bot policy; add explicit tests for hidden queues, economy, research, positions, wall damage, and strength.
-  - Evidence: Pending.
+  - Evidence: 2026-07-19 bot policy now accepts only `observable_state`; core provides full own data, public rules/schedule, filtered visible events/walls/tiles, and visible enemies as strength bands only. Explicit fog tests cover hidden enemy positions, queues, economy, research, wall state, and exact strength; pinned core suite passes with no engine errors.
 
 - [ ] `M1-P01-T06` Extract modular core responsibilities behind the preserved `GameCore` facade.
   - Dependencies: M1-P01-T02, M1-P01-T03, M1-P01-T04, M1-P01-T05

@@ -13,12 +13,12 @@ func setup(new_profile: Dictionary) -> void:
   profile = new_profile.duplicate(true)
   next_client_sequence = 1
 
-func build_turn_commands(core, player_id: String) -> Array[Dictionary]:
+func build_turn_commands(obs: Dictionary) -> Array[Dictionary]:
   var commands: Array[Dictionary] = []
-  var obs = core.observable_state(player_id)
+  var player_id: String = String(obs["player_id"])
   if obs["phase"] == PHASE_ALLOCATION:
-    commands.append(_allocation_command(core, obs))
-  commands.append_array(_movement_commands(core, obs))
+    commands.append(_allocation_command(obs))
+  commands.append_array(_movement_commands(obs))
   commands.append({
     "type": "end_phase",
     "player_id": player_id,
@@ -28,7 +28,7 @@ func build_turn_commands(core, player_id: String) -> Array[Dictionary]:
   })
   return commands
 
-func _allocation_command(core, obs: Dictionary) -> Dictionary:
+func _allocation_command(obs: Dictionary) -> Dictionary:
   var player_id = String(obs["player_id"])
   var bank = int(obs["player"]["bank_cents"])
   var reserve = int(profile.get("allocation", {}).get("minimum_reserve_cents", 100))
@@ -57,7 +57,7 @@ func _allocation_command(core, obs: Dictionary) -> Dictionary:
     "client_sequence": _next_sequence()
   }
 
-func _movement_commands(core, obs: Dictionary) -> Array[Dictionary]:
+func _movement_commands(obs: Dictionary) -> Array[Dictionary]:
   var result: Array[Dictionary] = []
   var player_id = String(obs["player_id"])
   var stacks: Dictionary = obs["stacks"]
@@ -68,7 +68,7 @@ func _movement_commands(core, obs: Dictionary) -> Array[Dictionary]:
       continue
     if stack.get("waypoints", []).size() > 0:
       continue
-    var target = _choose_target(core, player_id, String(stack["tile_id"]), visible_tiles)
+    var target = _choose_target(player_id, String(stack["tile_id"]), visible_tiles)
     if target == "":
       continue
     result.append({
@@ -83,16 +83,16 @@ func _movement_commands(core, obs: Dictionary) -> Array[Dictionary]:
     })
   return result
 
-func _choose_target(core, player_id: String, from_tile: String, visible_tiles: Dictionary) -> String:
-  var best_neutral = _nearest_tile(core, player_id, from_tile, visible_tiles, "neutral")
+func _choose_target(player_id: String, from_tile: String, visible_tiles: Dictionary) -> String:
+  var best_neutral = _nearest_tile(player_id, from_tile, visible_tiles, "neutral")
   if best_neutral != "":
     return best_neutral
-  var best_enemy = _nearest_tile(core, player_id, from_tile, visible_tiles, "enemy")
+  var best_enemy = _nearest_tile(player_id, from_tile, visible_tiles, "enemy")
   if best_enemy != "":
     return best_enemy
   return ""
 
-func _nearest_tile(core, player_id: String, from_tile: String, tiles: Dictionary, mode: String) -> String:
+func _nearest_tile(player_id: String, from_tile: String, tiles: Dictionary, mode: String) -> String:
   var from_coord = HexUtils.parse_tile_id(from_tile)
   var best = ""
   var best_distance = 999999

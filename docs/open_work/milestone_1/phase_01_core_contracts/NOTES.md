@@ -47,3 +47,11 @@ Append-only. No implementation entries yet.
 - Validation: focused tests pass for equal SHA-256 hashes, rejected-diagnostic hash exclusion, 64-hex output, recorded research/combat/bot streams, and a complete 80-turn zero-allocation draw cycle. The core suite retains exactly two intentional T05 fog-observation red assertions, with no engine errors.
 - Blockers or risks: none.
 - Exact next action: implement `M1-P01-T05` fog-safe observable snapshots, remove direct `GameCore` access from bot policy, and prove private data is absent.
+
+## 2026-07-19 — M1-P01-T05 fog-safe bot boundary
+
+- Status: Complete. `BaselineBot` now accepts an observable value snapshot rather than `GameCore`; presentation obtains that snapshot from the core. Own stacks stay complete, while visible enemies carry only ID/owner/tile/strength band. The snapshot exposes no private player collection, diagnostics, hidden stack/wall data, or hidden enemy events.
+- Files changed: `godot/scripts/core/game_core.gd`, `godot/scripts/core/baseline_bot.gd`, `godot/scripts/presentation/main.gd`, and `godot/tests/run_core_tests.gd`.
+- Validation: pinned core suite passes all contracts, including dedicated fog tests for hidden positions, paths, economy, research, walls, and exact strength; no engine errors.
+- Blockers or risks: none.
+- Exact next action: implement `M1-P01-T06` modular responsibility extraction behind the preserved `GameCore` facade, then run focused regression tests.

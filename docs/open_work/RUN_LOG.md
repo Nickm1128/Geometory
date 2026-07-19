@@ -200,6 +200,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: implement `M1-P01-T05` observable snapshot/bot-interface boundary.
 
+### M1-RUN-20260719-001 / M1-P01-T05 fog-safe bot boundary
+
+- Status: Complete
+- Branch/ref: `milestone/m1-vertical-slice` at the uncommitted T05 boundary.
+- Files or artifacts: fog-filtered observable snapshot, detached baseline bot policy, presentation call site, and privacy tests.
+- Decisions: bot policies receive values, never a core object; own state is exact; visible enemy strength is band-only; public rules/schedule remain available; private enemy data is absent rather than redacted.
+- Validation and exact result: pinned core suite passed with no engine errors, including explicit hidden position/queue/economy/research/wall/strength/event assertions.
+- Blockers or risks: none.
+- Paid call and ledger entry: None
+- Exact next action: implement `M1-P01-T06` modular core extraction.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
