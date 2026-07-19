@@ -9,7 +9,7 @@ run_id: "M1-RUN-20260719-001"
 exact_next_action: "Add failing contract tests for gameplay-only canonical hashing and documented RNG stream derivation, then repair M1-P01-T04 before proceeding to the other reopened P01 tasks."
 last_completed_phase_tag: "m1-p00"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
-last_green_validation: "Commit efb3397 passed GitHub Actions run 29700145449; two pinned Godot 4.6.3 core runs produced identical hash 0a69b09a884b4f794e83f5a6d72b0fe1350ddb4045866efeb5a05f689479ea4e and the three-size UI smoke suite passed, but substantive review reopened T04-T06."
+last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
 ---
 
 # Milestone 1 Work Index

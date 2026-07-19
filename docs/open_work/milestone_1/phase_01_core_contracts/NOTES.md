@@ -109,3 +109,9 @@ Append-only. No implementation entries yet.
 - Public evidence: replacement run `29702770565`, job `88234544633`, passed the production Audit and then failed the expanded regression step because the P00 hygiene `Result: Pass` anchor remained LF-only.
 - Remediation and proof: the result anchor accepts optional carriage return, and the regression suite now converts the canonical hygiene log to CRLF and requires `PhaseClose M1-P00` to pass. All INDEX, hygiene, negative-review, and non-resolving-ref fixtures pass locally.
 - Exact next action: publish and require a fully green replacement workflow before handoff.
+
+## 2026-07-19 — Workflow checkpoint publicly green
+
+- GitHub Actions run `29702830233` at `48fbb83` passed every tracker, checker-regression, parity, pinned-engine, deterministic-core, three-size UI-smoke, and visual-contract step.
+- P01 remains intentionally reopened at T04; green automation does not override the substantive review findings recorded above.
+- Exact next action: publish this evidence handoff, verify the branch is clean/synchronized with green CI, and forward-test the fresh Terra/High resume before giving the user the new-thread prompt.

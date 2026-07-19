@@ -277,6 +277,17 @@ Append one entry at every run start and at each task, blocker, paid-call, contex
 - Paid call and ledger entry: None
 - Exact next action: publish this focused correction and require the entire public workflow—not only the tracker steps—to pass.
 
+### M1-RUN-20260719-001 / workflow-checkpoint public green / M1-P01-T07
+
+- Status: Complete for public validation of the autonomous-workflow checkpoint.
+- Branch/ref: published checkpoint `48fbb83`; GitHub Actions run `29702830233`.
+- Files or artifacts: complete public Validate workflow and decoded prior-failure logs.
+- Decisions: the two failed runs remain auditable evidence of the CRLF gaps; only the fully green replacement is promoted to INDEX as current validation.
+- Validation and exact result: every public step passed—work-state Audit, expanded checker regressions, root/runtime data parity, verified Godot 4.6.3 download/version, deterministic core tests, 360×800/393×852/480×960 UI smoke, and deterministic visual-QA contracts.
+- Blockers or risks: none. Clean fresh-context model verification and final remote/worktree checks remain before user handoff.
+- Paid call and ledger entry: None
+- Exact next action: publish this evidence-only handoff update, require its CI to remain green, then run the clean Terra/High resume test and return the stored prompt.
+
 ## Entry Template
 
 ### RUN-ID / timestamp / task-or-boundary
