@@ -4,9 +4,9 @@ milestone: "M1"
 workflow_state: "active"
 continuation_mode: "autonomous"
 active_phase: "M1-P01"
-current_task: "M1-P01-T04"
+current_task: "M1-P01-T05"
 run_id: "M1-RUN-20260719-001"
-exact_next_action: "M1-P01-T04: include stream ID and purpose in the named RNG derivation tuple, salt combat by both cohort identities, and prove stream separation plus repeated deterministic combat output."
+exact_next_action: "M1-P01-T05: recursively project the nested income event payload to its documented public fields and prove private nested values cannot enter observable events."
 last_completed_phase_tag: "m1-p00"
 last_checkpoint_ref: "milestone/m1-vertical-slice"
 last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29702830233, including work-state regressions, data parity, pinned Godot 4.6.3 core, three-size UI smoke, and visual-contract tests; substantive review keeps T04-T06 reopened."
@@ -19,7 +19,7 @@ last_green_validation: "Workflow checkpoint 48fbb83 passed GitHub Actions run 29
 - Branch: `milestone/m1-vertical-slice`
 - Protected baseline: `m1-baseline` at `4b7dc89`
 - Earliest incomplete phase: `M1-P01`
-- Active coordinator task: `M1-P01-T04`
+- Active coordinator task: `M1-P01-T05`
 - Continuation mode: `autonomous`
 - Open blockers: none
 
@@ -39,7 +39,7 @@ Allowed phase states are `Planned`, `Ready`, `Active`, `Gate Review`, `Hygiene`,
 
 ## Resume Handoff
 
-- Current task: `M1-P01-T04`
+- Current task: `M1-P01-T05`
 - Continuation mode: `autonomous`
 - Exact handoff: Fresh source review reopened T02, T04, T05, and dependent T06.
   T02 is repaired. Continue with T04 RNG tuple/combat salts, then T05 recursive

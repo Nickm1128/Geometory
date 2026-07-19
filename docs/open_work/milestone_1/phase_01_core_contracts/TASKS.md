@@ -18,11 +18,11 @@
   - Definition of done: validate every executed adjacent edge; stop at invalid/walled edges; merge friendly cohorts deterministically, clear both queues, and emit an event; resolve controller-first defender combat before applying surviving control and capital transfer.
   - Evidence: 2026-07-19 movement revalidates each executed edge and preserves blocked queues with events; same-owner stacks merge into the stable destination, clear queues, and emit merge events; combat tiles resolve in stable order and control applies only after combat. Focused movement/combat assertions and full three-size UI smoke pass; core suite has only 3 intentional T04/T05 red assertions and no engine errors.
 
-- [ ] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
+- [x] `M1-P01-T04` Add the turn cap, owned RNG streams, and canonical SHA-256 state hashes.
   - Dependencies: M1-P01-T02, M1-P01-T03
   - Can run early: No
   - Definition of done: resolve an unfinished match as a deterministic draw after player-turn 80; isolate deterministic research/combat/bot streams; canonicalize all gameplay-relevant state and prove repeated hashes.
-  - Evidence: Reopened 2026-07-19 after fresh source review: canonical projection and turn cap are sound, but RNG derivation omits recorded `stream_id`/`purpose` and combat salts omit defender cohort identity. Remediate documented stream tuple and combat-key scope, then prove stream separation and repeated deterministic output.
+  - Evidence: Reopened and repaired 2026-07-19. `RngRules` now mixes derivation version, `stream_id`, purpose, salt namespace, operation salt, and match seed. Combat's operation salt includes tile, exchange, sorted attacker cohort IDs, and sorted defender cohort IDs. Pinned Godot 4.6.3 contracts prove descriptor changes separate streams, cohort identities change combat salts, and repeat seeded combat identically.
 
 - [ ] `M1-P01-T05` Replace direct bot core access with the fog-safe observable snapshot contract.
   - Dependencies: M1-P01-T01, M1-P01-T02

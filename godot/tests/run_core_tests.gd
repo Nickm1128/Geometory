@@ -4,6 +4,7 @@ const GameCoreScript := preload("res://scripts/core/game_core.gd")
 const ConfigLoaderScript := preload("res://scripts/core/config_loader.gd")
 const BaselineBotScript := preload("res://scripts/core/baseline_bot.gd")
 const CombatRulesScript := preload("res://scripts/core/combat_rules.gd")
+const RngRulesScript := preload("res://scripts/core/rng_rules.gd")
 
 var failures := 0
 
@@ -224,6 +225,12 @@ func _test_turn_cap_rng_and_hash_contracts(configs: Dictionary) -> void:
   var research_stream = hash_core.state["rng_streams"].get("research", {})
   _assert(typeof(research_stream) == TYPE_DICTIONARY and String(research_stream.get("stream_id", "")) == "research" and String(research_stream.get("purpose", "")) == "public_research_schedule" and String(research_stream.get("salt_namespace", "")) == "research_schedule_v1", "contract: research stream records its owned derivation namespace")
   _assert(String(hash_core.state.get("research_schedule_generation_version", "")) == "research_schedule_v1", "contract: research schedule records its generation version")
+  var base_stream_hash: int = RngRulesScript.stream_hash(301, hash_core.state["rng_streams"], "research", "scope_test")
+  var changed_stream_id: Dictionary = hash_core.state["rng_streams"].duplicate(true)
+  changed_stream_id["research"]["stream_id"] = "research_changed"
+  var changed_purpose: Dictionary = hash_core.state["rng_streams"].duplicate(true)
+  changed_purpose["research"]["purpose"] = "changed_purpose"
+  _assert(base_stream_hash != RngRulesScript.stream_hash(301, changed_stream_id, "research", "scope_test") and base_stream_hash != RngRulesScript.stream_hash(301, changed_purpose, "research", "scope_test"), "contract: RNG derivation includes recorded stream ID and purpose")
 
   var capped = GameCoreScript.new()
   capped.setup(configs["rules"], configs["map"], 302)
@@ -283,6 +290,9 @@ func _test_invalid_serialization_and_combat_regressions(configs: Dictionary) -> 
     core.call("_resolve_all_combats")
     core.call("_apply_post_resolution_control")
   _assert(combat_a.canonical_state_hash() == combat_b.canonical_state_hash() and combat_a.snapshot()["replay_events"] == combat_b.snapshot()["replay_events"], "contract: seeded combat state and event order are deterministic across repeated runs")
+  var salt_a := CombatRulesScript.combat_operation_salt("T_0_0", 1, {"cohorts": [{"cohort_id": "C1"}]}, {"cohorts": [{"cohort_id": "C2"}]})
+  var salt_b := CombatRulesScript.combat_operation_salt("T_0_0", 1, {"cohorts": [{"cohort_id": "C1"}]}, {"cohorts": [{"cohort_id": "C3"}]})
+  _assert(salt_a != salt_b and salt_a.contains("attacker:C1") and salt_a.contains("defender:C2"), "contract: combat RNG salt includes both attacker and defender cohort identities")
 
 func _test_bot(configs: Dictionary) -> void:
   var core = GameCoreScript.new()

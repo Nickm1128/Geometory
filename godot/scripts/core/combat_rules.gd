@@ -40,8 +40,9 @@ static func resolve_all_combats(state: Dictionary, rules: Dictionary, roll_damag
         break
       var attacker_stack: Dictionary = state["stacks"][attacker_stack_id]
       var defender_stack: Dictionary = state["stacks"][defender_stack_id]
-      var attacker_damage := int(roll_damage.call(attacker_stack, "combat_%s_%s_%d" % [tile_id, attacker_stack_id, exchange]))
-      var defender_damage := int(roll_damage.call(defender_stack, "combat_%s_%s_%d" % [tile_id, defender_stack_id, exchange]))
+      var operation_salt := combat_operation_salt(tile_id, exchange, attacker_stack, defender_stack)
+      var attacker_damage := int(roll_damage.call(attacker_stack, "%s|attacker" % operation_salt))
+      var defender_damage := int(roll_damage.call(defender_stack, "%s|defender" % operation_salt))
       apply_damage(state, defender_stack_id, attacker_damage)
       apply_damage(state, attacker_stack_id, defender_damage)
       emit_event.call("combat_exchange", {"tile_id": tile_id, "attacker": attacker_stack["owner"], "defender": defender_stack["owner"], "attacker_damage": attacker_damage, "defender_damage": defender_damage})
@@ -98,3 +99,13 @@ static func stack_health(stack: Dictionary) -> int:
   var total := 0
   for cohort in stack.get("cohorts", []): total += int(cohort["current_total_health"])
   return total
+
+static func combat_operation_salt(tile_id: String, exchange: int, attacker_stack: Dictionary, defender_stack: Dictionary) -> String:
+  return "tile:%s|exchange:%d|attacker:%s|defender:%s" % [tile_id, exchange, _cohort_id_key(attacker_stack), _cohort_id_key(defender_stack)]
+
+static func _cohort_id_key(stack: Dictionary) -> String:
+  var cohort_ids: Array[String] = []
+  for cohort in stack.get("cohorts", []):
+    cohort_ids.append(String(cohort.get("cohort_id", "")))
+  cohort_ids.sort()
+  return ",".join(cohort_ids)

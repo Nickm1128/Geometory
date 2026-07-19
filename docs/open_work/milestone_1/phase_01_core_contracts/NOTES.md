@@ -152,3 +152,9 @@ Append-only. No implementation entries yet.
 - Status: Complete. Rejected-command diagnostics now store only stable scalar common fields and sorted field names, never a raw command value.
 - Validation: pinned Godot 4.6.3 core test passed a `RefCounted` unknown-field case proving it remains rejected, does not enter accepted history or hash scope, and leaves recursively serializable MatchState.
 - Exact next action: repair T04 RNG descriptor tuple and combat-key scope.
+
+## 2026-07-19 - M1-P01-T04 RNG derivation repair
+
+- Status: Complete. Named RNG derivation now includes the full documented descriptor tuple, and combat operation salts include tile/exchange plus sorted attacker and defender cohort identities.
+- Validation: pinned Godot 4.6.3 core contracts passed descriptor-separation and combat-salt-scope assertions with deterministic repeated combat output.
+- Exact next action: repair T05 nested income-event projection.
